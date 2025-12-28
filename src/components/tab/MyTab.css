@@ -1,0 +1,27 @@
+.my-tab-container {
+  display: flex;
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 16px;
+}
+
+.my-tab-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: gray;
+  font-weight: 500;
+  border-bottom: 3px solid transparent;
+}
+
+.my-tab-item:hover {
+  color: black;
+}
+
+.my-tab-item.active {
+  color: black;
+  border-bottom: 3px solid green;
+}
+
+.my-tab-content {
+  min-height: 360px;   /* adjust once, stays same */
+  max-height: 340px;
+}

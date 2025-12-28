@@ -1,0 +1,32 @@
+.footer-side {
+  width: 140px; 
+}
+
+.footer-center {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-back {
+  background-color:rgb(162, 144, 144) !important;
+  color: white;
+  border: none;
+}
+
+.btn-next {
+  background-color: rgb(111, 111, 237) !important;
+  color: white !important;
+  border: none;
+}
+
+.btn-save {
+  background-color: rgb(23, 170, 23) !important;
+  color: white !important;
+  border: none ;
+}
+
+.btn-reset {
+  background-color: gray !important;
+  color: white !important;
+  border: none;
+}
