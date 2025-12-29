@@ -1,15 +1,14 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
-import { FIELD_LABELS } from "./restaurantFieldValues";
-import type { TabProps } from "./TabProps";
+import type { TabProps } from "../../types/restaurantTypes";
 
 const ContactTab: React.FC<TabProps> = ({ register, errors }) => (
   <Grid container spacing={2}>
     {/* Owner Name */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyInput
-        label={FIELD_LABELS.ownerName}
+        label="Owner Name"
         placeholder="Enter your name"
         {...register("ownerName")}
         errorMessage={errors.ownerName?.message}
@@ -20,7 +19,7 @@ const ContactTab: React.FC<TabProps> = ({ register, errors }) => (
     {/* Support Email */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyInput
-        label={FIELD_LABELS.supportEmail}
+        label="Support Email"
         placeholder="Enter email"
         {...register("supportEmail")}
         errorMessage={errors.supportEmail?.message}
@@ -31,7 +30,7 @@ const ContactTab: React.FC<TabProps> = ({ register, errors }) => (
     {/* Phone */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyInput
-        label={FIELD_LABELS.phone}
+        label="Phone"
         placeholder="Enter phone no"
         {...register("phone")}
         errorMessage={errors.phone?.message}
@@ -42,7 +41,7 @@ const ContactTab: React.FC<TabProps> = ({ register, errors }) => (
     {/* Alternate Phone */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyInput
-        label={FIELD_LABELS.alternatePhone}
+        label="Alternate Phone"
         placeholder="Alternate phone no"
         {...register("alternatePhone")}
         errorMessage={errors.alternatePhone?.message}

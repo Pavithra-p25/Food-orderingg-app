@@ -2,6 +2,7 @@
 import * as yup from "yup";
 import type { RestaurantValues, RestaurantType} from "../types/restaurantTypes";
 
+
 // Define schema
 export const restaurantSchema: yup.ObjectSchema<RestaurantValues> = yup.object({
   // Login tab

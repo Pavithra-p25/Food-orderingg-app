@@ -5,15 +5,14 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { Controller } from "react-hook-form";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
-import { FIELD_LABELS } from "./restaurantFieldValues";
-import type { TabProps } from "./TabProps";
+import type { TabProps } from "../../types/restaurantTypes";
 
 const RestaurantTab: React.FC<TabProps> = ({ register, errors, control }) => (
   <Grid container spacing={2}>
     {/* Restaurant Name */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyInput
-        label={FIELD_LABELS.restaurantName}
+        label="Restaurant Name"
         placeholder="Enter restaurant name"
         {...register("restaurantName")}
         errorMessage={errors.restaurantName?.message}
@@ -24,7 +23,7 @@ const RestaurantTab: React.FC<TabProps> = ({ register, errors, control }) => (
     {/* Restaurant Type */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyDropdown
-        label={FIELD_LABELS.restaurantType}
+        label="Restaurant Type"
         options={["Veg", "Non-Veg", "Both"]}
         {...register("restaurantType")}
         errorMessage={errors.restaurantType?.message}
@@ -35,7 +34,7 @@ const RestaurantTab: React.FC<TabProps> = ({ register, errors, control }) => (
     {/* Category */}
     <Grid size={{ xs: 12, md: 6 }}>
       <MyDropdown
-        label={FIELD_LABELS.category}
+        label="Category"
         options={["Indian", "Chinese", "Fast Food", "Italian", "Mexican"]}
         {...register("category")}
         errorMessage={errors.category?.message}

@@ -1,4 +1,4 @@
-
+import type { UseFormRegister, FieldErrors, Control } from "react-hook-form";
 
 // Keys for the tabs
 export type RestaurantTabKey = "login" | "restaurant" | "contact" | "location";
@@ -13,14 +13,14 @@ export type RestaurantTabStatusMap = Record<RestaurantTabKey, TabStatus>;
 export type RestaurantType = "Veg" | "Non-Veg" | "Both";
 export const RESTAURANT_TYPES: RestaurantType[] = ["Veg", "Non-Veg", "Both"];
 
-//  Login tab fields
+// Login tab fields
 export type LoginValues = {
   email: string;
   password: string;
   confirmPassword: string;
 };
 
-//  Restaurant tab fields
+// Restaurant tab fields
 export type RestaurantTabValues = {
   restaurantName: string;
   restaurantType: RestaurantType;
@@ -54,5 +54,12 @@ export type RestaurantValues = LoginValues &
   ContactValues &
   LocationValues;
 
-//  Form errors type
+// Form errors type
 export type RestaurantFormErrors = Partial<Record<keyof RestaurantValues, string>>;
+
+// Props passed to all tab components
+export type TabProps = {
+  register: UseFormRegister<RestaurantValues>;
+  errors: FieldErrors<RestaurantValues>;
+  control?: Control<RestaurantValues>; // optional, only used in tabs that need Controller
+};
