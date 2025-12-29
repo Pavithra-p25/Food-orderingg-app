@@ -1,52 +1,51 @@
-import { Row, Col } from "react-bootstrap";
-import MyInput from "../../components/textfields/MyInput";
-import { FIELD_LABELS,VALIDATION_RULES } from "./restaurantFormValidation";
-import type { TabProps } from "./TabProps";
+import React from "react";
+import Grid from "@mui/material/Grid";
+import MyInput from "../../components/newcomponents/textfields/MyInput";
+import type { UseFormRegister,FieldErrors } from "react-hook-form";
+import type { RestaurantValues } from "../../types/restaurantTypes";
 
+interface LoginTabProps {
+  register: UseFormRegister<RestaurantValues>;
+  errors: FieldErrors<RestaurantValues>;
+}
 
-const LoginTab: React.FC<TabProps> = ({ register, errors }) => (
-  <>
-    <Row>
-      <Col md={12}>
-        <MyInput
-          label={FIELD_LABELS.email}
-          placeholder="Enter email / username"
-          {...register("email", VALIDATION_RULES.email)}
-          error={errors.email?.message}
-          required
-        />
-      </Col>
-    </Row>
+const LoginTab: React.FC<LoginTabProps> = ({ register, errors }) => (
+  <Grid container spacing={2}>
+    {/* Email / Username */}
+    <Grid size={12}>
+      <MyInput
+        label="Email / Username"
+        placeholder="Enter email / username"
+        {...register("email")}
+        errorMessage={errors.email?.message} // string | undefined
+        required
+      />
+    </Grid>
 
-    <Row>
-      <Col md={12}>
-        <MyInput
-          label={FIELD_LABELS.password}
-          type="password"
-          placeholder="Enter password"
-          {...register("password", VALIDATION_RULES.password)}
-          error={errors.password?.message}
-          required
-        />
-      </Col>
-    </Row>
+    {/* Password */}
+    <Grid size={12}>
+      <MyInput
+        label="Password"
+        type="password"
+        placeholder="Enter password"
+        {...register("password")}
+        errorMessage={errors.password?.message}
+        required
+      />
+    </Grid>
 
-    <Row>
-      <Col md={12}>
-        <MyInput
-          label={FIELD_LABELS.confirmPassword}
-          type="password"
-          placeholder="Re-enter password"
-          {...register(
-            "confirmPassword",
-            VALIDATION_RULES.confirmPassword
-          )}
-          error={errors.confirmPassword?.message}
-          required
-        />
-      </Col>
-    </Row>
-  </>
+    {/* Confirm Password */}
+    <Grid size={12}>
+      <MyInput
+        label="Confirm Password"
+        type="password"
+        placeholder="Re-enter password"
+        {...register("confirmPassword")}
+        errorMessage={errors.confirmPassword?.message}
+        required
+      />
+    </Grid>
+  </Grid>
 );
 
 export default LoginTab;

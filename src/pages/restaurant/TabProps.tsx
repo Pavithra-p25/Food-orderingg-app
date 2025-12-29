@@ -1,11 +1,12 @@
 import type {
-  FieldErrors,
   UseFormRegister,
+  FieldErrors,
+  Control,
 } from "react-hook-form";
+import type { RestaurantValues } from "../../types/restaurantTypes";
 
-import type { RestaurantFormValues } from "./restaurantFormTypes";
-
-export interface TabProps {
-  register: UseFormRegister<RestaurantFormValues>;
-  errors: FieldErrors<RestaurantFormValues>;
-}
+export type TabProps = {
+  register: UseFormRegister<RestaurantValues>;
+  errors: FieldErrors<RestaurantValues>;
+  control?: Control<RestaurantValues>; // optional (only RestaurantTab needs it)
+};

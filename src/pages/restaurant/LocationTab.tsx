@@ -1,71 +1,71 @@
-import { Row, Col } from "react-bootstrap";
-import MyTextarea from "../../components/textfields/MyTextarea";
-import MyInput from "../../components/textfields/MyInput";
-import { FIELD_LABELS,VALIDATION_RULES } from "./restaurantFormValidation";
-import type { TabProps } from "./TabProps";
+import React from "react";
+import Grid from "@mui/material/Grid";
+import MyInput from "../../components/newcomponents/textfields/MyInput";
+import MyTextarea from "../../components/newcomponents/textfields/MyTextarea";
+import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import type { RestaurantValues } from "../../types/restaurantTypes";
 
-const LocationTab: React.FC<TabProps> = ({ register, errors }) => (
-  <>
-    <Row>
-      <Col md={12}>
-        <MyTextarea
-          label="Street / Address"
-          placeholder="Enter full address"
-          {...register("address", VALIDATION_RULES.address)}
-          error={errors.address?.message}
-          required
-        />
-      </Col>
-    </Row>
+interface LocationTabProps {
+  register: UseFormRegister<RestaurantValues>;
+  errors: FieldErrors<RestaurantValues>;
+}
 
-    <Row>
-      <Col md={6}>
-        <MyInput
-          label={FIELD_LABELS.city}
-          placeholder="Enter city"
-          {...register("city", VALIDATION_RULES.city)}
-          error={errors.city?.message}
-          required
-        />
-      </Col>
+const LocationTab: React.FC<LocationTabProps> = ({ register, errors }) => (
+  <Grid container spacing={2}>
+    {/* Street / Address */}
+    <Grid size={12}>
+      <MyTextarea
+        label="Street / Address"
+        placeholder="Enter full address"
+        {...register("address")}
+        errorMessage={errors.address?.message}
+        required
+      />
+    </Grid>
 
-      <Col md={6}>
-        <MyInput
-          label={FIELD_LABELS.state}
-          placeholder="Enter state"
-          {...register("state", VALIDATION_RULES.state)}
-          error={errors.state?.message}
-          required
-        />
-      </Col>
-    </Row>
+    {/* City */}
+    <Grid size={{ xs: 12, md: 6 }}>
+      <MyInput
+        label="City"
+        placeholder="Enter city"
+        {...register("city")}
+        errorMessage={errors.city?.message}
+        required
+      />
+    </Grid>
 
-    <Row>
-      <Col md={6}>
-        <MyInput
-          label={FIELD_LABELS.country}
-          placeholder="Enter country"
-          {...register(
-            "country",
-            VALIDATION_RULES.country
-          )}
-          error={errors.country?.message}
-        />
-      </Col>
+    {/* State */}
+    <Grid size={{ xs: 12, md: 6 }}>
+      <MyInput
+        label="State"
+        placeholder="Enter state"
+        {...register("state")}
+        errorMessage={errors.state?.message}
+        required
+      />
+    </Grid>
 
-      <Col md={6}>
-        <MyInput
-          label={FIELD_LABELS.pincode}
-          placeholder="Enter pincode"
-          {...register(
-            "pincode",
-            VALIDATION_RULES.pincode
-          )}
-          error={errors.pincode?.message}
-        />
-      </Col>
-    </Row>
-  </>
+    {/* Country */}
+    <Grid size={{ xs: 12, md: 6 }}>
+      <MyInput
+        label="Country"
+        placeholder="Enter country"
+        {...register("country")}
+        errorMessage={errors.country?.message}
+        required
+      />
+    </Grid>
+
+    {/* Pincode */}
+    <Grid size={{ xs: 12, md: 6 }}>
+      <MyInput
+        label="Pincode"
+        placeholder="Enter pincode"
+        {...register("pincode")}
+        errorMessage={errors.pincode?.message}
+      />
+    </Grid>
+  </Grid>
 );
 
 export default LocationTab;

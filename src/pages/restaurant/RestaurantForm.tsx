@@ -12,7 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./restaurantform.css";
 
 //  Type imports
-import type { RestaurantFormValues,RestaurantTabKey } from "../../types/restaurantFormTypes";
+import type { RestaurantValues,RestaurantTabKey } from "../../types/restaurantTypes";
 
 interface Props {
   show: boolean; //modal is visible or not
@@ -38,12 +38,12 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     formState: { errors }, //validation errors
     reset,
     trigger,
-  } = useForm<RestaurantFormValues>({
+  } = useForm<RestaurantValues>({
     mode: "onChange", //when user type validation occur
   });
 
   //  SUBMIT
-  const onSubmit = (data: RestaurantFormValues) => {
+  const onSubmit = (data: RestaurantValues) => {
     setToastMsg("Restaurant registered successfully");
     setShowToast(true);
     console.log("Submitted Data:", data);
@@ -104,7 +104,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   //  which fields need validation tab wise
   const TAB_FIELDS: Record<
     RestaurantTabKey,
-    (keyof RestaurantFormValues)[]
+    (keyof RestaurantValues)[]
   > = {
     login: ["email", "password", "confirmPassword"],
 
