@@ -69,7 +69,7 @@ useEffect(() => {
   };
 
   if (id) fetchRestaurant();
-}, [id]); // ✅ Removed getRestaurantDetails from dependencies
+}, [id]); 
 
 
   // favorite handler

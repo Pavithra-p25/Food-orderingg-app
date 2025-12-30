@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Form } from "react-bootstrap";
 import { useForm, FormProvider } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup"; // Added for schema
+import { yupResolver } from "@hookform/resolvers/yup"; //connect yup with rhf
 import LoginTab from "./LoginTab";
 import RestaurantTab from "./RestaurantTab";
 import ContactTab from "./ContactTab";
@@ -35,10 +35,10 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
-  //  REACT HOOK FORM with Yup schema
+  //  rhf with Yup schema
   const methods = useForm<RestaurantValues>({
     mode: "onChange", //when user type validation occur
-    resolver: yupResolver(restaurantSchema), // <-- using schema for validation
+    resolver: yupResolver(restaurantSchema), // schema for validation
     defaultValues: {
       email: "",
       password: "",
@@ -161,13 +161,15 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
         <Modal.Body>
           <Form onSubmit={handleSubmit(onSubmit)}>
             {/*rhf handlesubmit to trigger onsubmit*/}
-<LocalizationProvider dateAdapter={AdapterDayjs}>
-            <MyTabs
-              tabs={tabsData}
-              activeTab={tabOrder.indexOf(activeTab)}
-              onTabChange={(index) => setActiveTab(tabOrder[index])}
-              
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>{/*adapterjs tell mui pickers to use dayjs*/}
+              {/*LocalizationProvider wraps pickers and tells 
+            them which library to use via dateAdapter.*/}
+              <MyTabs
+                tabs={tabsData}
+                activeTab={tabOrder.indexOf(activeTab)}
+                onTabChange={(index) => setActiveTab(tabOrder[index])}
+
+              />
             </LocalizationProvider>
           </Form>
         </Modal.Body>

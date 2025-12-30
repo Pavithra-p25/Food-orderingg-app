@@ -1,5 +1,4 @@
-// src/schemas/restaurantSchema.ts
-import * as yup from "yup";
+import * as yup from "yup";//schema validation library 
 import type { RestaurantValues, RestaurantType} from "../types/restaurantTypes";
 
 // Define schema
@@ -15,11 +14,11 @@ export const restaurantSchema: yup.ObjectSchema<RestaurantValues> = yup.object({
   // Restaurant tab
   restaurantName: yup.string().required("Restaurant name is required"),
   restaurantType: yup
-  .mixed<RestaurantType>()
+  .mixed<RestaurantType>() //mixed can be any type (string number object etc)
   .oneOf(["Veg", "Non-Veg", "Both"], "Invalid restaurant type")
   .required("Restaurant type is required"),
    category: yup.string().required("Category is required"),
-   averageDeliveryTime: yup.string().notRequired(),
+   averageDeliveryTime: yup.string().optional(),
 
   // Contact tab
   ownerName: yup.string().required("Owner name is required"),

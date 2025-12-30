@@ -12,7 +12,7 @@ import { DELIVERY_TIME_OPTIONS } from "../../types/restaurantTypes";
 
 
 const RestaurantTab: React.FC = () => {
-  const { register, control, formState: { errors } } = useFormContext<RestaurantValues>();
+  const { control, formState: { errors } } = useFormContext<RestaurantValues>();
 
   return (
     <Grid container spacing={2}>
@@ -21,12 +21,13 @@ const RestaurantTab: React.FC = () => {
         <MyInput
           label="Restaurant Name"
           placeholder="Enter restaurant name"
-          {...register("restaurantName")}
+          name="restaurantName"
+          control={control}
           errorMessage={errors.restaurantName?.message}
           required
-          control={control}
         />
       </Grid>
+
 
       {/* Restaurant Type */}
       <Grid size={{ xs: 12, md: 6 }}>
@@ -89,9 +90,9 @@ const RestaurantTab: React.FC = () => {
           render={({ field }) => (
             <TimePicker
               label="Closing Time"
-              value={field.value ? dayjs(field.value) : null}
+              value={field.value ? dayjs(field.value) : null}//convert stored value to dayjs object,pass to timepicker,pass null if no value
               onChange={(newValue) =>
-                field.onChange(newValue?.toISOString())
+                field.onChange(newValue?.toISOString()) // convert back to ISO string for rhf state
               }
               slotProps={{ textField: { fullWidth: true } }}
             />
@@ -105,18 +106,30 @@ const RestaurantTab: React.FC = () => {
           label="Website / Social Link"
           type="url"
           placeholder="Enter your website link"
-          {...register("website")}
-          errorMessage={errors.website?.message}
+          name="website"
           control={control}
+          errorMessage={errors.website?.message}
         />
+
       </Grid>
 
       {/* Upload Logo */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <Button variant="outlined" component="label" fullWidth>
-          Upload Logo
-          <input type="file" hidden {...register("logo")} />
-        </Button>
+        <Controller
+          name="logo"
+          control={control}
+          render={({ field }) => (
+            <Button variant="outlined" component="label" fullWidth>
+              Upload Logo
+              <input
+                type="file"
+                hidden
+                onChange={(e) => field.onChange(e.target.files)}
+              />
+            </Button>
+          )}
+        />
+
       </Grid>
     </Grid>
 

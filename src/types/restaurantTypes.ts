@@ -1,4 +1,4 @@
-import type { UseFormRegister, FieldErrors, Control } from "react-hook-form";
+import type { FieldErrors, Control } from "react-hook-form";
 
 // Keys for the tabs
 export type RestaurantTabKey = "login" | "restaurant" | "contact" | "location";
@@ -63,11 +63,10 @@ export type RestaurantValues = LoginValues &
   LocationValues;
 
 // Form errors type
-export type RestaurantFormErrors = Partial<Record<keyof RestaurantValues, string>>;
+export type RestaurantFormErrors = Partial<Record<keyof RestaurantValues, string>>; //partial makes  fields optional
 
 // Props passed to all tab components
 export type TabProps = {
-  register: UseFormRegister<RestaurantValues>;
-  errors: FieldErrors<RestaurantValues>;
+  errors: FieldErrors<RestaurantValues>; // showing validation errors
   control: Control<RestaurantValues>; // optional, only used in tabs that need Controller
 };
