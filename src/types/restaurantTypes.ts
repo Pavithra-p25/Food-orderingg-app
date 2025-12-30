@@ -25,7 +25,6 @@ export const DELIVERY_TIME_OPTIONS = [
   "30 - 40 mins",
   "40 - 50 mins",
   "50 - 60 mins",
-  "60+ mins",
 ];
 
 // Restaurant tab fields

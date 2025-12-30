@@ -25,3 +25,14 @@
   min-height: 360px;   /* adjust once, stays same */
   max-height: 340px;
 }
+.my-tab-item.success {
+  border-bottom: 3px solid green;
+}
+
+.my-tab-item.error {
+  border-bottom: 3px solid red;
+}
+
+.my-tab-item.neutral {
+  border-bottom: 3px solid gray;
+}

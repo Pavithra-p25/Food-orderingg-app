@@ -166,6 +166,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
               tabs={tabsData}
               activeTab={tabOrder.indexOf(activeTab)}
               onTabChange={(index) => setActiveTab(tabOrder[index])}
+              
             />
             </LocalizationProvider>
           </Form>

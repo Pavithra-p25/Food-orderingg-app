@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./MyTab.css";
+import type { TabStatus } from "../../types/restaurantTypes";
 
 export interface TabConfig {
   tabName: string; //text shown in tab header("lpgin details")
@@ -10,6 +11,7 @@ interface MyTabsProps {
   tabs: TabConfig[]; //all tabs with name content
   activeTab?: number; // which tab is active (index)
   onTabChange?: (index: number) => void; // callback when tab is clicked
+  tabStatus?: TabStatus[];
 }
 
 const MyTabs: React.FC<MyTabsProps> = ({
@@ -40,7 +42,7 @@ const MyTabs: React.FC<MyTabsProps> = ({
             key={index}
             className={`my-tab-item ${
               activeIndex === index ? "active" : "" // if there index the tab become my-tab-item-active / my-tab-item
-            }`}
+            } `}
             onClick={() => handleChange(index)}
           >
             {tab.tabName}
