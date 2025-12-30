@@ -8,7 +8,7 @@ import ContactTab from "./ContactTab";
 import LocationTab from "./LocationTab";
 import MyToast from "../../components/toast/MyToast";
 import MyButton from "../../components/button/MyButton";
-import MyTabs from "../../components/tab/MyTab";
+import MyTabs from "../../components/newcomponents/tabs/MyTab";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./restaurantform.css";
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -158,21 +158,24 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
           <Modal.Title className="w-100 text-center">Register Your Restaurant</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            {/*rhf handlesubmit to trigger onsubmit*/}
-            <LocalizationProvider dateAdapter={AdapterDayjs}>{/*adapterjs tell mui pickers to use dayjs*/}
-              {/*LocalizationProvider wraps pickers and tells 
-            them which library to use via dateAdapter.*/}
-              <MyTabs
-                tabs={tabsData}
-                activeTab={tabOrder.indexOf(activeTab)}
-                onTabChange={(index) => setActiveTab(tabOrder[index])}
+       <Modal.Body>
+  <Form onSubmit={handleSubmit(onSubmit)}>
+    {/*rhf handlesubmit to trigger onsubmit*/}
+    <LocalizationProvider dateAdapter={AdapterDayjs}>{/*adapterjs tell mui pickers to use dayjs*/}
+      {/*LocalizationProvider wraps pickers and tells 
+    them which library to use via dateAdapter.*/}
 
-              />
-            </LocalizationProvider>
-          </Form>
-        </Modal.Body>
+      <MyTabs
+        tabs={tabsData}
+        activeTab={tabOrder.indexOf(activeTab)} // convert string to index
+        onTabChange={(index) => setActiveTab(tabOrder[index])} // convert index back to string
+        
+      />
+
+    </LocalizationProvider>
+  </Form>
+</Modal.Body>
+
 
         {/* FOOTER */}
         <Modal.Footer className="border-0">
