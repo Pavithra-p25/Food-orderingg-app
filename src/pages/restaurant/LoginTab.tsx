@@ -1,51 +1,52 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
-import type { UseFormRegister,FieldErrors } from "react-hook-form";
-import type { RestaurantValues } from "../../types/restaurantTypes";
+import { useFormContext } from "react-hook-form";
 
-interface LoginTabProps {
-  register: UseFormRegister<RestaurantValues>;
-  errors: FieldErrors<RestaurantValues>;
-}
+const LoginTab: React.FC = () => {
+  const { control, formState: { errors } } = useFormContext();
 
-const LoginTab: React.FC<LoginTabProps> = ({ register, errors }) => (
-  <Grid container spacing={2}>
-    {/* Email / Username */}
-    <Grid size={12}>
-      <MyInput
-        label="Email / Username"
-        placeholder="Enter email / username"
-        {...register("email")}
-        errorMessage={errors.email?.message} // string | undefined
-        required
-      />
+  return (
+    <Grid container spacing={2}>
+      {/* Email */}
+      <Grid size={12}>
+        <MyInput
+          name="email"
+          control={control}
+          label="Email"
+          placeholder="Enter email"
+          required
+          errorMessage={errors.email?.message?.toString()}
+        />
+      </Grid>
+
+      {/* Password */}
+      <Grid size={12}>
+        <MyInput
+          name="password"
+          type="password"
+          control={control}
+          label="Password"
+          placeholder="Enter password"
+          required
+          errorMessage={errors.password?.message?.toString()}
+        />
+      </Grid>
+
+      {/* Confirm Password */}
+      <Grid size={12}>
+        <MyInput
+          name="confirmPassword"
+          type="password"
+          control={control}
+          label="Confirm Password"
+          placeholder="Re-enter password"
+          required
+          errorMessage={errors.confirmPassword?.message?.toString()}
+        />
+      </Grid>
     </Grid>
-
-    {/* Password */}
-    <Grid size={12}>
-      <MyInput
-        label="Password"
-        type="password"
-        placeholder="Enter password"
-        {...register("password")}
-        errorMessage={errors.password?.message}
-        required
-      />
-    </Grid>
-
-    {/* Confirm Password */}
-    <Grid size={12}>
-      <MyInput
-        label="Confirm Password"
-        type="password"
-        placeholder="Re-enter password"
-        {...register("confirmPassword")}
-        errorMessage={errors.confirmPassword?.message}
-        required
-      />
-    </Grid>
-  </Grid>
-);
+  );
+};
 
 export default LoginTab;

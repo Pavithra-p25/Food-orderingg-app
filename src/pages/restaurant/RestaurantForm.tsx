@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Modal, Form} from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { Modal, Form } from "react-bootstrap";
+import { useForm, FormProvider } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup"; // Added for schema
 import LoginTab from "./LoginTab";
 import RestaurantTab from "./RestaurantTab";
 import ContactTab from "./ContactTab";
@@ -10,9 +11,15 @@ import MyButton from "../../components/button/MyButton";
 import MyTabs from "../../components/tab/MyTab";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./restaurantform.css";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+
+// Schema import
+import { restaurantSchema } from "../../schemas/restaurantSchema";
 
 //  Type imports
-import type { RestaurantValues,RestaurantTabKey } from "../../types/restaurantTypes";
+import type { RestaurantValues, RestaurantTabKey } from "../../types/restaurantTypes";
 
 interface Props {
   show: boolean; //modal is visible or not
@@ -20,27 +27,39 @@ interface Props {
 }
 
 const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
-  const [activeTab, setActiveTab] =
-    useState<RestaurantTabKey>("login"); //which tab is currently active
+  const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
 
   const [showConfirm, setShowConfirm] = useState(false); //confirm toast is open or not
-  const [actionType, setActionType] = useState<
-    "register" | "reset" | "cancel" | null
-  >(null); //which action is triggred
+  const [actionType, setActionType] = useState<"register" | "reset" | "cancel" | null>(null); //which action is triggred
 
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
-  //  REACT HOOK FORM
-  const {
-    register, //connect form field with validation
-    handleSubmit, //handle form submission
-    formState: { errors }, //validation errors
-    reset,
-    trigger,
-  } = useForm<RestaurantValues>({
+  //  REACT HOOK FORM with Yup schema
+  const methods = useForm<RestaurantValues>({
     mode: "onChange", //when user type validation occur
+    resolver: yupResolver(restaurantSchema), // <-- using schema for validation
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      restaurantName: "",
+      restaurantType: undefined,
+      category: "",
+      logo: undefined,
+      ownerName: "",
+      supportEmail: "",
+      phone: "",
+      alternatePhone: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+    },
   });
+
+  const { handleSubmit, reset, trigger } = methods;
 
   //  SUBMIT
   const onSubmit = (data: RestaurantValues) => {
@@ -50,9 +69,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   };
 
   //  CONFIRMATION
-  const handleConfirmOpen = (
-    type: "register" | "reset" | "cancel"
-  ) => {
+  const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
     setActionType(type);
     setShowConfirm(true);
   };
@@ -60,7 +77,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const handleConfirmYes = async () => {
     if (actionType === "register") {
       if (activeTab === "location") {
-        const isValid = await trigger();
+        const isValid = await trigger(); // validate all fields before submit
         if (!isValid) {
           setShowConfirm(false);
           return;
@@ -74,7 +91,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
         return;
       }
 
-      // validate only current tab
+      // validate only current tab fields
       const isValid = await trigger(TAB_FIELDS[activeTab]);
       if (!isValid) {
         setShowConfirm(false);
@@ -101,37 +118,15 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     }
   };
 
-  //  which fields need validation tab wise
-  const TAB_FIELDS: Record<
-    RestaurantTabKey,
-    (keyof RestaurantValues)[]
-  > = {
+  //  which fields need validation tab wise (for trigger)
+  const TAB_FIELDS: Record<RestaurantTabKey, (keyof RestaurantValues)[]> = {
     login: ["email", "password", "confirmPassword"],
-
-    restaurant: ["restaurantName", "restaurantType", "category"],
-
-    contact: [
-      "ownerName",
-      "supportEmail",
-      "phone",
-      "alternatePhone",
-    ],
-
-    location: [
-      "address",
-      "city",
-      "state",
-      "country",
-      "pincode",
-    ],
+    restaurant: ["restaurantName", "restaurantType", "category", "logo"],
+    contact: ["ownerName", "supportEmail", "phone", "alternatePhone"],
+    location: ["address", "city", "state", "country", "pincode"],
   };
 
-  const tabOrder: RestaurantTabKey[] = [
-    "login",
-    "restaurant",
-    "contact",
-    "location",
-  ];
+  const tabOrder: RestaurantTabKey[] = ["login", "restaurant", "contact", "location"];
 
   const goNext = () => {
     const index = tabOrder.indexOf(activeTab);
@@ -149,39 +144,30 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
 
   //  TAB CONTENTS
   const tabsData = [
-  { tabName: "Login Details", tabContent: <LoginTab register={register} errors={errors} /> },
-  { tabName: "Restaurant Details", tabContent: <RestaurantTab register={register} errors={errors} /> },
-  { tabName: "Contact Info", tabContent: <ContactTab register={register} errors={errors} /> },
-  { tabName: "Location Details", tabContent: <LocationTab register={register} errors={errors} /> },
-];
+    { tabName: "Login Details", tabContent: <LoginTab /> },
+    { tabName: "Restaurant Details", tabContent: <RestaurantTab /> },
+    { tabName: "Contact Info", tabContent: <ContactTab /> },
+    { tabName: "Location Details", tabContent: <LocationTab /> },
+  ];
 
   return (
-    <>
+    <FormProvider {...methods}>
       {/* MAIN FORM MODAL */}
-      <Modal
-        show={show}
-        onHide={onClose}
-        centered
-        size="lg"
-        backdrop="static"
-      >
+      <Modal show={show} onHide={onClose} centered size="lg" backdrop="static">
         <Modal.Header closeButton className="border-0">
-          <Modal.Title className="w-100 text-center">
-            Register Your Restaurant
-          </Modal.Title>
+          <Modal.Title className="w-100 text-center">Register Your Restaurant</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <Form onSubmit={handleSubmit(onSubmit)}>
             {/*rhf handlesubmit to trigger onsubmit*/}
-
+<LocalizationProvider dateAdapter={AdapterDayjs}>
             <MyTabs
               tabs={tabsData}
               activeTab={tabOrder.indexOf(activeTab)}
-              onTabChange={(index) =>
-                setActiveTab(tabOrder[index])
-              }
+              onTabChange={(index) => setActiveTab(tabOrder[index])}
             />
+            </LocalizationProvider>
           </Form>
         </Modal.Body>
 
@@ -189,56 +175,22 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
         <Modal.Footer className="border-0">
           <div className="w-100 d-flex align-items-center">
             {/* LEFT */}
-            <div
-              className="footer-side d-flex justify-content-start"
-              style={{ width: "150px" }}
-            >
-              {activeTab !== "login" && (
-                <MyButton
-                  className="btn-back"
-                  onClick={goBack}
-                >
-                  Back
-                </MyButton>
-              )}
+            <div className="footer-side d-flex justify-content-start" style={{ width: "150px" }}>
+              {activeTab !== "login" && <MyButton className="btn-back" onClick={goBack}>Back</MyButton>}
             </div>
 
             {/* CENTER */}
             <div className="footer-center d-flex justify-content-center flex-grow-1 gap-2">
-              <MyButton
-                className="btn-save"
-                onClick={() =>
-                  handleConfirmOpen("register")
-                }
-              >
-                {activeTab === "location"
-                  ? "Save & Register"
-                  : "Save"}
+              <MyButton className="btn-save" onClick={() => handleConfirmOpen("register")}>
+                {activeTab === "location" ? "Save & Register" : "Save"}
               </MyButton>
 
-              <MyButton
-                className="btn-reset"
-                onClick={() =>
-                  handleConfirmOpen("reset")
-                }
-              >
-                Reset
-              </MyButton>
+              <MyButton className="btn-reset" onClick={() => handleConfirmOpen("reset")}>Reset</MyButton>
             </div>
 
             {/* RIGHT */}
-            <div
-              className="footer-side d-flex justify-content-end"
-              style={{ width: "150px" }}
-            >
-              {activeTab !== "location" && (
-                <MyButton
-                  className="btn-next"
-                  onClick={goNext}
-                >
-                  Next
-                </MyButton>
-              )}
+            <div className="footer-side d-flex justify-content-end" style={{ width: "150px" }}>
+              {activeTab !== "location" && <MyButton className="btn-next" onClick={goNext}>Next</MyButton>}
             </div>
           </div>
         </Modal.Footer>
@@ -249,27 +201,14 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
         <Modal.Body className="text-center">
           Are you sure?
           <div className="d-flex justify-content-center gap-2 mt-3">
-            <MyButton
-              onClick={() => setShowConfirm(false)}
-            >
-              No
-            </MyButton>
-            <MyButton
-              className="btn-save"
-              onClick={handleConfirmYes}
-            >
-              Yes
-            </MyButton>
+            <MyButton onClick={() => setShowConfirm(false)}>No</MyButton>
+            <MyButton className="btn-save" onClick={handleConfirmYes}>Yes</MyButton>
           </div>
         </Modal.Body>
       </Modal>
 
-      <MyToast
-        show={showToast}
-        message={toastMsg}
-        onClose={() => setShowToast(false)}
-      />
-    </>
+      <MyToast show={showToast} message={toastMsg} onClose={() => setShowToast(false)} />
+    </FormProvider>
   );
 };
 

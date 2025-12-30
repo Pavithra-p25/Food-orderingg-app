@@ -20,6 +20,7 @@ export const restaurantSchema: yup.ObjectSchema<RestaurantValues> = yup.object({
   .oneOf(["Veg", "Non-Veg", "Both"], "Invalid restaurant type")
   .required("Restaurant type is required"),
    category: yup.string().required("Category is required"),
+   averageDeliveryTime: yup.string().notRequired(),
 
   // Contact tab
   ownerName: yup.string().required("Owner name is required"),

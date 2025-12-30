@@ -20,6 +20,14 @@ export type LoginValues = {
   confirmPassword: string;
 };
 
+export const DELIVERY_TIME_OPTIONS = [
+  "20 - 30 mins",
+  "30 - 40 mins",
+  "40 - 50 mins",
+  "50 - 60 mins",
+  "60+ mins",
+];
+
 // Restaurant tab fields
 export type RestaurantTabValues = {
   restaurantName: string;
@@ -27,6 +35,7 @@ export type RestaurantTabValues = {
   category: string;
   openingTime?: string;
   closingTime?: string;
+  averageDeliveryTime: string;
   website?: string;
   logo: FileList;
 };
@@ -61,5 +70,5 @@ export type RestaurantFormErrors = Partial<Record<keyof RestaurantValues, string
 export type TabProps = {
   register: UseFormRegister<RestaurantValues>;
   errors: FieldErrors<RestaurantValues>;
-  control?: Control<RestaurantValues>; // optional, only used in tabs that need Controller
+  control: Control<RestaurantValues>; // optional, only used in tabs that need Controller
 };

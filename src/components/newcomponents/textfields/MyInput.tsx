@@ -1,23 +1,43 @@
-import React from "react";
+import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
 import { TextField } from "@mui/material";
-import type { TextFieldProps } from "@mui/material/TextField";
 
-type MyInputProps = TextFieldProps & {
-  errorMessage?: string; // renamed to avoid collision with MUI's 'error' boolean
+type MyInputProps<T extends FieldValues> = {
+  name: Path<T>;
+  control: Control<T>;
+  label: string;
+  placeholder?: string;
+  type?: string;
+  required?: boolean;
+  errorMessage?: string;
 };
 
-const MyInput = React.forwardRef<HTMLInputElement, MyInputProps>(
-  ({ errorMessage, ...rest }, ref) => {
-    return (
-      <TextField
-        {...rest}
-        fullWidth
-        error={Boolean(errorMessage)} // boolean for MUI
-        helperText={errorMessage} // string for error message
-        inputRef={ref}
-      />
-    );
-  }
-);
+const MyInput = <T extends FieldValues>({
+  name,
+  control,
+  label,
+  placeholder,
+  type = "text",
+  required = false,
+  errorMessage,
+}: MyInputProps<T>) => {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <TextField
+          {...field}
+          fullWidth
+          label={label}
+          placeholder={placeholder}
+          type={type}
+          required={required}
+          error={Boolean(errorMessage)}
+          helperText={errorMessage}
+        />
+      )}
+    />
+  );
+};
 
 export default MyInput;

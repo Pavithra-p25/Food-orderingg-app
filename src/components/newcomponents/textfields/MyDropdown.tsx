@@ -1,42 +1,52 @@
 import React from "react";
 import { TextField, MenuItem } from "@mui/material";
-import type { TextFieldProps } from "@mui/material/TextField";
+import { Controller } from "react-hook-form";
+import type { Control, FieldErrors } from "react-hook-form";
 
-type MyDropdownProps = Omit<TextFieldProps, "error" | "helperText"> & {
+type MyDropdownProps = {
+  name: string;
+  control: Control<any>;
+  label: string;
   options: string[];
-  errorMessage?: string;
+  errors?: FieldErrors<any>;
+  required?: boolean;
 };
 
-const MyDropdown = React.forwardRef<
-  HTMLInputElement,
-  MyDropdownProps
->(({ label, value, onChange, options, errorMessage, required, ...rest }, ref) => {
+const MyDropdown: React.FC<MyDropdownProps> = ({
+  name,
+  control,
+  label,
+  options,
+  errors,
+  required = false,
+}) => {
   return (
-    <TextField
-      select
-      fullWidth
-      label={label}
-      value={value ?? ""}
-      onChange={onChange}
-      required={required}
-      error={Boolean(errorMessage)}
-      helperText={errorMessage}
-      inputRef={ref}
-      {...rest}
-    >
-      <MenuItem value="">
-        Select {label}
-      </MenuItem>
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <TextField
+          {...field}
+          select
+          fullWidth
+          label={label}
+          required={required}
+          error={Boolean(errors?.[name]?.message)}
+          helperText={errors?.[name]?.message as string}
+        >
+          <MenuItem value="">
+            Select {label}
+          </MenuItem>
 
-      {options.map((opt) => (
-        <MenuItem key={opt} value={opt}>
-          {opt}
-        </MenuItem>
-      ))}
-    </TextField>
+          {options.map((opt) => (
+            <MenuItem key={opt} value={opt}>
+              {opt}
+            </MenuItem>
+          ))}
+        </TextField>
+      )}
+    />
   );
-});
-
-MyDropdown.displayName = "MyDropdown";
+};
 
 export default MyDropdown;
