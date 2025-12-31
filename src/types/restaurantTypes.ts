@@ -10,11 +10,11 @@ export type TabStatus = "neutral" | "error" | "success";
 export type RestaurantTabStatusMap = Record<RestaurantTabKey, TabStatus>;
 
 // Allowed restaurant types
-export type RestaurantType = "Veg" | "Non-Veg" | "Both";
+export type RestaurantType = "Veg" | "Non-Veg" | "Both" |"";
 export const RESTAURANT_TYPES: RestaurantType[] = ["Veg", "Non-Veg", "Both"];
 
 // Login tab fields
-export type LoginValues = {
+export type Login = {
   email: string;
   password: string;
   confirmPassword: string;
@@ -28,19 +28,19 @@ export const DELIVERY_TIME_OPTIONS = [
 ];
 
 // Restaurant tab fields
-export type RestaurantTabValues = {
+export type RestaurantData = {
   restaurantName: string;
-  restaurantType: RestaurantType;
+  restaurantType?: RestaurantType;
   category: string;
   openingTime?: string;
   closingTime?: string;
   averageDeliveryTime: string;
   website?: string;
-  logo: FileList;
+  logo?: FileList;
 };
 
 // Contact tab fields
-export type ContactValues = {
+export type Contact = {
   ownerName: string;
   supportEmail: string;
   phone: string;
@@ -48,7 +48,7 @@ export type ContactValues = {
 };
 
 // Location tab fields
-export type LocationValues = {
+export type Location = {
   address: string;
   city: string;
   state: string;
@@ -57,16 +57,16 @@ export type LocationValues = {
 };
 
 // Combined form type
-export type RestaurantValues = LoginValues &
-  RestaurantTabValues &
-  ContactValues &
-  LocationValues;
+export type Restaurant = Login &
+  RestaurantData&
+  Contact &
+  Location;
 
 // Form errors type
-export type RestaurantFormErrors = Partial<Record<keyof RestaurantValues, string>>; //partial makes  fields optional
+export type RestaurantErrors = Partial<Record<keyof Restaurant, string>>; //partial makes  fields optional
 
 // Props passed to all tab components
 export type TabProps = {
-  errors: FieldErrors<RestaurantValues>; // showing validation errors
-  control: Control<RestaurantValues>; // optional, only used in tabs that need Controller
+  errors: FieldErrors<Restaurant>; // showing validation errors
+  control: Control<Restaurant>; // optional, only used in tabs that need Controller
 };

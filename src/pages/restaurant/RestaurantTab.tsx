@@ -1,18 +1,15 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import MyTimePicker from "../../components/newcomponents/timepicker/MyTimePicker";
 import { Controller, useFormContext } from "react-hook-form";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
-import { RESTAURANT_TYPES } from "../../types/restaurantTypes";
-import type { RestaurantValues } from "../../types/restaurantTypes";
-import dayjs from 'dayjs';
-import { DELIVERY_TIME_OPTIONS } from "../../types/restaurantTypes";
-
+import type { Restaurant } from "../../types/RestaurantTypes";
+import { RESTAURANT_TYPES, DELIVERY_TIME_OPTIONS } from "../../types/RestaurantTypes";
 
 const RestaurantTab: React.FC = () => {
-  const { control, formState: { errors } } = useFormContext<RestaurantValues>();
+  const { control, formState: { errors } } = useFormContext<Restaurant>();
 
   return (
     <Grid container spacing={2}>
@@ -66,39 +63,23 @@ const RestaurantTab: React.FC = () => {
 
       {/* Opening Time */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <Controller
+        <MyTimePicker<Restaurant>
           name="openingTime"
+          label="Opening Time"
           control={control}
-          render={({ field }) => (
-            <TimePicker
-              label="Opening Time"
-              value={field.value ? dayjs(field.value) : null}
-              onChange={(newValue) =>
-                field.onChange(newValue?.toISOString())
-              }
-              slotProps={{ textField: { fullWidth: true } }}
-            />
-          )}
         />
       </Grid>
 
+
       {/* Closing Time */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <Controller
+        <MyTimePicker<Restaurant>
           name="closingTime"
+          label="Closing Time"
           control={control}
-          render={({ field }) => (
-            <TimePicker
-              label="Closing Time"
-              value={field.value ? dayjs(field.value) : null}//convert stored value to dayjs object,pass to timepicker,pass null if no value
-              onChange={(newValue) =>
-                field.onChange(newValue?.toISOString()) // convert back to ISO string for rhf state
-              }
-              slotProps={{ textField: { fullWidth: true } }}
-            />
-          )}
         />
       </Grid>
+
 
       {/* Website */}
       <Grid size={{ xs: 12, md: 6 }}>
@@ -119,7 +100,7 @@ const RestaurantTab: React.FC = () => {
           name="logo"
           control={control}
           render={({ field }) => (
-            <Button variant="outlined" component="label" fullWidth>
+            <Button variant="outlined" fullWidth component="label" sx={{ height: '56px' }}>
               Upload Logo
               <input
                 type="file"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./MyTab.css";
-import type { TabStatus } from "../../types/restaurantTypes";
+import type { TabStatus } from "../../types/RestaurantTypes";
 
 export interface TabConfig {
   tabName: string; //text shown in tab header("lpgin details")

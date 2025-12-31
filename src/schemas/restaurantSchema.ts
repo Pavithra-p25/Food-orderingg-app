@@ -1,8 +1,8 @@
 import * as yup from "yup";//schema validation library 
-import type { RestaurantValues, RestaurantType} from "../types/restaurantTypes";
+import type { Restaurant, RestaurantType} from "../types/RestaurantTypes";
 
 // Define schema
-export const restaurantSchema: yup.ObjectSchema<RestaurantValues> = yup.object({
+export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
   // Login tab
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
@@ -37,4 +37,4 @@ export const restaurantSchema: yup.ObjectSchema<RestaurantValues> = yup.object({
   openingTime: yup.string().optional(),
   closingTime: yup.string().optional(),
   website: yup.string().url("Must be a valid URL").optional(),
-}) as yup.ObjectSchema<RestaurantValues>;
+}) as yup.ObjectSchema<Restaurant>;
