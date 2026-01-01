@@ -12,20 +12,20 @@ export const restaurantDefaultValues: Restaurant = {
   category: "",            
   averageDeliveryTime: "", 
   openingTime: "",
-  closingTime: undefined,
-  website: undefined,
+  closingTime: "",
+  website:"",
   logo: undefined,
 
   // Contact Tab 
   ownerName: "",
   supportEmail: "",
   phone: "",
-  alternatePhone: undefined,
+  alternatePhone:"",
 
   // Location Tab 
   address: "",
   city: "",
   state: "",
-  pincode: undefined,
+  pincode: "",
   country: "",
 };

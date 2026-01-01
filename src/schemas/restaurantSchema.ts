@@ -1,40 +1,81 @@
 import * as yup from "yup";//schema validation library 
 import type { Restaurant, RestaurantType} from "../types/RestaurantTypes";
+import { ERROR_MESSAGES } from "../config/constants/ErrorMessages";
 
 // Define schema
 export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
   // Login tab
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  email: yup
+    .string()
+    .email(ERROR_MESSAGES.email.invalid)
+    .required(ERROR_MESSAGES.email.required),
+
+  password: yup
+    .string()
+    .min(6, ERROR_MESSAGES.password.min)
+    .required(ERROR_MESSAGES.password.required),
+
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
+    .oneOf([yup.ref("password")], ERROR_MESSAGES.password.match)
     .required("Confirm Password is required"),
 
   // Restaurant tab
-  restaurantName: yup.string().required("Restaurant name is required"),
+  restaurantName: yup
+    .string()
+    .required(ERROR_MESSAGES.restaurant.nameRequired),
+
   restaurantType: yup
-  .mixed<RestaurantType>() //mixed can be any type (string number object etc)
-  .oneOf(["Veg", "Non-Veg", "Both"], "Invalid restaurant type")
-  .required("Restaurant type is required"),
-   category: yup.string().required("Category is required"),
-   averageDeliveryTime: yup.string().optional(),
+    .mixed<RestaurantType>() //mixed can be any type (string number object etc)
+    .oneOf(["Veg", "Non-Veg", "Both"], ERROR_MESSAGES.restaurant.typeInvalid)
+    .required(ERROR_MESSAGES.restaurant.typeRequired),
+
+  category: yup
+    .string()
+    .required(ERROR_MESSAGES.restaurant.categoryRequired),
+
+  averageDeliveryTime: yup.string().optional(),
 
   // Contact tab
-  ownerName: yup.string().required("Owner name is required"),
-  supportEmail: yup.string().email("Invalid email").required("Support email is required"),
-  phone: yup.string().required("Phone is required"),
+  ownerName: yup
+    .string()
+    .required(ERROR_MESSAGES.contact.ownerNameRequired),
+
+  supportEmail: yup
+    .string()
+    .email(ERROR_MESSAGES.email.invalid)
+    .required(ERROR_MESSAGES.contact.supportEmailRequired),
+
+  phone: yup
+    .string()
+    .required(ERROR_MESSAGES.contact.phoneRequired),
+
   alternatePhone: yup.string().optional(),
 
   // Location tab
-  address: yup.string().required("Address is required"),
-  city: yup.string().required("City is required"),
-  state: yup.string().required("State is required"),
+  address: yup
+    .string()
+    .required(ERROR_MESSAGES.location.addressRequired),
+
+  city: yup
+    .string()
+    .required(ERROR_MESSAGES.location.cityRequired),
+
+  state: yup
+    .string()
+    .required(ERROR_MESSAGES.location.stateRequired),
+
   pincode: yup.string().optional(),
-  country: yup.string().required("Country is required"),
+
+  country: yup
+    .string()
+    .required(ERROR_MESSAGES.location.countryRequired),
 
   // Optional fields
   openingTime: yup.string().optional(),
   closingTime: yup.string().optional(),
-  website: yup.string().url("Must be a valid URL").optional(),
+  website: yup
+    .string()
+    .url(ERROR_MESSAGES.url.invalid)
+    .optional(),
 }) as yup.ObjectSchema<Restaurant>;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Stack, Box } from "@mui/material";
+import { DialogContent, DialogActions, Stack, Box } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -11,10 +11,11 @@ import ContactTab from "./ContactTab";
 import LocationTab from "./LocationTab";
 import MyTabs from "../../components/newcomponents/tabs/MyTab";
 import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
-import CloseIconButton from "../../components/newcomponents/button/CloseIconButton";
 import { restaurantDefaultValues } from "./restaurantDefaultValues";
 import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
+import MyDialog from "../../components/newcomponents/dialog/MyDialog";
+import { useFormHandlers } from "../../hooks/useFormHandlers";
 
 interface Props {
   show: boolean; // show or hide the dialog
@@ -24,7 +25,8 @@ interface Props {
 const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
   const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
-  const [actionType, setActionType] = useState<"register" | "reset" | "cancel" | null>(null); //which action is triggered
+  const [actionType, setActionType] =
+    useState<"register" | "reset" | "cancel" | null>(null); //which action is triggered
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -39,13 +41,12 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   });
 
   const {
-    formState: { errors }, //for tab error tracking
+    formState: { errors, isDirty }, //for tab error tracking
     watch, //check filled fields
+
   } = methods;
+
   const watchedValues = watch();
-
-
-  const { handleSubmit, reset, trigger } = methods;
 
   // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
@@ -55,60 +56,70 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     location: ["address", "city", "state", "country", "pincode"],
   };
 
-  const getTabStatus = (tab: RestaurantTabKey): "neutral" | "error" | "success" => {
-    const fields = TAB_FIELDS[tab];
-
-    const hasError = fields.some((field) => errors[field]);
-    if (hasError) return "error";
-
-    const values = fields.map((field) => watchedValues[field]);
-
-    const allFilled = values.every((val) => {
-      if (val === undefined || val === null) return false;
-
-      if (typeof val === "string") return val.trim() !== "";
-
-      return true;
-    });
-
-    return allFilled ? "success" : "neutral";
-  };
-
   //tab navigation order
-  const tabOrder: RestaurantTabKey[] = ["login", "restaurant", "contact", "location"];
+  const tabOrder: RestaurantTabKey[] = [
+    "login",
+    "restaurant",
+    "contact",
+    "location",
+  ];
 
-  const goNext = async () => {
-    // Always trigger validation for current tab (to show errors)
-    await trigger(TAB_FIELDS[activeTab]);
-
-    // Always move to next tab
-    const index = tabOrder.indexOf(activeTab);
-    if (index < tabOrder.length - 1) {
-      setActiveTab(tabOrder[index + 1]);
-    }
-  };
-
-  const goBack = async () => {
-    // Always trigger validation for current tab
-    await trigger(TAB_FIELDS[activeTab]);
-
-    // Always move to previous tab
-    const index = tabOrder.indexOf(activeTab);
-    if (index > 0) {
-      setActiveTab(tabOrder[index - 1]);
-    }
-  };
-
-
-  // SUBMIT function
   const onSubmit = (data: Restaurant) => {
+    console.log("Submitted data:", data);
     setSnackbar({
       open: true,
       message: "Restaurant registered successfully",
       severity: "success",
     });
-    console.log("Submitted Data:", data);
+    onClose();
   };
+
+
+
+  //useFormHandlers hook
+  const {
+    handleNext,
+    handleBack,
+    handleFinalSubmit,
+    handleReset,
+    handleNextOrRegister,
+  } = useFormHandlers({
+    form: methods,
+    tabOrder,
+    tabFields: TAB_FIELDS,
+    onFinalSubmit: onSubmit,
+    getIsAllTabsValid: () =>
+      Object.values(TAB_FIELDS).every((fields) =>
+        fields.every((field) => {
+          const val = watchedValues[field];
+          if (val === undefined || val === null) return false;
+          if (typeof val === "string") return val.trim() !== "";
+          return true;
+        })
+      ),
+    onConfirmRegister: () => handleConfirmOpen("register"),
+  });
+
+  const tabStatusMap = Object.fromEntries(
+    tabOrder.map((tab) => {
+      const fields = TAB_FIELDS[tab];
+      const hasError = fields.some((field) => errors[field]);
+      if (hasError) return [tab, "error"];
+      const allFilled = fields.every((field) => {
+        const val = watchedValues[field];
+        if (val === undefined || val === null) return false;
+        if (typeof val === "string") return val.trim() !== "";
+        return true;
+      });
+      return [tab, allFilled ? "success" : "neutral"];
+    })
+  ) as Record<RestaurantTabKey, "neutral" | "error" | "success">;
+
+  const isAllTabsValid = Object.values(tabStatusMap).every(
+    (status) => status === "success"
+  );
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   // CONFIRMATION
   const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
@@ -118,39 +129,20 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
 
   const handleConfirmYes = async () => {
     if (actionType === "register") {
-      if (activeTab === "location") {//if in last tab, validate all fields and submit , else validate current tab and go next
-        const isValid = await trigger(); // validate all fields before submit
-        if (!isValid) {
-          setShowConfirm(false);
-          return;
-        }
-        handleSubmit((data) => {
-          onSubmit(data); // Toast will show here
-          setShowConfirm(false);
-        })();
-        return;
-      }
-
-      // validate only current tab fields
-      const isValid = await trigger(TAB_FIELDS[activeTab]);
-      if (!isValid) {
-        setShowConfirm(false);
-        return;
-      }
-
-      goNext();
+      await handleFinalSubmit();
       setShowConfirm(false);
       return;
     }
 
     if (actionType === "reset") {
-      reset(); // reset the form fields
+      handleReset(setActiveTab, isDirty, hasErrors, () =>
+        handleConfirmOpen("reset")
+      );
       setSnackbar({
         open: true,
         message: "Form reset successfully",
         severity: "info",
       });
-      setActiveTab("login"); // go back to first tab
       setShowConfirm(false);
       return;
     }
@@ -161,70 +153,41 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     }
   };
 
-  // for tab status 
-  const tabStatusMap = {
-    login: getTabStatus("login"),
-    restaurant: getTabStatus("restaurant"),
-    contact: getTabStatus("contact"),
-    location: getTabStatus("location"),
-  };
-
-  const isAllTabsValid = Object.values(tabStatusMap).every(
-    (status) => status === "success"
-  );
-
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
-    { key: "restaurant", tabName: "Restaurant Details", tabContent: <RestaurantTab /> },
+    {
+      key: "restaurant",
+      tabName: "Restaurant Details",
+      tabContent: <RestaurantTab />,
+    },
     { key: "contact", tabName: "Contact Info", tabContent: <ContactTab /> },
-    { key: "location", tabName: "Location Details", tabContent: <LocationTab /> },
+    {
+      key: "location",
+      tabName: "Location Details",
+      tabContent: <LocationTab />,
+    },
   ];
 
   return (
     <FormProvider {...methods}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         {/* MAIN FORM MODAL */}
-        <Dialog open={show} onClose={onClose} maxWidth="md" fullWidth>
-          <DialogTitle
-            sx={{
-              textAlign: "center",
-              position: "relative",
-            }}
-          >
-            Register Your Restaurant
-
-            <Box
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: "50%",
-                transform: "translateY(-50%)",
-              }}
-            >
-              <CloseIconButton onClick={onClose} />
-            </Box>
-          </DialogTitle>
-
-
-          <DialogContent>
-            {/* Fixed height tab container */}
-            <Box sx={{ minHeight: 400, display: "flex", flexDirection: "column" }}>
-              <MyTabs
-                tabs={tabsData}
-                activeTab={tabOrder.indexOf(activeTab)}
-                onTabChange={(index) => setActiveTab(tabOrder[index])}
-                tabStatus={tabStatusMap}
-              />
-
-            </Box>
-          </DialogContent>
+        <MyDialog open={show} onClose={onClose} title="Register Your Restaurant">
+          <Box sx={{ minHeight: 400, display: "flex", flexDirection: "column" }}>
+            <MyTabs
+              tabs={tabsData}
+              activeTab={tabOrder.indexOf(activeTab)}
+              onTabChange={(index) => setActiveTab(tabOrder[index])}
+              tabStatus={tabStatusMap}
+            />
+          </Box>
 
           {/* FOOTER */}
           <DialogActions sx={{ justifyContent: "space-between", paddingX: 3 }}>
             {/* LEFT : BACK */}
             <MyButton
               variant="outlined"
-              onClick={goBack}
+              onClick={() => handleBack(activeTab, setActiveTab)}
               disabled={activeTab === "login"}
             >
               Back
@@ -234,29 +197,21 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
             <Stack direction="row" spacing={2}>
               <MyButton
                 variant="success"
-                onClick={async () => {
-                  // Always trigger validation for current tab
-                  await trigger(TAB_FIELDS[activeTab]);
-
-                  // If NOT last tab → just move forward (NO confirmation)
-                  if (activeTab !== "location") {
-                    goNext();
-                    return;
-                  }
-
-                  // Last tab + all tabs valid → ask confirmation
-                  if (isAllTabsValid) {
-                    handleConfirmOpen("register");
-                  }
-                }}
+                onClick={() => handleNextOrRegister(activeTab, setActiveTab)}
               >
                 {isAllTabsValid && activeTab === "location" ? "Register" : "Save"}
               </MyButton>
 
               <MyButton
                 variant="outlined"
-
-                onClick={() => handleConfirmOpen("reset")}
+                onClick={() =>
+                  handleReset(
+                    setActiveTab,
+                    isDirty,
+                    hasErrors,
+                    () => handleConfirmOpen("reset")
+                  )
+                }
               >
                 Reset
               </MyButton>
@@ -265,43 +220,46 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
             {/* RIGHT : NEXT */}
             <MyButton
               variant="contained"
-              onClick={goNext}
+              onClick={() => handleNext(activeTab, setActiveTab)}
               disabled={activeTab === "location"}
             >
               Next
             </MyButton>
           </DialogActions>
-        </Dialog>
+        </MyDialog>
 
         {/* CONFIRM MODAL */}
-        <Dialog open={showConfirm} onClose={() => setShowConfirm(false)} maxWidth="xs" fullWidth>
+        <MyDialog
+          open={showConfirm}
+          onClose={() => setShowConfirm(false)}
+          maxWidth="xs"
+        >
           <DialogContent sx={{ textAlign: "center" }}>
             {actionType === "register"
               ? "Proceed with restaurant registration?"
               : "Are you sure?"}
-            <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 3 }}>
-              <MyButton
-                variant="outlined"
-                onClick={() => setShowConfirm(false)}
-              >
+            <Stack
+              direction="row"
+              spacing={2}
+              justifyContent="center"
+              sx={{ mt: 3 }}
+            >
+              <MyButton variant="outlined" onClick={() => setShowConfirm(false)}>
                 No
               </MyButton>
-              <MyButton
-                variant="contained"
-                onClick={handleConfirmYes}
-              >
+              <MyButton variant="contained" onClick={handleConfirmYes}>
                 Yes
               </MyButton>
             </Stack>
           </DialogContent>
-        </Dialog>
+        </MyDialog>
 
         {/* SNACKBAR */}
         <MySnackbar
-          open={snackbar.open} //true or false
+          open={snackbar.open}
           message={snackbar.message}
-          severity={snackbar.severity} // "success" | "error" ..
-          onClose={() => setSnackbar({ ...snackbar, open: false })} //handle close
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
         />
       </LocalizationProvider>
     </FormProvider>

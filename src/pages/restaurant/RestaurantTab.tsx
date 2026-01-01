@@ -1,15 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import MyTimePicker from "../../components/newcomponents/timepicker/MyTimePicker";
 import { Controller, useFormContext } from "react-hook-form";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
+import MyButton from "../../components/newcomponents/button/MyButton";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import { RESTAURANT_TYPES, DELIVERY_TIME_OPTIONS } from "../../types/RestaurantTypes";
+import { RESTAURANT_TYPES, DELIVERY_TIME_OPTIONS } 
+from "../../config/constants/RestaurantConst";
+
+
 
 const RestaurantTab: React.FC = () => {
   const { control, formState: { errors } } = useFormContext<Restaurant>();
+ const [fileName, setFileName] = useState<string>("");
+ const [fileUrl, setFileUrl] = useState<string>("");
 
   return (
     <Grid container spacing={2}>
@@ -31,7 +36,7 @@ const RestaurantTab: React.FC = () => {
         <MyDropdown
           name="restaurantType"
           label="Restaurant Type"
-          options={RESTAURANT_TYPES}
+          options={[...RESTAURANT_TYPES]}
           control={control}
           errors={errors}
           required
@@ -55,7 +60,7 @@ const RestaurantTab: React.FC = () => {
         <MyDropdown
           name="averageDeliveryTime"
           label="Average Delivery Time"
-          options={DELIVERY_TIME_OPTIONS}
+          options={[...DELIVERY_TIME_OPTIONS]}
           control={control}
           errors={errors}
         />
@@ -95,22 +100,45 @@ const RestaurantTab: React.FC = () => {
       </Grid>
 
       {/* Upload Logo */}
-      <Grid size={{ xs: 12, md: 6 }}>
+    <Grid size={{ xs: 12, md: 6 }}>
         <Controller
           name="logo"
           control={control}
           render={({ field }) => (
-            <Button variant="outlined" fullWidth component="label" sx={{ height: '56px' }}>
-              Upload Logo
+            <>
+              <MyButton
+                variant="outlined"
+                fullWidth
+                onClick={() => document.getElementById("logo-upload")?.click()}
+                style={{ height: 56 }}
+              >
+                {fileName ? fileName : "Upload Logo"}
+              </MyButton>
               <input
                 type="file"
+                id="logo-upload"
                 hidden
-                onChange={(e) => field.onChange(e.target.files)}
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files[0]) {
+                    field.onChange(files);
+                    setFileName(files[0].name);
+                    setFileUrl(URL.createObjectURL(files[0]));
+                  }
+                }}
               />
-            </Button>
+              {fileUrl && (
+                <a
+                  href={fileUrl}
+                  download={fileName}
+                  style={{ display: "block", marginTop: 8 }}
+                >
+                  Download {fileName}
+                </a>
+              )}
+            </>
           )}
         />
-
       </Grid>
     </Grid>
 

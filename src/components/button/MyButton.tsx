@@ -10,6 +10,7 @@ interface MyButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>; //TypeScript to know the exact element type(button)
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  
 }
 
 const MyButton: React.FC<MyButtonProps> = ({

@@ -8,7 +8,9 @@ type MyInputProps<T extends FieldValues> = {
   placeholder?: string;
   type?: string;
   required?: boolean;
+  value?: string;
   errorMessage?: string;
+  onClick?: () => void;
 };
 
 const MyInput = <T extends FieldValues>({
