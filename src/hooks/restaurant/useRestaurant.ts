@@ -1,5 +1,5 @@
-import * as restaurantService  from "../services/restaurantService";
-
+import * as restaurantService  from "../../services/restaurantService";
+ 
 export const useRestaurants = () => {
   const getAllRestaurants = async () => {
     try {

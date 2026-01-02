@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyTextarea from "../../components/newcomponents/textfields/MyTextarea";
 import { useFormContext } from "react-hook-form";
+import MyCheckbox from "../../components/newcomponents/checkbox/MyCheckbox";
 
 const LocationTab: React.FC = () => {
   const {
     control,
     formState: { errors },
+    trigger,
   } = useFormContext();
+
+   useEffect(() => {
+    trigger("acceptTerms");
+  }, [trigger]);
 
   return (
     <Grid container spacing={2}>
@@ -72,6 +78,12 @@ const LocationTab: React.FC = () => {
           errorMessage={errors.pincode?.message?.toString()}
         />
       </Grid>
+
+      <MyCheckbox
+        name="acceptTerms"
+        label="I agree to the Terms & Conditions"
+      />
+
     </Grid>
   );
 };

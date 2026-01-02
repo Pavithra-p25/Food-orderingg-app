@@ -1,4 +1,4 @@
-import type { Restaurant, RestaurantTabKey } from "../types/RestaurantTypes";
+import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 
 type UseFormHandlersProps = {
   form: any; // react-hook-form methods
@@ -75,7 +75,7 @@ export function useFormHandlers({
     setActiveTab("login");
   };
 
-  // ✅ unified handler for center button (Save / Register)
+  // handler for center button (Save / Register)
   const handleNextOrRegister = async (
     activeTab: RestaurantTabKey,
     setActiveTab: (tab: RestaurantTabKey) => void
@@ -95,6 +95,18 @@ export function useFormHandlers({
     }
   };
 
+    const handleTabChange = async (
+    fromTab: RestaurantTabKey,
+    toTab: RestaurantTabKey,
+    setActiveTab: (tab: RestaurantTabKey) => void
+  ) => {
+    // trigger validation for current tab
+    await trigger(tabFields[fromTab]);
+
+    // allow navigation (errors will now appear)
+    setActiveTab(toTab);
+  };
+
   return {
     handleNext,
     handleBack,
@@ -103,5 +115,6 @@ export function useFormHandlers({
     handleFinalSubmit,
     handleReset,
     handleNextOrRegister,
+    handleTabChange,
   };
 }

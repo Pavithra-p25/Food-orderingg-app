@@ -6,15 +6,14 @@ import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import { RESTAURANT_TYPES, DELIVERY_TIME_OPTIONS } 
-from "../../config/constants/RestaurantConst";
-
-
+import { RESTAURANT_TYPES, DELIVERY_TIME_OPTIONS }
+  from "../../config/constants/RestaurantConst";
+import MyRadioButton from "../../components/newcomponents/radiobutton/MyRadioButton";
 
 const RestaurantTab: React.FC = () => {
   const { control, formState: { errors } } = useFormContext<Restaurant>();
- const [fileName, setFileName] = useState<string>("");
- const [fileUrl, setFileUrl] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");
+  const [fileUrl, setFileUrl] = useState<string>("");
 
   return (
     <Grid container spacing={2}>
@@ -33,14 +32,23 @@ const RestaurantTab: React.FC = () => {
 
       {/* Restaurant Type */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <MyDropdown
-          name="restaurantType"
-          label="Restaurant Type"
-          options={[...RESTAURANT_TYPES]}
-          control={control}
-          errors={errors}
-          required
-        />
+        <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
+          Restaurant Type
+        </label>
+
+        <Grid container spacing={2}>
+          {RESTAURANT_TYPES.map((type) => (
+            <Grid key={type}>
+              <MyRadioButton
+                name="restaurantType"
+                label={type}
+                value={type}
+              />
+            </Grid>
+          ))}
+          
+        </Grid>
+
       </Grid>
 
       {/* Category */}
@@ -100,7 +108,7 @@ const RestaurantTab: React.FC = () => {
       </Grid>
 
       {/* Upload Logo */}
-    <Grid size={{ xs: 12, md: 6 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Controller
           name="logo"
           control={control}

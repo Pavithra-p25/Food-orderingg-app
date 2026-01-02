@@ -15,7 +15,8 @@ import { restaurantDefaultValues } from "./restaurantDefaultValues";
 import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
-import { useFormHandlers } from "../../hooks/useFormHandlers";
+import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
+import { isFieldFilled } from "../../utils/formutils";
 
 interface Props {
   show: boolean; // show or hide the dialog
@@ -41,7 +42,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   });
 
   const {
-    formState: { errors, isDirty }, //for tab error tracking
+    formState: { errors, isDirty }, //for tab error tracking , dirty - any changes made
     watch, //check filled fields
 
   } = methods;
@@ -64,6 +65,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     "location",
   ];
 
+  //run only when full form is valid
   const onSubmit = (data: Restaurant) => {
     console.log("Submitted data:", data);
     setSnackbar({
@@ -74,8 +76,6 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     onClose();
   };
 
-
-
   //useFormHandlers hook
   const {
     handleNext,
@@ -83,34 +83,34 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     handleFinalSubmit,
     handleReset,
     handleNextOrRegister,
+    handleTabChange,
   } = useFormHandlers({
     form: methods,
     tabOrder,
     tabFields: TAB_FIELDS,
     onFinalSubmit: onSubmit,
+
+    //function to check if all tabs are valid , passed to useFormHandlers, hook decide when to show register
     getIsAllTabsValid: () =>
       Object.values(TAB_FIELDS).every((fields) =>
-        fields.every((field) => {
-          const val = watchedValues[field];
-          if (val === undefined || val === null) return false;
-          if (typeof val === "string") return val.trim() !== "";
-          return true;
-        })
+        fields.every((field) =>
+          isFieldFilled(watchedValues[field])
+        )
       ),
+
     onConfirmRegister: () => handleConfirmOpen("register"),
   });
 
-  const tabStatusMap = Object.fromEntries(
+  const tabStatusMap = Object.fromEntries( //track current tab status
     tabOrder.map((tab) => {
-      const fields = TAB_FIELDS[tab];
-      const hasError = fields.some((field) => errors[field]);
-      if (hasError) return [tab, "error"];
-      const allFilled = fields.every((field) => {
-        const val = watchedValues[field];
-        if (val === undefined || val === null) return false;
-        if (typeof val === "string") return val.trim() !== "";
-        return true;
-      });
+      const fields = TAB_FIELDS[tab]; //fields in the tab
+      const hasError = fields.some((field) => errors[field]); //any field has error
+      if (hasError) return [tab, "error"]; //rhf error
+
+      //runs per tab to check all fields filled
+      const allFilled = fields.every((field) =>
+        isFieldFilled(watchedValues[field])
+      );
       return [tab, allFilled ? "success" : "neutral"];
     })
   ) as Record<RestaurantTabKey, "neutral" | "error" | "success">;
@@ -119,7 +119,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     (status) => status === "success"
   );
 
-  const hasErrors = Object.keys(errors).length > 0;
+  const hasErrors = Object.keys(errors).length > 0; //convert errors object to array and check length
 
   // CONFIRMATION
   const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
@@ -155,18 +155,14 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
-    {
-      key: "restaurant",
-      tabName: "Restaurant Details",
-      tabContent: <RestaurantTab />,
-    },
+    { key: "restaurant", tabName: "Restaurant Details", tabContent: <RestaurantTab /> },
     { key: "contact", tabName: "Contact Info", tabContent: <ContactTab /> },
-    {
-      key: "location",
-      tabName: "Location Details",
-      tabContent: <LocationTab />,
-    },
+    { key: "location", tabName: "Location Details", tabContent: <LocationTab /> },
   ];
+
+  const activeTabIndex = tabOrder.indexOf(activeTab);
+  const isFirstTab = activeTabIndex === 0;
+  const isLastTab = activeTabIndex === tabOrder.length - 1;
 
   return (
     <FormProvider {...methods}>
@@ -177,7 +173,14 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
             <MyTabs
               tabs={tabsData}
               activeTab={tabOrder.indexOf(activeTab)}
-              onTabChange={(index) => setActiveTab(tabOrder[index])}
+              onTabChange={(index) =>
+                handleTabChange(
+                  activeTab,
+                  tabOrder[index],
+                  setActiveTab
+                )
+              }
+
               tabStatus={tabStatusMap}
             />
           </Box>
@@ -188,7 +191,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
             <MyButton
               variant="outlined"
               onClick={() => handleBack(activeTab, setActiveTab)}
-              disabled={activeTab === "login"}
+              disabled={isFirstTab}
             >
               Back
             </MyButton>
@@ -199,7 +202,8 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
                 variant="success"
                 onClick={() => handleNextOrRegister(activeTab, setActiveTab)}
               >
-                {isAllTabsValid && activeTab === "location" ? "Register" : "Save"}
+                {isAllTabsValid && isLastTab ? "Register" : "Save"}
+
               </MyButton>
 
               <MyButton
@@ -221,7 +225,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
             <MyButton
               variant="contained"
               onClick={() => handleNext(activeTab, setActiveTab)}
-              disabled={activeTab === "location"}
+              disabled={isLastTab}
             >
               Next
             </MyButton>

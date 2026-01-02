@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useFilter } from "../../context/FilterContext";
-import { useRestaurants } from "../../hooks/useRestaurant";
+import { useRestaurants } from "../../hooks/restaurant/useRestaurant";
 import type { Restaurant } from "../../types/types";
 import MyButton from "../../components/button/MyButton";
 import "../../components/Button/Button.css";

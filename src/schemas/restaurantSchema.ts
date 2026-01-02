@@ -18,7 +18,7 @@ export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], ERROR_MESSAGES.password.match)
-    .required("Confirm Password is required"),
+    .required(ERROR_MESSAGES.password.confirmPasswordRequired),
 
   // Restaurant tab
   restaurantName: yup
@@ -65,11 +65,16 @@ export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
     .string()
     .required(ERROR_MESSAGES.location.stateRequired),
 
-  pincode: yup.string().optional(),
+  pincode: yup.string().required(ERROR_MESSAGES.location.pincodeRequired),
 
   country: yup
     .string()
     .required(ERROR_MESSAGES.location.countryRequired),
+
+    acceptTerms: yup
+    .boolean()
+    .required(ERROR_MESSAGES.checkbox.acceptTermsRequired)
+    .oneOf([true],ERROR_MESSAGES.checkbox.acceptTermsRequired),
 
   // Optional fields
   openingTime: yup.string().optional(),

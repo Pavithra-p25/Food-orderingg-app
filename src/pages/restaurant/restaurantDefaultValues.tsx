@@ -28,4 +28,5 @@ export const restaurantDefaultValues: Restaurant = {
   state: "",
   pincode: "",
   country: "",
+  acceptTerms: false,
 };

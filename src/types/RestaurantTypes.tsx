@@ -42,6 +42,7 @@ export type Location = {
   state: string;
   pincode?: string;
   country: string;
+  acceptTerms:boolean;
 };
 
 export type Restaurant =

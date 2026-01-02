@@ -4,7 +4,7 @@ import { Container, Row, Col, Alert, Placeholder } from "react-bootstrap";
 import MyButton from "../../components/button/MyButton";
 import MyCard from "../../components/cards/MyCard";
 import "./restaurant.css";
-import { useRestaurants } from "../../hooks/useRestaurant";
+import { useRestaurants } from "../../hooks/restaurant/useRestaurant";
 
 const RestaurantDetails: React.FC = () => {
   const { id } = useParams(); // get restaurant id from URL
