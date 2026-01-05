@@ -35,20 +35,8 @@ const RestaurantTab: React.FC = () => {
         />
       </Grid>
 
-      {/* Restaurant Type */}
-      <Grid size={{ xs: 12, md: 6 }}>
-        <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
-          Restaurant Type
-        </label>
-
-        <Grid container spacing={2}>
-          {RESTAURANT_TYPES.map((type) => (
-            <Grid key={type}>
-              <MyRadioButton name="restaurantType" label={type} value={type} />
-            </Grid>
-          ))}
-        </Grid>
-      </Grid>
+     
+    
 
       {/* Category */}
       <Grid size={{ xs: 12, md: 6 }}>
@@ -153,7 +141,17 @@ const RestaurantTab: React.FC = () => {
           disableFuture={false} // allow future opening date if needed
         />
       </Grid>
+      
+        <Grid size={{ xs: 12}}>
+      <MyRadioButton
+  name="restaurantType"
+  label="Restaurant Type"
+  options={RESTAURANT_TYPES.map((type) => ({ label: type, value: type }))}
+/>
+
+      </Grid>
     </Grid>
+    
   );
 };
 

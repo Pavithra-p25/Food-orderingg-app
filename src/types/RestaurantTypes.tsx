@@ -26,7 +26,7 @@ export type RestaurantData = {
   closingTime?: string;
   averageDeliveryTime: string;
   website?: string;
-  logo?: FileList;
+  logo?: string ;
 };
 
 export type Contact = {

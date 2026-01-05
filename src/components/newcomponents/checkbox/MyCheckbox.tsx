@@ -1,51 +1,58 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { Checkbox, FormControlLabel, FormHelperText, FormGroup } from "@mui/material";
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+} from "@mui/material";
 
 interface MyCheckboxProps {
   name: string;
   label: string;
   disabled?: boolean;
+  required?: boolean;
 }
 
-const MyCheckbox: React.FC<MyCheckboxProps> = ({ name, label, disabled = false }) => {
+const MyCheckbox: React.FC<MyCheckboxProps> = ({
+  name,
+  label,
+  disabled = false,
+  required = false,
+}) => {
   const {
     control,
-    trigger,
     formState: { errors },
   } = useFormContext();
 
-  const error = errors[name];
-
-  // Trigger validation once when the component mounts
-  useEffect(() => {
-    trigger(name);
-  }, [trigger, name]);
+  const errorMessage = errors[name]?.message as string | undefined;
+  const hasError = !!errorMessage;
 
   return (
-    <FormGroup>
+    <FormControl error={hasError}>
       <Controller
         name={name}
         control={control}
+        defaultValue={false}
         render={({ field }) => (
           <FormControlLabel
             control={
               <Checkbox
-                {...field}
                 checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
                 disabled={disabled}
-                onChange={(e) => {
-                  field.onChange(e.target.checked);
-                  trigger(name); // validate on every change
-                }}
+                required={required}
               />
             }
             label={label}
           />
         )}
       />
-      {error && <FormHelperText error>{String((error as any)?.message)}</FormHelperText>}
-    </FormGroup>
+
+      {hasError && (
+        <FormHelperText>{errorMessage}</FormHelperText>
+      )}
+    </FormControl>
   );
 };
 

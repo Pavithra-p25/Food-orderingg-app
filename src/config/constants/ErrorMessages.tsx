@@ -16,7 +16,7 @@ export const ERROR_MESSAGES = {
   restaurant: {
     nameRequired: `Restaurant name ${REQUIRED_ERROR}`,
     typeRequired: `Restaurant type ${REQUIRED_ERROR}`,
-    typeInvalid: "Invalid restaurant type",
+    typeInvalid: "Select the restaurant type",
     categoryRequired: `Category ${REQUIRED_ERROR}`,
   },
   contact: {

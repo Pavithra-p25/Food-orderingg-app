@@ -1,6 +1,8 @@
 import React from "react";
 import {
   FormControl,
+  FormLabel,
+  RadioGroup,
   FormControlLabel,
   Radio,
   FormHelperText,
@@ -8,16 +10,16 @@ import {
 import { Controller, useFormContext } from "react-hook-form";
 
 interface MyRadioButtonProps {
-  name: string;
-  label: string;
-  value: string | number;
+  name: string; //field name
+  label: string; // Group label
+  options: { label: string; value: string | number }[]; //array of options
   disabled?: boolean;
 }
 
 const MyRadioButton: React.FC<MyRadioButtonProps> = ({
   name,
   label,
-  value,
+  options,
   disabled = false,
 }) => {
   const {
@@ -25,31 +27,33 @@ const MyRadioButton: React.FC<MyRadioButtonProps> = ({
     formState: { errors },
   } = useFormContext();
 
-  const error = errors[name];
+  const error = errors[name]; // get error for this field
 
   return (
-    <FormControl error={!!error} disabled={disabled}>
+    <FormControl component="fieldset" error={false} disabled={disabled}>
+      <FormLabel component="legend" sx={{ fontWeight: 500, marginBottom: 1 }}>
+        {label}
+      </FormLabel>
+
       <Controller
         name={name}
         control={control}
         render={({ field }) => (
-          <FormControlLabel
-            label={label}
-            control={
-              <Radio
-                checked={field.value === value}
-                onChange={() => field.onChange(value)}
+          <RadioGroup {...field} row>
+            {options.map((option) => (
+              <FormControlLabel
+                key={option.value}
+                value={option.value}
+                control={<Radio />}
+                label={option.label}
               />
-            }
-          />
+            ))}
+          </RadioGroup>
         )}
       />
 
-      {error && (
-        <FormHelperText>
-          {String((error as any)?.message)}
-        </FormHelperText>
-      )}
+      {/* Display error message if exists */}
+      {error && <FormHelperText error>{String((error as any)?.message)}</FormHelperText>} 
     </FormControl>
   );
 };

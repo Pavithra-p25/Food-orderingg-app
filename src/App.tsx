@@ -8,8 +8,8 @@ import { FilterProvider } from "./context/FilterContext";
 import RestaurantsPage from "./pages/restaurant/RestaurantList";
 import RestaurantDetails from "./pages/restaurant/RestaurantDetails";
 import CssBaseline from "@mui/material/CssBaseline";
-import FormTheme from "./config/theme/FormTheme";
-import { Navigate } from "react-router-dom";
+import FormTheme from "./config/theme/Theme";
+
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
 
 
@@ -31,7 +31,7 @@ const App: React.FC = () => {
             {/* MAIN CONTENT  */}
             <main className="flex-grow-1 pt-5">
               <Routes>
-<Route path="/" element={<Navigate to="/restaurants" />} />
+
                 <Route path="/restaurants" element={<RestaurantsPage />} />
                 <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */}
               </Routes>

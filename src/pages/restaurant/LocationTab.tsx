@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Grid from "@mui/material/Grid";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyTextarea from "../../components/newcomponents/textfields/MyTextarea";
@@ -9,13 +9,10 @@ const LocationTab: React.FC = () => {
   const {
     control,
     formState: { errors },
-    trigger,
+    
   } = useFormContext();
 
-   useEffect(() => {
-    trigger("acceptTerms");
-  }, [trigger]);
-
+ 
   return (
     <Grid container spacing={2}>
       {/* Address - full width */}
@@ -82,6 +79,7 @@ const LocationTab: React.FC = () => {
       <MyCheckbox
         name="acceptTerms"
         label="I agree to the Terms & Conditions"
+       required
       />
 
     </Grid>

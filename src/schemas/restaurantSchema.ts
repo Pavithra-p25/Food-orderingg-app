@@ -71,10 +71,9 @@ export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
     .string()
     .required(ERROR_MESSAGES.location.countryRequired),
 
-    acceptTerms: yup
-    .boolean()
-    .required(ERROR_MESSAGES.checkbox.acceptTermsRequired)
-    .oneOf([true],ERROR_MESSAGES.checkbox.acceptTermsRequired),
+   acceptTerms: yup
+  .boolean()
+  .oneOf([true], ERROR_MESSAGES.checkbox.acceptTermsRequired),
 
   // Optional fields
   openingTime: yup.string().optional(),

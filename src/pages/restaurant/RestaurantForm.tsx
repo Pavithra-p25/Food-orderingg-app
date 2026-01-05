@@ -27,9 +27,8 @@ interface Props {
 const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
   const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
-  const [actionType, setActionType] = useState<
-    "register" | "reset" | "cancel" | null
-  >(null); //which action is triggered
+  const [actionType, setActionType] = useState< "register" | "reset" | "cancel" | null>(null); //which action is triggered
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -45,6 +44,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   // react-hook-form with Yup schema
   const methods = useForm<Restaurant>({
     mode: "onChange", // validation occurs onChange
+    reValidateMode: "onChange",
     resolver: yupResolver(restaurantSchema),
     defaultValues: savedData ? JSON.parse(savedData) : restaurantDefaultValues,
   });
@@ -68,7 +68,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     login: ["email", "password", "confirmPassword"],
     restaurant: ["restaurantName", "restaurantType", "category"],
     contact: ["ownerName", "supportEmail", "phone"],
-    location: ["address", "city", "state", "country", "pincode"],
+    location: ["address", "city", "state", "country", "pincode","acceptTerms"],
   };
 
   //tab navigation order
@@ -79,16 +79,18 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     "location",
   ];
 
-  
+ 
+
   //run only when full form is valid
   const onSubmit = async (data: Restaurant) => {
   try {
+  
     const normalizedRestaurant = {
       id: crypto.randomUUID(),
       name: data.restaurantName,           //match existing data
       category: data.category,
       rating: 0,                            // default
-      image: "",
+      image: data.logo,                       
       menu: [],                             // required by UI
     };
 

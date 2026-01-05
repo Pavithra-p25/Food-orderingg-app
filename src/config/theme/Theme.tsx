@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 
-const FormTheme = createTheme({
+const Theme = createTheme({
   components: { //to override default MUI styles
     MuiFormHelperText: { //text below input fields
       styleOverrides: {
@@ -13,4 +13,4 @@ const FormTheme = createTheme({
   },
 });
 
-export default FormTheme;
+export default Theme;
