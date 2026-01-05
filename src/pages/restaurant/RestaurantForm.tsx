@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DialogContent, DialogActions, Stack, Box } from "@mui/material";
@@ -17,6 +17,7 @@ import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
 import { isFieldFilled } from "../../utils/formutils";
+import useRestaurants from "../../hooks/restaurant/useRestaurant";
 
 interface Props {
   show: boolean; // show or hide the dialog
@@ -26,28 +27,41 @@ interface Props {
 const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
   const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
-  const [actionType, setActionType] =
-    useState<"register" | "reset" | "cancel" | null>(null); //which action is triggered
+  const [actionType, setActionType] = useState<
+    "register" | "reset" | "cancel" | null
+  >(null); //which action is triggered
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success" as "success" | "error" | "warning" | "info",
   });
 
+  // ADDED FOR LOCAL STORAGE (load saved data)
+  const savedData = localStorage.getItem("restaurant_form_data");
+
+  //json data storing
+  const { addRestaurant } = useRestaurants();
+
   // react-hook-form with Yup schema
   const methods = useForm<Restaurant>({
     mode: "onChange", // validation occurs onChange
     resolver: yupResolver(restaurantSchema),
-    defaultValues: restaurantDefaultValues,
+    defaultValues: savedData ? JSON.parse(savedData) : restaurantDefaultValues,
   });
 
   const {
     formState: { errors, isDirty }, //for tab error tracking , dirty - any changes made
     watch, //check filled fields
-
   } = methods;
 
   const watchedValues = watch();
+
+  // ADDED FOR LOCAL STORAGE (auto save)
+  useEffect(() => {
+    if (!show) return;
+
+    localStorage.setItem("restaurant_form_data", JSON.stringify(watchedValues));
+  }, [watchedValues, show]);
 
   // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
@@ -65,16 +79,39 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     "location",
   ];
 
+  
   //run only when full form is valid
-  const onSubmit = (data: Restaurant) => {
-    console.log("Submitted data:", data);
+  const onSubmit = async (data: Restaurant) => {
+  try {
+    const normalizedRestaurant = {
+      id: crypto.randomUUID(),
+      name: data.restaurantName,           //match existing data
+      category: data.category,
+      rating: 0,                            // default
+      image: "",
+      menu: [],                             // required by UI
+    };
+
+    await addRestaurant(normalizedRestaurant);
+
+    localStorage.removeItem("restaurant_form_data");
+
     setSnackbar({
       open: true,
       message: "Restaurant registered successfully",
       severity: "success",
     });
+
     onClose();
-  };
+  } catch (error) {
+    setSnackbar({
+      open: true,
+      message: "Failed to register restaurant",
+      severity: "error",
+    });
+  }
+};
+
 
   //useFormHandlers hook
   const {
@@ -85,7 +122,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     handleNextOrRegister,
     handleTabChange,
   } = useFormHandlers({
-    form: methods,
+    methods,
     tabOrder,
     tabFields: TAB_FIELDS,
     onFinalSubmit: onSubmit,
@@ -93,15 +130,14 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     //function to check if all tabs are valid , passed to useFormHandlers, hook decide when to show register
     getIsAllTabsValid: () =>
       Object.values(TAB_FIELDS).every((fields) =>
-        fields.every((field) =>
-          isFieldFilled(watchedValues[field])
-        )
+        fields.every((field) => isFieldFilled(watchedValues[field]))
       ),
 
     onConfirmRegister: () => handleConfirmOpen("register"),
   });
 
-  const tabStatusMap = Object.fromEntries( //track current tab status
+  const tabStatusMap = Object.fromEntries(
+    //track current tab status
     tabOrder.map((tab) => {
       const fields = TAB_FIELDS[tab]; //fields in the tab
       const hasError = fields.some((field) => errors[field]); //any field has error
@@ -135,14 +171,8 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     }
 
     if (actionType === "reset") {
-      handleReset(setActiveTab, isDirty, hasErrors, () =>
-        handleConfirmOpen("reset")
-      );
-      setSnackbar({
-        open: true,
-        message: "Form reset successfully",
-        severity: "info",
-      });
+      methods.reset(restaurantDefaultValues);
+      localStorage.removeItem("restaurant_form_data");
       setShowConfirm(false);
       return;
     }
@@ -155,9 +185,17 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
-    { key: "restaurant", tabName: "Restaurant Details", tabContent: <RestaurantTab /> },
+    {
+      key: "restaurant",
+      tabName: "Restaurant Details",
+      tabContent: <RestaurantTab />,
+    },
     { key: "contact", tabName: "Contact Info", tabContent: <ContactTab /> },
-    { key: "location", tabName: "Location Details", tabContent: <LocationTab /> },
+    {
+      key: "location",
+      tabName: "Location Details",
+      tabContent: <LocationTab />,
+    },
   ];
 
   const activeTabIndex = tabOrder.indexOf(activeTab);
@@ -168,19 +206,20 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     <FormProvider {...methods}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         {/* MAIN FORM MODAL */}
-        <MyDialog open={show} onClose={onClose} title="Register Your Restaurant">
-          <Box sx={{ minHeight: 400, display: "flex", flexDirection: "column" }}>
+        <MyDialog
+          open={show}
+          onClose={onClose}
+          title="Register Your Restaurant"
+        >
+          <Box
+            sx={{ minHeight: 400, display: "flex", flexDirection: "column" }}
+          >
             <MyTabs
               tabs={tabsData}
               activeTab={tabOrder.indexOf(activeTab)}
               onTabChange={(index) =>
-                handleTabChange(
-                  activeTab,
-                  tabOrder[index],
-                  setActiveTab
-                )
+                handleTabChange(activeTab, tabOrder[index], setActiveTab)
               }
-
               tabStatus={tabStatusMap}
             />
           </Box>
@@ -203,17 +242,13 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
                 onClick={() => handleNextOrRegister(activeTab, setActiveTab)}
               >
                 {isAllTabsValid && isLastTab ? "Register" : "Save"}
-
               </MyButton>
 
               <MyButton
                 variant="outlined"
                 onClick={() =>
-                  handleReset(
-                    setActiveTab,
-                    isDirty,
-                    hasErrors,
-                    () => handleConfirmOpen("reset")
+                  handleReset(setActiveTab, isDirty, hasErrors, () =>
+                    handleConfirmOpen("reset")
                   )
                 }
               >
@@ -248,7 +283,10 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
               justifyContent="center"
               sx={{ mt: 3 }}
             >
-              <MyButton variant="outlined" onClick={() => setShowConfirm(false)}>
+              <MyButton
+                variant="outlined"
+                onClick={() => setShowConfirm(false)}
+              >
                 No
               </MyButton>
               <MyButton variant="contained" onClick={handleConfirmYes}>

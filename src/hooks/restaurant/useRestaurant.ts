@@ -1,4 +1,5 @@
 import * as restaurantService  from "../../services/restaurantService";
+
  
 export const useRestaurants = () => {
   const getAllRestaurants = async () => {
@@ -20,10 +21,22 @@ export const useRestaurants = () => {
       return null; 
     }
   };
+ 
+//add new restaurant
+  const addRestaurant = async (formData: any) => {
+    try {
+      const data = await restaurantService.createRestaurant(formData);
+      return data;
+    } catch (error) {
+      console.error("Failed to save restaurant:", error);
+      throw error;
+    }
+  };
 
   return {
     getAllRestaurants,
     getRestaurantDetails,
+    addRestaurant,
   };
 };
 

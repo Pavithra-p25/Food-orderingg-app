@@ -1,18 +1,25 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider } from "./context/ThemeContext"; // custom theme context,dark-light mode
 import "./styles/theme.css";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import { FilterProvider } from "./context/FilterContext";
 import RestaurantsPage from "./pages/restaurant/RestaurantList";
 import RestaurantDetails from "./pages/restaurant/RestaurantDetails";
+import CssBaseline from "@mui/material/CssBaseline";
+import FormTheme from "./config/theme/FormTheme";
+import { Navigate } from "react-router-dom";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
 
 
 const App: React.FC = () => {
   return (
   
     <Router>
+        <MuiThemeProvider theme={FormTheme}>
+        <CssBaseline /> {/* to reset default browser css */}
+        
       <ThemeProvider>
         <FilterProvider>
 
@@ -24,7 +31,7 @@ const App: React.FC = () => {
             {/* MAIN CONTENT  */}
             <main className="flex-grow-1 pt-5">
               <Routes>
-
+<Route path="/" element={<Navigate to="/restaurants" />} />
                 <Route path="/restaurants" element={<RestaurantsPage />} />
                 <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */}
               </Routes>
@@ -35,6 +42,8 @@ const App: React.FC = () => {
 
         </FilterProvider>
       </ThemeProvider>
+
+       </MuiThemeProvider>
     </Router>
   );
 };

@@ -1,7 +1,7 @@
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 
 type UseFormHandlersProps = {
-  form: any; // react-hook-form methods
+  methods: any; // react-hook-form methods
   tabOrder: RestaurantTabKey[];
   tabFields: Record<RestaurantTabKey, (keyof Restaurant)[]>;
   onFinalSubmit: (data: Restaurant) => void;
@@ -10,14 +10,14 @@ type UseFormHandlersProps = {
 };
 
 export function useFormHandlers({
-  form,
+  methods,
   tabOrder,
   tabFields,
   onFinalSubmit,
   getIsAllTabsValid,
   onConfirmRegister,
 }: UseFormHandlersProps) {
-  const { trigger, reset, handleSubmit } = form;
+  const { trigger, reset, handleSubmit } = methods;
 
   //  ACTIONS
   const handleNext = async (

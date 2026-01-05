@@ -6,12 +6,18 @@ import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import { RESTAURANT_TYPES, DELIVERY_TIME_OPTIONS }
-  from "../../config/constants/RestaurantConst";
+import {
+  RESTAURANT_TYPES,
+  DELIVERY_TIME_OPTIONS,
+} from "../../config/constants/RestaurantConst";
 import MyRadioButton from "../../components/newcomponents/radiobutton/MyRadioButton";
+import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 
 const RestaurantTab: React.FC = () => {
-  const { control, formState: { errors } } = useFormContext<Restaurant>();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<Restaurant>();
   const [fileName, setFileName] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
 
@@ -29,7 +35,6 @@ const RestaurantTab: React.FC = () => {
         />
       </Grid>
 
-
       {/* Restaurant Type */}
       <Grid size={{ xs: 12, md: 6 }}>
         <label style={{ fontWeight: 500, marginBottom: 8, display: "block" }}>
@@ -39,16 +44,10 @@ const RestaurantTab: React.FC = () => {
         <Grid container spacing={2}>
           {RESTAURANT_TYPES.map((type) => (
             <Grid key={type}>
-              <MyRadioButton
-                name="restaurantType"
-                label={type}
-                value={type}
-              />
+              <MyRadioButton name="restaurantType" label={type} value={type} />
             </Grid>
           ))}
-          
         </Grid>
-
       </Grid>
 
       {/* Category */}
@@ -83,7 +82,6 @@ const RestaurantTab: React.FC = () => {
         />
       </Grid>
 
-
       {/* Closing Time */}
       <Grid size={{ xs: 12, md: 6 }}>
         <MyTimePicker<Restaurant>
@@ -92,7 +90,6 @@ const RestaurantTab: React.FC = () => {
           control={control}
         />
       </Grid>
-
 
       {/* Website */}
       <Grid size={{ xs: 12, md: 6 }}>
@@ -104,7 +101,6 @@ const RestaurantTab: React.FC = () => {
           control={control}
           errorMessage={errors.website?.message}
         />
-
       </Grid>
 
       {/* Upload Logo */}
@@ -148,8 +144,16 @@ const RestaurantTab: React.FC = () => {
           )}
         />
       </Grid>
-    </Grid>
 
+      {/* Opening Date */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <MyDatePicker
+          name="openingDate"
+          label="Opening Date"
+          disableFuture={false} // allow future opening date if needed
+        />
+      </Grid>
+    </Grid>
   );
 };
 

@@ -1,6 +1,7 @@
 import { apiService } from "./apiService";
 import type { Restaurant } from "../types/types";
 
+
 // api functions 
 export const getRestaurants = async (): Promise<Restaurant[]> => {
   const data = await apiService.get<Restaurant[]>("/restaurants");
@@ -9,5 +10,13 @@ export const getRestaurants = async (): Promise<Restaurant[]> => {
 
 export const getRestaurantById = async (id: number): Promise<Restaurant> => {
   const data = await apiService.get<Restaurant>(`/restaurants/${id}`);
+  return data;
+};
+
+// new registered restaurant
+export const createRestaurant = async (
+  payload: Restaurant
+): Promise<Restaurant> => {
+  const data = await apiService.post<Restaurant>("/restaurants", payload);
   return data;
 };
