@@ -27,7 +27,9 @@ interface Props {
 const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
   const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
-  const [actionType, setActionType] = useState< "register" | "reset" | "cancel" | null>(null); //which action is triggered
+  const [actionType, setActionType] = useState<
+    "register" | "reset" | "cancel" | null
+  >(null); //which action is triggered
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -56,19 +58,14 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
 
   const watchedValues = watch();
 
-  // ADDED FOR LOCAL STORAGE (auto save)
-  useEffect(() => {
-    if (!show) return;
-
-    localStorage.setItem("restaurant_form_data", JSON.stringify(watchedValues));
-  }, [watchedValues, show]);
+  
 
   // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
     login: ["email", "password", "confirmPassword"],
     restaurant: ["restaurantName", "restaurantType", "category"],
     contact: ["ownerName", "supportEmail", "phone"],
-    location: ["address", "city", "state", "country", "pincode","acceptTerms"],
+    location: ["address", "city", "state", "country", "pincode", "acceptTerms"],
   };
 
   //tab navigation order
@@ -79,22 +76,24 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     "location",
   ];
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
  
+  // ADDED FOR LOCAL STORAGE (auto save)
+  useEffect(() => {
+  if (!show || isSubmitted) return;
 
-  //run only when full form is valid
+  localStorage.setItem(
+    "restaurant_form_data",
+    JSON.stringify(watchedValues)
+  );
+}, [watchedValues, show, isSubmitted]);
+
+  //submit handler
   const onSubmit = async (data: Restaurant) => {
   try {
-  
-    const normalizedRestaurant = {
-      id: crypto.randomUUID(),
-      name: data.restaurantName,           //match existing data
-      category: data.category,
-      rating: 0,                            // default
-      image: data.logo,                       
-      menu: [],                             // required by UI
-    };
+    setIsSubmitted(true); 
 
-    await addRestaurant(normalizedRestaurant);
+    await addRestaurant(data);
 
     localStorage.removeItem("restaurant_form_data");
 
@@ -104,7 +103,9 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
       severity: "success",
     });
 
-    onClose();
+    setTimeout(() => {
+      onClose();
+    }, 1500);
   } catch (error) {
     setSnackbar({
       open: true,
@@ -113,7 +114,6 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
     });
   }
 };
-
 
   //useFormHandlers hook
   const {

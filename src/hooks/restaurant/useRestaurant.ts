@@ -1,6 +1,5 @@
 import * as restaurantService  from "../../services/restaurantService";
 
- 
 export const useRestaurants = () => {
   const getAllRestaurants = async () => {
     try {
@@ -32,6 +31,8 @@ export const useRestaurants = () => {
       throw error;
     }
   };
+
+ 
 
   return {
     getAllRestaurants,

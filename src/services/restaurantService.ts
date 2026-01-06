@@ -1,5 +1,5 @@
 import { apiService } from "./apiService";
-import type { Restaurant } from "../types/types";
+import type { Restaurant } from "../types/RestaurantTypes";
 
 
 // api functions 

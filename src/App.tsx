@@ -5,13 +5,26 @@ import "./styles/theme.css";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import { FilterProvider } from "./context/FilterContext";
-import RestaurantsPage from "./pages/restaurant/RestaurantList";
-import RestaurantDetails from "./pages/restaurant/RestaurantDetails";
+//import RestaurantsPage from "./pages/restaurant/RestaurantList";
+ //import RestaurantDetails from "./pages/restaurant/RestaurantDetails";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormTheme from "./config/theme/Theme";
-
+import { useNavigate } from "react-router-dom";
+import RestaurantForm from "./pages/restaurant/RestaurantForm";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
+import RestaurantSearch from "./pages/restaurant/RestaurantSearch";
 
+
+const AddRestaurantModal = () => {
+  const navigate = useNavigate();
+
+  return (
+    <RestaurantForm
+      show={true}
+      onClose={() => navigate(-1)} // close popup → go back
+    />
+  );
+};
 
 const App: React.FC = () => {
   return (
@@ -32,8 +45,12 @@ const App: React.FC = () => {
             <main className="flex-grow-1 pt-5">
               <Routes>
 
-                <Route path="/restaurants" element={<RestaurantsPage />} />
-                <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */}
+               {/*} <Route path="/restaurants" element={<RestaurantsPage />} />*/}
+            {/*  <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */} 
+                <Route path="/RestaurantSearch" element={<RestaurantSearch/>}/>
+
+                <Route path="/add-restaurant" element={<AddRestaurantModal />} />
+
               </Routes>
             </main>
 

@@ -31,376 +31,228 @@
       "password": "123"
     }
   ],
+
   "restaurants": [
     {
-      "id": "1",
-      "name": "Spicy India",
-      "category": "Indian",
-      "rating": 4.5,
-      "image": "https://sukhis.com/app/uploads/2022/06/image2-1.jpg",
-      "location": {
-        "lat": 12.913498,
-        "lng": 80.114962
-      },
-      "menu": [
-        {
-          "id": 1,
-          "name": "Paneer Butter Masala",
-          "price": 250,
-          "image": "https://tse2.mm.bing.net/th/id/OIP.H2Y5n3vkat6jK2Iwav-lIwHaDv?pid=Api&P=0&h=180"
-        },
-        {
-          "id": 2,
-          "name": "Chicken Curry",
-          "price": 300,
-          "image": "https://spiceeats.com/wp-content/uploads/2020/02/Mild-Chicken-Curry.jpg"
-        },
-        {
-          "id": 3,
-          "name": "Dal Makhani",
-          "price": 200,
-          "image": "https://maunikagowardhan.co.uk/wp-content/uploads/2017/11/Black-Dal-Makhani.jpg"
-        },
-        {
-          "id": 4,
-          "name": "Tandoori Roti",
-          "price": 30,
-          "image": "https://www.bhatcurry.com/wp-content/uploads/2016/11/Tandoori-Chicken_16612.jpg"
-        },
-        {
-          "id": 5,
-          "name": "Biryani",
-          "price": 280,
-          "image": "https://feeds.abplive.com/onecms/images/uploaded-images/2023/10/11/fa6be68d80b1f9676ece11173a8b6ded1697004727372557_original.jpg"
-        },
-        {
-          "id": 6,
-          "name": "Gulab Jamun",
-          "price": 100,
-          "image": "https://tse1.mm.bing.net/th/id/OIP.G3PgBqy-X46fWxdaNVFE-QHaEK?pid=Api&P=0&h=180"
-        }
-      ]
+      "email": "greenleaf@gmail.com",
+      "password": "Green@123",
+      "confirmPassword": "Green@123",
+      "restaurantName": "Green Leaf Veg Restaurant",
+      "restaurantType": "Veg",
+      "category": "South Indian",
+      "openingTime": "08:00",
+      "closingTime": "22:00",
+      "averageDeliveryTime": "30 mins",
+      "website": "https://greenleafveg.com",
+      "logo": "",
+      "ownerName": "Ramesh Kumar",
+      "supportEmail": "support@greenleafveg.com",
+      "phone": "9876543210",
+      "alternatePhone": "9123456780",
+      "address": "12, Gandhi Street",
+      "city": "Madurai",
+      "state": "Tamil Nadu",
+      "pincode": "625001",
+      "country": "India",
+      "acceptTerms": true
     },
     {
-      "id": "2",
-      "name": "Burger Hub",
+      "email": "spicehub@gmail.com",
+      "password": "Spice@123",
+      "confirmPassword": "Spice@123",
+      "restaurantName": "Spice Hub",
+      "restaurantType": "Non-Veg",
+      "category": "Biryani",
+      "openingTime": "11:00",
+      "closingTime": "23:00",
+      "averageDeliveryTime": "40 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Arun Prasad",
+      "supportEmail": "help@spicehub.com",
+      "phone": "9988776655",
+      "address": "45, Anna Nagar",
+      "city": "Trichy",
+      "state": "Tamil Nadu",
+      "pincode": "620018",
+      "country": "India",
+      "acceptTerms": true
+    },
+    {
+      "email": "foodcorner@gmail.com",
+      "password": "Food@123",
+      "confirmPassword": "Food@123",
+      "restaurantName": "Food Corner",
+      "restaurantType": "Both",
       "category": "Fast Food",
-      "rating": 4.2,
-      "image": "https://tb-static.uber.com/prod/image-proc/processed_images/31f4e7d8cfd37ed0fb567ae18d395682/aa13fff7e2466014ca51307be81e7738.jpeg",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Cheeseburger",
-          "price": 180
-        },
-        {
-          "id": 2,
-          "name": "Veggie Burger",
-          "price": 150
-        },
-        {
-          "id": 3,
-          "name": "Chicken Burger",
-          "price": 200
-        },
-        {
-          "id": 4,
-          "name": "Fries",
-          "price": 80
-        },
-        {
-          "id": 5,
-          "name": "Onion Rings",
-          "price": 90
-        },
-        {
-          "id": 6,
-          "name": "Coke",
-          "price": 50
-        }
-      ]
+      "openingTime": "10:00",
+      "closingTime": "22:30",
+      "averageDeliveryTime": "25 mins",
+      "website": "https://foodcorner.in",
+      "logo": "",
+      "ownerName": "Priya Sharma",
+      "supportEmail": "support@foodcorner.in",
+      "phone": "9090909090",
+      "address": "8, Market Road",
+      "city": "Coimbatore",
+      "state": "Tamil Nadu",
+      "pincode": "641001",
+      "country": "India",
+      "acceptTerms": true
     },
     {
-      "id": "3",
-      "name": "Pizza Planet",
-      "category": "Fast Food",
-      "rating": 5,
-      "image": "https://img.restaurantguru.com/w550/h367/r645-pizza-FreshSlice-Pizza-2021-09-120.jpg",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Margherita Pizza",
-          "price": 220
-        },
-        {
-          "id": 2,
-          "name": "Pepperoni Pizza",
-          "price": 300
-        },
-        {
-          "id": 3,
-          "name": "Veggie Supreme",
-          "price": 280
-        },
-        {
-          "id": 4,
-          "name": "BBQ Chicken Pizza",
-          "price": 320
-        },
-        {
-          "id": 5,
-          "name": "Garlic Bread",
-          "price": 120
-        },
-        {
-          "id": 6,
-          "name": "Chocolate Lava Cake",
-          "price": 150
-        }
-      ]
+      "email": "annapoorna@gmail.com",
+      "password": "Anna@123",
+      "confirmPassword": "Anna@123",
+      "restaurantName": "Annapoorna Veg",
+      "restaurantType": "Veg",
+      "category": "Breakfast",
+      "openingTime": "06:00",
+      "closingTime": "14:00",
+      "averageDeliveryTime": "20 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Lakshmi Devi",
+      "supportEmail": "contact@annapoorna.com",
+      "phone": "9887766554",
+      "address": "MG Road",
+      "city": "Salem",
+      "state": "Tamil Nadu",
+      "pincode": "636001",
+      "country": "India",
+      "acceptTerms": true
     },
     {
-      "id": "4",
-      "name": "Curry Palace",
-      "category": "Indian",
-      "rating": 4.3,
-      "image": "https://www.currypalacealton.co.uk/images/food-menu.png",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Chicken Tikka Masala",
-          "price": 300
-        },
-        {
-          "id": 2,
-          "name": "Lamb Curry",
-          "price": 320
-        },
-        {
-          "id": 3,
-          "name": "Dal Fry",
-          "price": 180
-        },
-        {
-          "id": 4,
-          "name": "Naan",
-          "price": 40
-        },
-        {
-          "id": 5,
-          "name": "Raita",
-          "price": 30
-        },
-        {
-          "id": 6,
-          "name": "Rasgulla",
-          "price": 100
-        }
-      ]
+      "email": "bbqflame@gmail.com",
+      "password": "BBQ@123",
+      "confirmPassword": "BBQ@123",
+      "restaurantName": "BBQ Flame",
+      "restaurantType": "Non-Veg",
+      "category": "Barbecue",
+      "openingTime": "12:00",
+      "closingTime": "23:30",
+      "averageDeliveryTime": "45 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Karthik Raj",
+      "supportEmail": "support@bbqflame.com",
+      "phone": "9871234560",
+      "address": "Bypass Road",
+      "city": "Erode",
+      "state": "Tamil Nadu",
+      "pincode": "638011",
+      "country": "India",
+      "acceptTerms": true
     },
     {
-      "id": "5",
-      "name": "Sushi World",
-      "category": "Japanese",
-      "rating": 4.7,
-      "image": "https://thumbs.dreamstime.com/b/sushi-world-store-located-food-court-chatswood-westfield-centre-sydney-australia-jun-lunch-time-rush-174164648.jpg",
-      "menu": [
-        {
-          "id": 1,
-          "name": "California Roll",
-          "price": 250
-        },
-        {
-          "id": 2,
-          "name": "Salmon Nigiri",
-          "price": 300
-        },
-        {
-          "id": 3,
-          "name": "Tuna Sashimi",
-          "price": 320
-        },
-        {
-          "id": 4,
-          "name": "Miso Soup",
-          "price": 100
-        },
-        {
-          "id": 5,
-          "name": "Edamame",
-          "price": 120
-        },
-        {
-          "id": 6,
-          "name": "Tempura",
-          "price": 200
-        }
-      ]
+      "email": "pizzahub@gmail.com",
+      "password": "Pizza@123",
+      "confirmPassword": "Pizza@123",
+      "restaurantName": "Pizza Hub",
+      "restaurantType": "Both",
+      "category": "Pizza",
+      "openingTime": "11:00",
+      "closingTime": "22:00",
+      "averageDeliveryTime": "35 mins",
+      "website": "https://pizzahub.in",
+      "logo": "",
+      "ownerName": "Sanjay Mehta",
+      "supportEmail": "care@pizzahub.in",
+      "phone": "9000012345",
+      "address": "Ring Road",
+      "city": "Chennai",
+      "state": "Tamil Nadu",
+      "pincode": "600028",
+      "country": "India",
+      "acceptTerms": true
     },
     {
-      "id": "6",
-      "name": "Noodle House",
+      "email": "burgerzone@gmail.com",
+      "password": "Burger@123",
+      "confirmPassword": "Burger@123",
+      "restaurantName": "Burger Zone",
+      "restaurantType": "Both",
+      "category": "Burgers",
+      "openingTime": "11:00",
+      "closingTime": "23:00",
+      "averageDeliveryTime": "30 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Rahul Verma",
+      "supportEmail": "support@burgerzone.com",
+      "phone": "9012345678",
+      "address": "Town Hall Road",
+      "city": "Dindigul",
+      "state": "Tamil Nadu",
+      "pincode": "624001",
+      "country": "India",
+      "acceptTerms": true
+    },
+    {
+      "email": "royalcurry@gmail.com",
+      "password": "Royal@123",
+      "confirmPassword": "Royal@123",
+      "restaurantName": "Royal Curry House",
+      "restaurantType": "Non-Veg",
+      "category": "North Indian",
+      "openingTime": "12:00",
+      "closingTime": "22:30",
+      "averageDeliveryTime": "40 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Mohammed Ali",
+      "supportEmail": "royalcurry@gmail.com",
+      "phone": "9345678123",
+      "address": "Bus Stand Road",
+      "city": "Vellore",
+      "state": "Tamil Nadu",
+      "pincode": "632004",
+      "country": "India",
+      "acceptTerms": true
+    },
+    {
+      "email": "tastytreats@gmail.com",
+      "password": "Tasty@123",
+      "confirmPassword": "Tasty@123",
+      "restaurantName": "Tasty Treats",
+      "restaurantType": "Veg",
+      "category": "Snacks",
+      "openingTime": "09:00",
+      "closingTime": "21:00",
+      "averageDeliveryTime": "20 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Sneha Iyer",
+      "supportEmail": "support@tastytreats.com",
+      "phone": "9888997766",
+      "address": "College Road",
+      "city": "Thanjavur",
+      "state": "Tamil Nadu",
+      "pincode": "613001",
+      "country": "India",
+      "acceptTerms": true
+    },
+    {
+      "email": "noodlehouse@gmail.com",
+      "password": "Noodle@123",
+      "confirmPassword": "Noodle@123",
+      "restaurantName": "Noodle House",
+      "restaurantType": "Both",
       "category": "Chinese",
-      "rating": 4.1,
-      "image": "https://cdn.concreteplayground.com/content/uploads/2016/01/Chinese-Noodle-House-CP-Trent-van-der-Jagt-2.jpg",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Veg Hakka Noodles",
-          "price": 180
-        },
-        {
-          "id": 2,
-          "name": "Chicken Chow Mein",
-          "price": 220
-        },
-        {
-          "id": 3,
-          "name": "Spring Rolls",
-          "price": 120
-        },
-        {
-          "id": 4,
-          "name": "Manchurian",
-          "price": 200
-        },
-        {
-          "id": 5,
-          "name": "Fried Rice",
-          "price": 180
-        },
-        {
-          "id": 6,
-          "name": "Sweet Corn Soup",
-          "price": 100
-        }
-      ]
-    },
-    {
-      "id": "7",
-      "name": "Taco Town",
-      "category": "Mexican",
-      "rating": 3,
-      "image": "https://i.pinimg.com/originals/31/c1/fe/31c1fe9e3b4597623bfc5f94a88ab426.png",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Beef Taco",
-          "price": 150
-        },
-        {
-          "id": 2,
-          "name": "Chicken Taco",
-          "price": 160
-        },
-        {
-          "id": 3,
-          "name": "Veg Taco",
-          "price": 140
-        },
-        {
-          "id": 4,
-          "name": "Nachos",
-          "price": 120
-        },
-        {
-          "id": 5,
-          "name": "Guacamole",
-          "price": 100
-        },
-        {
-          "id": 6,
-          "name": "Churros",
-          "price": 90
-        }
-      ]
-    },
-    {
-      "id": "8",
-      "name": "Burger King",
-      "category": "Fast Food",
-      "rating": 4,
-      "image": "https://thefoodxp.com/wp-content/uploads/2023/03/History-Of-Burger-King.jpg",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Whopper",
-          "price": 250
-        },
-        {
-          "id": 2,
-          "name": "Chicken Whopper",
-          "price": 270
-        },
-        {
-          "id": 3,
-          "name": "Veggie Whopper",
-          "price": 220
-        },
-        {
-          "id": 4,
-          "name": "Fries",
-          "price": 80
-        },
-        {
-          "id": 5,
-          "name": "Soft Drink",
-          "price": 50
-        },
-        {
-          "id": 6,
-          "name": "Apple Pie",
-          "price": 100
-        }
-      ]
-    },
-    {
-      "id": "9",
-      "name": "Paneer Delight",
-      "category": "Indian",
-      "rating": 4.6,
-      "image": "https://tse3.mm.bing.net/th/id/OIP.aClfPgpNAutWzfKrfXDchgHaEK?pid=Api&P=0&h=180",
-      "menu": [
-        {
-          "id": 1,
-          "name": "Paneer Tikka",
-          "price": 250
-        },
-        {
-          "id": 2,
-          "name": "Shahi Paneer",
-          "price": 280
-        },
-        {
-          "id": 3,
-          "name": "Paneer Butter Masala",
-          "price": 300
-        },
-        {
-          "id": 4,
-          "name": "Naan",
-          "price": 30
-        },
-        {
-          "id": 5,
-          "name": "Dal Makhani",
-          "price": 200
-        },
-        {
-          "id": 6,
-          "name": "Gulab Jamun",
-          "price": 100
-        }
-      ]
-    },
-    {
-      "id": "fa1ab0ba-783d-4b81-a2ed-3e160e5f9368",
-      "name": "bjkbk",
-      "category": "Indian",
-      "rating": 0,
-      "image": "",
-      "menu": []
+      "openingTime": "11:00",
+      "closingTime": "22:30",
+      "averageDeliveryTime": "35 mins",
+      "website": "",
+      "logo": "",
+      "ownerName": "Chen Wei",
+      "supportEmail": "support@noodlehouse.com",
+      "phone": "9786543210",
+      "address": "New Bus Stand",
+      "city": "Tirunelveli",
+      "state": "Tamil Nadu",
+      "pincode": "627007",
+      "country": "India",
+      "acceptTerms": true
     }
-   
   ]
 }
