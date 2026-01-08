@@ -24,6 +24,7 @@ import { restaurantDefaultValues } from "./restaurantDefaultValues";
 import MyTable from "../../components/newcomponents/table/MyTable";
 import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
+import { Chip } from "@mui/material";
 
 // Allowed restaurant types
 const categories = [
@@ -44,7 +45,7 @@ const RestaurantSearch: React.FC = () => {
   const { control, handleSubmit, reset } = methods;
   const [results, setResults] = useState<Restaurant[]>([]); //search results
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
-  const { getAllRestaurants } = useRestaurants(); //function from hook
+  const { getAllRestaurants, softDeleteRestaurant } = useRestaurants(); //function from hook
   const [openAddForm, setOpenAddForm] = useState(false); //form popup state
 
   // Snackbar states for delete
@@ -66,9 +67,13 @@ const RestaurantSearch: React.FC = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const data = await getAllRestaurants(); //fetch all restaurants
+        const data = await getAllRestaurants();
+
+        //Keep full data
         setAllRestaurants(data);
-        setResults(data); //show all by default
+
+        //Show only ACTIVE restaurants in table
+        setResults(data); // show all (active + inactive)
       } catch (error) {
         console.error("Failed to fetch restaurants:", error);
       }
@@ -83,45 +88,47 @@ const RestaurantSearch: React.FC = () => {
   };
 
   const onSubmit = async (data: any) => {
-    try {
-      const filtered = allRestaurants.filter((res: Restaurant) => {
-        //check input is filled , then filter
-        return (
-          (data.restaurantName &&
-            (res.restaurantName ?? "")
-              .toLowerCase()
-              .includes(data.restaurantName.toLowerCase().trim())) ||
-          (data.category &&
-            (res.category ?? "").toLowerCase().trim() ===
-              data.category.toLowerCase().trim()) ||
-          (data.restaurantType &&
-            (res.restaurantType ?? "").toLowerCase().trim() ===
-              data.restaurantType.toLowerCase().trim()) ||
-          (data.city &&
-            (res.city ?? "")
-              .toLowerCase()
-              .includes(data.city.toLowerCase().trim())) ||
-          (data.state &&
-            (res.state ?? "")
-              .toLowerCase()
-              .includes(data.state.toLowerCase().trim())) ||
-          (data.phone &&
-            (res.phone ?? "")
-              .toLowerCase()
-              .includes(data.phone.toLowerCase().trim())) ||
-          (data.email &&
-            (res.email ?? "")
-              .toLowerCase()
-              .includes(data.email.toLowerCase().trim()))
-        );
-      });
+  try {
+    const filtered = allRestaurants.filter((res: Restaurant) => {
+      return (
+        (!data.restaurantName ||
+          (res.restaurantName ?? "")
+            .toLowerCase()
+            .includes(data.restaurantName.toLowerCase().trim())) &&
+        (!data.category ||
+          (res.category ?? "").toLowerCase().trim() ===
+            data.category.toLowerCase().trim()) &&
+        (!data.restaurantType ||
+          (res.restaurantType ?? "").toLowerCase().trim() ===
+            data.restaurantType.toLowerCase().trim()) &&
+        (!data.city ||
+          (res.city ?? "")
+            .toLowerCase()
+            .includes(data.city.toLowerCase().trim())) &&
+        (!data.state ||
+          (res.state ?? "")
+            .toLowerCase()
+            .includes(data.state.toLowerCase().trim())) &&
+        (!data.phone ||
+          (res.phone ?? "")
+            .toLowerCase()
+            .includes(data.phone.toLowerCase().trim())) &&
+        (!data.email ||
+          (res.email ?? "")
+            .toLowerCase()
+            .includes(data.email.toLowerCase().trim()))
+      );
+    });
 
-      setResults(filtered);
-    } catch (error) {
-      console.error("Failed to fetch restaurants:", error);
-      setResults([]);
-    }
-  };
+    setResults(filtered);
+
+  } catch (error) {
+    console.error("Failed to fetch restaurants:", error);
+    setResults([]);
+    
+  }
+};
+
 
   //  Delete
   const handleDeleteClick = (restaurant: Restaurant) => {
@@ -129,21 +136,40 @@ const RestaurantSearch: React.FC = () => {
     setShowConfirm(true); // open confirmation dialog
   };
 
-  const handleConfirmYes = () => {
+  const handleConfirmYes = async () => {
     if (!pendingDelete) return;
 
-    // Remove from table only
-    setResults((prev) => prev.filter((r) => r !== pendingDelete));
+    try {
+      // Update DB
+      await softDeleteRestaurant(pendingDelete.id);
 
-    // Show success snackbar
-    setSnackbarMessage(
-      `"${pendingDelete.restaurantName}" removed successfully`
-    );
-    setSnackbarSeverity("success");
-    setSnackbarOpen(true);
+      // Update full list
+      setAllRestaurants((prev) =>
+        prev.map((r) =>
+          r.id === pendingDelete.id ? { ...r, isActive: false } : r
+        )
+      );
 
-    setPendingDelete(null);
-    setShowConfirm(false);
+      //  Remove from visible table
+      setResults((prev) =>
+        prev.map((r) =>
+          r.id === pendingDelete.id ? { ...r, isActive: false } : r
+        )
+      );
+
+      setSnackbarMessage(
+        `"${pendingDelete.restaurantName}" removed successfully`
+      );
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      setSnackbarMessage("Failed to delete restaurant");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setPendingDelete(null);
+      setShowConfirm(false);
+    }
   };
 
   const handleConfirmNo = () => {
@@ -173,7 +199,10 @@ const RestaurantSearch: React.FC = () => {
 
                 <MyButton
                   variant="contained"
-                  onClick={() => setOpenAddForm(true)}
+                  onClick={() => {
+                    setEditingRestaurant(null); // reset so form is empty
+                    setOpenAddForm(true);
+                  }}
                 >
                   <AddIcon sx={{ mr: 1 }} />
                   Restaurant
@@ -276,62 +305,99 @@ const RestaurantSearch: React.FC = () => {
             rows={results}
             columns={[
               {
+                id: "restaurantName",
                 label: "Restaurant Name",
+                align: "left",
                 render: (r) => r.restaurantName,
-                sortValue: (r) => r.restaurantName,
               },
               {
+                id: "category",
                 label: "Category",
+                align: "left",
                 render: (r) => r.category,
-                sortValue: (r) => r.category,
               },
               {
+                id: "restaurantType",
                 label: "Type",
+                align: "left",
                 render: (r) => r.restaurantType,
-                sortValue: (r) => r.restaurantType ?? "",
               },
               {
+                id: "city",
                 label: "City",
+                align: "left",
                 render: (r) => r.city,
-                sortValue: (r) => r.city,
               },
               {
+                id: "state",
                 label: "State",
                 render: (r) => r.state,
-                sortValue: (r) => r.state,
               },
               {
+                id: "phone",
                 label: "Phone Number",
+                align: "center",
                 render: (r) => r.phone ?? "-",
-                sortValue: (r) => r.phone ?? "",
+              },
+              {
+                id: "email",
+                label: "Email",
+                render: (r) => r.email,
+                align: "left",
+              },
+              {
+                id: "status",
+                label: "Status",
+                align: "center",
+                sortable: false,
+                render: (r) => (
+                  <Chip
+                    label={r.isActive === false ? "Inactive" : "Active"}
+                    color={r.isActive === false ? "error" : "success"}
+                    size="small"
+                    variant="outlined"
+                  />
+                ),
               },
 
               {
-                label: "Email",
-                render: (r) => r.email,
-                sortValue: (r) => r.email,
-              },
-              {
+                id: "actions",
                 label: "Actions",
-                render: (r) => (
-                  <>
-                    <EditNoteIcon
-                      color="primary"
-                      sx={{ cursor: "pointer", mr: 1 }}
-                      onClick={() => {
-                        setEditingRestaurant(r); // set restaurant to edit
-                        setOpenAddForm(true); // open form popup
-                      }}
-                    />
-                    <MyButton
-                      variant="outline-secondary"
-                      style={{ minWidth: 0, padding: 0 }}
-                      onClick={() => handleDeleteClick(r)}
-                    >
-                      <DeleteIcon color="error" />
-                    </MyButton>
-                  </>
-                ),
+                sortable: false,
+                render: (r) => {
+                  const isInactive = r.isActive === false;
+
+                  return (
+                    <>
+                      {/* EDIT ICON */}
+                      <EditNoteIcon
+                        color={isInactive ? "disabled" : "primary"}
+                        sx={{
+                          cursor: isInactive ? "not-allowed" : "pointer",
+                          mr: 1,
+                        }}
+                        onClick={() => {
+                          if (isInactive) return; // 🚫 block edit
+                          setEditingRestaurant(r);
+                          setOpenAddForm(true);
+                        }}
+                      />
+
+                      {/* DELETE ICON */}
+                      <MyButton
+                        variant="outline-secondary"
+                        disabled={isInactive} // disable button
+                        style={{ minWidth: 0, padding: 0 }}
+                        onClick={() => {
+                          if (isInactive) return; //  block delete
+                          handleDeleteClick(r);
+                        }}
+                      >
+                        <DeleteIcon color={isInactive ? "disabled" : "error"} />
+                      </MyButton>
+                    </>
+                  );
+                },
               },
             ]}
           />
@@ -346,6 +412,29 @@ const RestaurantSearch: React.FC = () => {
           setEditingRestaurant(null); // reset after closing
         }}
         restaurant={editingRestaurant} // pass restaurant to edit
+        onSave={(updated) => {
+          // Update full list
+          setAllRestaurants((prev) => {
+            const index = prev.findIndex((r) => r.id === updated.id);
+            if (index > -1) {
+              const copy = [...prev];
+              copy[index] = updated;
+              return copy;
+            }
+            return [...prev, updated]; // add new if not exist
+          });
+
+          // Update filtered list for search results
+          setResults((prev) => {
+            const index = prev.findIndex((r) => r.id === updated.id);
+            if (index > -1) {
+              const copy = [...prev];
+              copy[index] = updated;
+              return copy;
+            }
+            return [...prev, updated]; // add new if not exist
+          });
+        }}
       />
 
       {/* Confirmation Dialog */}

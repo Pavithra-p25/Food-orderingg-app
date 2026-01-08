@@ -19,9 +19,6 @@ const Theme = createTheme({
           backgroundColor: "#9e9e9e", 
           color: "#ffffff",          
         },
-        body: {
-          textAlign: "center",  
-        },
       },
     },
   },

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Paper,
   Table,
@@ -13,9 +13,12 @@ import {
 } from "@mui/material";
 
 interface Column<T> {
+  id: keyof T | string; // column key
   label: string; //column heading
   render: (row: T) => React.ReactNode; //what to show in cell
-  sortValue?: (row: T) => string | number; // enable sorting
+  sortable?: boolean; // enable / disable sorting
+  align?: "left" | "center" | "right";
+  cellAlign?: (row: any) => "left" | "center" | "right";
 }
 
 interface MyTableProps<T> {
@@ -24,19 +27,24 @@ interface MyTableProps<T> {
 }
 
 function MyTable<T>({ columns, rows }: MyTableProps<T>) {
-  const [orderBy, setOrderBy] = useState<number | null>(null); //store which column is sorted
+  const [orderBy, setOrderBy] = useState<string | null>(null);
+  //store which column is sorted
   const [order, setOrder] = useState<"asc" | "desc">("asc"); //sort order
 
   //  pagination states
   const [page, setPage] = useState(0); //current page
   const [rowsPerPage, setRowsPerPage] = useState(5); //rows per page
 
-  const handleSort = (index: number) => {
-    //run when user clicks column header
-    if (orderBy === index) {
+  // Reset page when rows change (e.g., after search)
+useEffect(() => {
+  setPage(0);
+}, [rows]);
+
+  const handleSort = (id: string) => {
+    if (orderBy === id) {
       setOrder(order === "asc" ? "desc" : "asc");
     } else {
-      setOrderBy(index);
+      setOrderBy(id);
       setOrder("asc");
     }
   };
@@ -45,12 +53,12 @@ function MyTable<T>({ columns, rows }: MyTableProps<T>) {
     //prevent sorting on every render
     if (orderBy === null) return rows; //no column selected return original data
 
-    const column = columns[orderBy];
-    if (!column.sortValue) return rows;
+    const column = columns.find((c) => c.id === orderBy);
+    if (!column || column.sortable === false) return rows;
 
-    return [...rows].sort((a, b) => {
-      const aVal = column.sortValue!(a);
-      const bVal = column.sortValue!(b);
+    return [...rows].sort((a: any, b: any) => {
+      const aVal = a[column.id];
+      const bVal = b[column.id];
 
       if (aVal < bVal) return order === "asc" ? -1 : 1;
       if (aVal > bVal) return order === "asc" ? 1 : -1;
@@ -71,12 +79,28 @@ function MyTable<T>({ columns, rows }: MyTableProps<T>) {
           <TableHead>
             <TableRow>
               {columns.map((col, index) => (
-                <TableCell key={index} sx={{ fontWeight: "bold" }}>
-                  {col.sortValue ? ( //if sortValue exists, make column sortable
+                <TableCell
+                  key={index}
+                  align={col.align || "center"}
+                  sx={{
+                    fontWeight: "bold",
+                    "& .MuiTableSortLabel-root": {
+                      width: "100%",
+                      display: "flex",
+                      justifyContent:
+                        col.align === "left"
+                          ? "flex-start"
+                          : col.align === "right"
+                          ? "flex-end"
+                          : "center",
+                    },
+                  }}
+                >
+                  {col.sortable !== false ? (
                     <TableSortLabel
-                      active={orderBy === index}
-                      direction={orderBy === index ? order : "asc"}
-                      onClick={() => handleSort(index)}
+                      active={orderBy === col.id}
+                      direction={orderBy === col.id ? order : "asc"}
+                      onClick={() => handleSort(col.id as string)}
                     >
                       {col.label}
                     </TableSortLabel>
@@ -91,9 +115,17 @@ function MyTable<T>({ columns, rows }: MyTableProps<T>) {
           <TableBody>
             {paginatedRows.map((row, rowIndex) => (
               <TableRow key={rowIndex}>
-                {columns.map((col, colIndex) => (
-                  <TableCell key={colIndex}>{col.render(row)}</TableCell>
-                ))}
+                {columns.map((col, colIndex) => {
+                  const alignment = col.cellAlign
+                    ? col.cellAlign(row)
+                    : col.align || "center";
+
+                  return (
+                    <TableCell key={colIndex} align={alignment}>
+                      {col.render(row)}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>

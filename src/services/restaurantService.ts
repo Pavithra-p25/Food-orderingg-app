@@ -29,3 +29,14 @@ export const updateRestaurant = async (
   const data = await apiService.put<Restaurant>(`/restaurants/${id}`, payload);
   return data;
 };
+
+export const softDeleteRestaurant = async (
+  id: number,
+  payload: Partial<Restaurant>
+): Promise<Restaurant> => {
+  const data = await apiService.patch<Restaurant>(
+    `/restaurants/${id}`,
+    payload
+  );
+  return data;
+};

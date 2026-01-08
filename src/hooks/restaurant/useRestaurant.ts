@@ -43,11 +43,23 @@ export const useRestaurants = () => {
     }
   };
 
+   const softDeleteRestaurant = async (id: number) => {
+    try {
+      return await restaurantService.softDeleteRestaurant(id, {
+        isActive: false,
+      });
+    } catch (error) {
+      console.error("Failed to soft delete restaurant:", error);
+      throw error;
+    }
+  };
+
   return {
     getAllRestaurants,
     getRestaurantDetails,
     addRestaurant,
     updateRestaurant,
+    softDeleteRestaurant
   };
 };
 

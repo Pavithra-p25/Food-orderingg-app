@@ -23,13 +23,14 @@ interface Props {
   show: boolean; // show or hide the dialog
   onClose: () => void; // to close the dialog
   restaurant?: Restaurant | null;
-  
+   onSave?: (updated: Restaurant) => void; 
 }
 
 const RestaurantForm: React.FC<Props> = ({
   show,
   onClose,
   restaurant = null,
+  onSave,
 }) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
   const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
@@ -72,10 +73,15 @@ const RestaurantForm: React.FC<Props> = ({
   const watchedValues = watch();
 
   useEffect(() => {
-    if (restaurant) {
-      methods.reset(restaurant);
-    }
-  }, [restaurant, methods]);
+  if (restaurant) {
+    // Edit mode → fill with restaurant data
+    methods.reset(restaurant);
+  } else {
+    // Add mode → reset to default values
+    methods.reset(restaurantDefaultValues);
+  }
+}, [restaurant, methods]);
+
 
   // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
@@ -105,13 +111,18 @@ const RestaurantForm: React.FC<Props> = ({
   
  
   //submit handler
-  const onSubmit = async (data: Restaurant) => {
+ const onSubmit = async (data: Restaurant) => {
   try {
     setIsSubmitted(true);
+    let savedRestaurant: Restaurant;
 
     if (restaurant?.id) {
       // EDIT mode → call update
-      await updateRestaurant(restaurant.id, data);
+      savedRestaurant = await updateRestaurant(restaurant.id, {
+        ...data,
+        id: restaurant.id, // ensure the ID is included
+      });
+
       setSnackbar({
         open: true,
         message: `"${data.restaurantName}" updated successfully`,
@@ -119,13 +130,16 @@ const RestaurantForm: React.FC<Props> = ({
       });
     } else {
       // NEW registration → call add
-      await addRestaurant(data);
+      savedRestaurant = await addRestaurant(data);
       setSnackbar({
         open: true,
         message: "Restaurant registered successfully",
         severity: "success",
       });
     }
+
+    // Trigger callback so parent can update table immediately
+    if (onSave) onSave(savedRestaurant);
 
     localStorage.removeItem("restaurant_form_data");
 
@@ -140,6 +154,7 @@ const RestaurantForm: React.FC<Props> = ({
     });
   }
 };
+
 
   //useFormHandlers hook
   const {

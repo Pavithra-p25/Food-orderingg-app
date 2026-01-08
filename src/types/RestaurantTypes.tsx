@@ -51,6 +51,7 @@ export type Restaurant =
   Contact &
   Location & {
     id: number;
+    isActive?:boolean;
       // optional for new restaurants
   };
 

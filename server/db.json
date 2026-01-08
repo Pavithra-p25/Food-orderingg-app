@@ -34,17 +34,16 @@
   "restaurants": [
     {
       "id": "df0b",
-      "email": "greenleaf@gmail.com",
+      "email": "greenlef@gmail.com",
       "password": "Green@123",
       "confirmPassword": "Green@123",
-      "isActive": true,
       "restaurantName": "Green Leaf Veg Restaurant",
       "restaurantType": "Veg",
       "category": "South Indian",
       "openingTime": "08:00",
       "closingTime": "22:00",
       "averageDeliveryTime": "30 mins",
-      "website": "https://greenleafveg.com",
+      "website": "https://greenleafve.com",
       "logo": "",
       "ownerName": "Ramesh Kumar",
       "supportEmail": "support@greenleafveg.com",
@@ -55,13 +54,14 @@
       "state": "Tamil Nadu",
       "pincode": "625001",
       "country": "India",
-      "acceptTerms": true
+      "acceptTerms": true,
+      "isActive": true
     },
     {
       "email": "spicehub@gmail.com",
       "password": "Spice@123",
       "confirmPassword": "Spice@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Spice Hub",
       "restaurantType": "Non-Veg",
       "category": "Biryani",
@@ -80,10 +80,6 @@
       "country": "India",
       "acceptTerms": true,
       "id": "f693"
-    },
-    {
-      "isActive": false,
-      "id": "c525"
     },
     {
       "email": "annapoorna@gmail.com",
@@ -110,10 +106,10 @@
       "id": "0f88"
     },
     {
-      "email": "bbqflame@gmail.com",
+      "email": "bbqflae@gmail.com",
       "password": "BBQ@123",
       "confirmPassword": "BBQ@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "BBQ Flame",
       "restaurantType": "Non-Veg",
       "category": "Barbecue",
@@ -134,7 +130,7 @@
       "id": "60d2"
     },
     {
-      "email": "pizzahub@gmail.com",
+      "email": "pizzahu@gmail.com",
       "password": "Pizza@123",
       "confirmPassword": "Pizza@123",
       "isActive": true,
@@ -258,7 +254,7 @@
       "email": "nice@anjaconline.org",
       "password": "111111",
       "confirmPassword": "111111",
-     
+      "isActive": false,
       "restaurantName": "Nice restaurant",
       "restaurantType": "Non-Veg",
       "category": "Fast Food",
@@ -508,7 +504,6 @@
       "email": "italianbites@gmail.com",
       "password": "Italy@123",
       "confirmPassword": "Italy@123",
-      "isActive": true,
       "restaurantName": "Italian Bites",
       "restaurantType": "Veg",
       "category": "Italian",
