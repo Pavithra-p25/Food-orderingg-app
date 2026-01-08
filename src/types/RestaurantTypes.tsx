@@ -49,7 +49,11 @@ export type Restaurant =
   Login &
   RestaurantData &
   Contact &
-  Location;
+  Location & {
+    id: number;
+      // optional for new restaurants
+  };
+
 
 export type RestaurantErrors = Partial<Record<keyof Restaurant, string>>;
 

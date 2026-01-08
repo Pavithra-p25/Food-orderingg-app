@@ -1,4 +1,5 @@
 import * as restaurantService  from "../../services/restaurantService";
+import type { Restaurant } from "../../types/RestaurantTypes";
 
 export const useRestaurants = () => {
   const getAllRestaurants = async () => {
@@ -22,7 +23,7 @@ export const useRestaurants = () => {
   };
  
 //add new restaurant
-  const addRestaurant = async (formData: any) => {
+  const addRestaurant = async (formData: Restaurant) => {
     try {
       const data = await restaurantService.createRestaurant(formData);
       return data;
@@ -32,12 +33,21 @@ export const useRestaurants = () => {
     }
   };
 
- 
+ //  update restaurant
+  const updateRestaurant = async (id: number, formData: Restaurant) => {
+    try {
+      return await restaurantService.updateRestaurant(id, formData);
+    } catch (error) {
+      console.error("Failed to update restaurant:", error);
+      throw error;
+    }
+  };
 
   return {
     getAllRestaurants,
     getRestaurantDetails,
     addRestaurant,
+    updateRestaurant,
   };
 };
 

@@ -20,3 +20,12 @@ export const createRestaurant = async (
   const data = await apiService.post<Restaurant>("/restaurants", payload);
   return data;
 };
+
+// update existing restaurant
+export const updateRestaurant = async (
+  id: number,
+  payload: Restaurant
+): Promise<Restaurant> => {
+  const data = await apiService.put<Restaurant>(`/restaurants/${id}`, payload);
+  return data;
+};

@@ -22,14 +22,25 @@ import useRestaurants from "../../hooks/restaurant/useRestaurant";
 interface Props {
   show: boolean; // show or hide the dialog
   onClose: () => void; // to close the dialog
+  restaurant?: Restaurant | null;
+  
 }
 
-const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
+const RestaurantForm: React.FC<Props> = ({
+  show,
+  onClose,
+  restaurant = null,
+}) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
   const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
   const [actionType, setActionType] = useState<
     "register" | "reset" | "cancel" | null
   >(null); //which action is triggered
+
+  const getCenterButtonLabel = () => {
+    if (restaurant) return "Update"; // edit mode
+    return isAllTabsValid && isLastTab ? "Register" : "Save"; // new mode
+  };
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -41,14 +52,16 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   const savedData = localStorage.getItem("restaurant_form_data");
 
   //json data storing
-  const { addRestaurant } = useRestaurants();
+  const { addRestaurant, updateRestaurant } = useRestaurants();
 
   // react-hook-form with Yup schema
   const methods = useForm<Restaurant>({
     mode: "onChange", // validation occurs onChange
     reValidateMode: "onChange",
     resolver: yupResolver(restaurantSchema),
-    defaultValues: savedData ? JSON.parse(savedData) : restaurantDefaultValues,
+    defaultValues:
+      restaurant ||
+      (savedData ? JSON.parse(savedData) : restaurantDefaultValues),
   });
 
   const {
@@ -58,7 +71,11 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
 
   const watchedValues = watch();
 
-  
+  useEffect(() => {
+    if (restaurant) {
+      methods.reset(restaurant);
+    }
+  }, [restaurant, methods]);
 
   // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
@@ -77,31 +94,40 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   ];
 
   const [isSubmitted, setIsSubmitted] = useState(false);
- 
+
   // ADDED FOR LOCAL STORAGE (auto save)
   useEffect(() => {
-  if (!show || isSubmitted) return;
+    if (!show || isSubmitted) return;
 
-  localStorage.setItem(
-    "restaurant_form_data",
-    JSON.stringify(watchedValues)
-  );
-}, [watchedValues, show, isSubmitted]);
+    localStorage.setItem("restaurant_form_data", JSON.stringify(watchedValues));
+  }, [watchedValues, show, isSubmitted]);
 
+  
+ 
   //submit handler
   const onSubmit = async (data: Restaurant) => {
   try {
-    setIsSubmitted(true); 
+    setIsSubmitted(true);
 
-    await addRestaurant(data);
+    if (restaurant?.id) {
+      // EDIT mode → call update
+      await updateRestaurant(restaurant.id, data);
+      setSnackbar({
+        open: true,
+        message: `"${data.restaurantName}" updated successfully`,
+        severity: "success",
+      });
+    } else {
+      // NEW registration → call add
+      await addRestaurant(data);
+      setSnackbar({
+        open: true,
+        message: "Restaurant registered successfully",
+        severity: "success",
+      });
+    }
 
     localStorage.removeItem("restaurant_form_data");
-
-    setSnackbar({
-      open: true,
-      message: "Restaurant registered successfully",
-      severity: "success",
-    });
 
     setTimeout(() => {
       onClose();
@@ -109,7 +135,7 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
   } catch (error) {
     setSnackbar({
       open: true,
-      message: "Failed to register restaurant",
+      message: "Failed to save restaurant",
       severity: "error",
     });
   }
@@ -241,9 +267,17 @@ const RestaurantForm: React.FC<Props> = ({ show, onClose }) => {
             <Stack direction="row" spacing={2}>
               <MyButton
                 variant="success"
-                onClick={() => handleNextOrRegister(activeTab, setActiveTab)}
+                onClick={async () => {
+                  if (restaurant) {
+                    // Edit mode → update from any tab
+                    await handleFinalSubmit();
+                  } else {
+                    // New mode 
+                    await handleNextOrRegister(activeTab, setActiveTab);
+                  }
+                }}
               >
-                {isAllTabsValid && isLastTab ? "Register" : "Save"}
+                {getCenterButtonLabel()}
               </MyButton>
 
               <MyButton

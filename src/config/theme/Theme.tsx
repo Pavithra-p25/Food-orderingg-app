@@ -1,12 +1,26 @@
 import { createTheme } from "@mui/material/styles";
 
 const Theme = createTheme({
-  components: { //to override default MUI styles
-    MuiFormHelperText: { //text below input fields
+  components: {
+    MuiFormHelperText: {
       styleOverrides: {
-        root: {   //form helper text
-          marginLeft: 0,   //removes left space
+        root: {
+          marginLeft: 0,
           marginRight: 0,
+        },
+      },
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          textAlign: "center", 
+          fontWeight: "bold", 
+          backgroundColor: "#9e9e9e", 
+          color: "#ffffff",          
+        },
+        body: {
+          textAlign: "center",  
         },
       },
     },
