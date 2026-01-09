@@ -57,8 +57,7 @@ export type Restaurant =
   Location &
   Timestamps & {
     id: number;
-    isActive?:boolean;
-      // optional for new restaurants
+    isActive?:boolean; // for new restaurants
   };
 
 

@@ -343,41 +343,37 @@ const RestaurantSearch: React.FC = () => {
                 id: "restaurantName",
                 label: "Restaurant Name",
                 align: "left",
-                render: (r) => r.restaurantName,
+               
               },
               {
                 id: "category",
                 label: "Category",
                 align: "left",
-                render: (r) => r.category,
+               
               },
               {
                 id: "restaurantType",
                 label: "Type",
                 align: "left",
-                render: (r) => r.restaurantType,
+                
               },
               {
                 id: "city",
                 label: "City",
                 align: "left",
-                render: (r) => r.city,
-              },
+                },
               {
                 id: "state",
                 label: "State",
-                render: (r) => r.state,
-              },
+               },
               {
                 id: "phone",
                 label: "Phone Number",
                 align: "center",
-                render: (r) => r.phone ?? "-",
-              },
+                },
               {
                 id: "email",
                 label: "Email",
-                render: (r) => r.email,
                 align: "left",
               },
               {

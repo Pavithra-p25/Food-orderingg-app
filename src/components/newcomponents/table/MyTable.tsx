@@ -15,7 +15,7 @@ import {
 interface Column<T> {
   id: keyof T | string; // column key
   label: string; //column heading
-  render: (row: T) => React.ReactNode; //what to show in cell
+  render?: (row: T) => React.ReactNode; //what to show in cell
   sortable?: boolean; // enable / disable sorting
   align?: "left" | "center" | "right";
   cellAlign?: (row: any) => "left" | "center" | "right";
@@ -24,6 +24,7 @@ interface Column<T> {
 interface MyTableProps<T> {
   columns: Column<T>[]; //table columns
   rows: T[]; //table data
+ 
 }
 
 function MyTable<T>({ columns, rows }: MyTableProps<T>) {
@@ -35,10 +36,10 @@ function MyTable<T>({ columns, rows }: MyTableProps<T>) {
   const [page, setPage] = useState(0); //current page
   const [rowsPerPage, setRowsPerPage] = useState(5); //rows per page
 
-  // Reset page when rows change 
-useEffect(() => {
-  setPage(0);
-}, [rows]);
+  // Reset page when rows change
+  useEffect(() => {
+    setPage(0);
+  }, [rows]);
 
   const handleSort = (id: string) => {
     if (orderBy === id) {
@@ -122,7 +123,7 @@ useEffect(() => {
 
                   return (
                     <TableCell key={colIndex} align={alignment}>
-                      {col.render(row)}
+                      {col.render ? col.render(row) : (row as any)[col.id]}
                     </TableCell>
                   );
                 })}

@@ -63,7 +63,7 @@
       "email": "spicehub@gmail.com",
       "password": "Spice@123",
       "confirmPassword": "Spice@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Spice Hub",
       "restaurantType": "Non-Veg",
       "category": "Biryani",
@@ -83,13 +83,13 @@
       "acceptTerms": true,
       "id": "f693",
       "createdAt": "2025-11-10T06:45:00.000Z",
-      "updatedAt": "2026-01-09T03:47:03.253Z"
+      "updatedAt": "2026-01-09T05:19:19.108Z"
     },
     {
       "email": "annapoorna@gmail.com",
       "password": "Anna@123",
       "confirmPassword": "Anna@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Annapoorna Veg",
       "restaurantType": "Veg",
       "category": "Breakfast",
@@ -109,7 +109,7 @@
       "acceptTerms": true,
       "id": "0f88",
       "createdAt": "2025-10-01T01:30:00.000Z",
-      "updatedAt": "2026-01-07T12:10:00.000Z"
+      "updatedAt": "2026-01-09T06:06:51.938Z"
     },
     {
       "email": "bbqflae@gmail.com",
@@ -562,6 +562,33 @@
       "openingDate": "2026-01-16T18:30:00.000Z",
       "createdAt": "2026-01-05T07:00:00.000Z",
       "updatedAt": "2026-01-08T14:35:00.000Z"
+    },
+    {
+      "id": "68da",
+      "email": "create@gmail.com",
+      "password": "111111",
+      "confirmPassword": "111111",
+      "restaurantName": "Create restaurant ",
+      "restaurantType": "Non-Veg",
+      "category": "Fast Food",
+      "averageDeliveryTime": "40 - 50 mins",
+      "openingTime": "2026-01-08T20:30:00.000Z",
+      "closingTime": "2026-01-09T06:30:00.000Z",
+      "website": "https://creatingg.com",
+      "ownerName": "creator",
+      "supportEmail": "create@gmail.com",
+      "phone": "8937539090",
+      "alternatePhone": "8937589389",
+      "address": "Ashok Nagar",
+      "city": "Srivillputhur",
+      "state": "Tamil Nadu",
+      "pincode": "626125",
+      "country": "India",
+      "acceptTerms": true,
+      "openingDate": "2026-01-18T18:30:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-01-09T03:55:24.152Z",
+      "updatedAt": "2026-01-09T03:55:24.152Z"
     }
   ]
 }
