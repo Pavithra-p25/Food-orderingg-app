@@ -11,6 +11,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
+import RestoreIcon from "@mui/icons-material/Restore";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useForm, FormProvider } from "react-hook-form";
@@ -35,6 +36,8 @@ const categories = [
   "Dessert",
 ];
 
+type PendingAction = "delete" | "restore" | null;
+
 const RestaurantSearch: React.FC = () => {
   const methods = useForm<Restaurant>({
     defaultValues: {
@@ -44,8 +47,9 @@ const RestaurantSearch: React.FC = () => {
 
   const { control, handleSubmit, reset } = methods;
   const [results, setResults] = useState<Restaurant[]>([]); //search results
-  const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
-  const { getAllRestaurants, softDeleteRestaurant } = useRestaurants(); //function from hook
+  const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]); //all restauarant data
+  const { getAllRestaurants, softDeleteRestaurant, activateRestaurant } =
+    useRestaurants(); //function from hook
   const [openAddForm, setOpenAddForm] = useState(false); //form popup state
 
   // Snackbar states for delete
@@ -60,9 +64,10 @@ const RestaurantSearch: React.FC = () => {
     null
   );
 
-  //  Dialog states for delete confirmation
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<Restaurant | null>(null);
+  //  Dialog states for delete/restore confirmation
+  const [showConfirm, setShowConfirm] = useState(false); //reusable confirmation dialog 
+  const [pendingDelete, setPendingDelete] = useState<Restaurant | null>(null); // which restaurant
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null); //what action (delete / restore)
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -71,8 +76,6 @@ const RestaurantSearch: React.FC = () => {
 
         //Keep full data
         setAllRestaurants(data);
-
-        //Show only ACTIVE restaurants in table
         setResults(data); // show all (active + inactive)
       } catch (error) {
         console.error("Failed to fetch restaurants:", error);
@@ -88,92 +91,124 @@ const RestaurantSearch: React.FC = () => {
   };
 
   const onSubmit = async (data: any) => {
-  try {
-    const filtered = allRestaurants.filter((res: Restaurant) => {
-      return (
-        (!data.restaurantName ||
-          (res.restaurantName ?? "")
-            .toLowerCase()
-            .includes(data.restaurantName.toLowerCase().trim())) &&
-        (!data.category ||
-          (res.category ?? "").toLowerCase().trim() ===
-            data.category.toLowerCase().trim()) &&
-        (!data.restaurantType ||
-          (res.restaurantType ?? "").toLowerCase().trim() ===
-            data.restaurantType.toLowerCase().trim()) &&
-        (!data.city ||
-          (res.city ?? "")
-            .toLowerCase()
-            .includes(data.city.toLowerCase().trim())) &&
-        (!data.state ||
-          (res.state ?? "")
-            .toLowerCase()
-            .includes(data.state.toLowerCase().trim())) &&
-        (!data.phone ||
-          (res.phone ?? "")
-            .toLowerCase()
-            .includes(data.phone.toLowerCase().trim())) &&
-        (!data.email ||
-          (res.email ?? "")
-            .toLowerCase()
-            .includes(data.email.toLowerCase().trim()))
-      );
-    });
+    try {
+      const filtered = allRestaurants.filter((res: Restaurant) => {
+        return (
+          (!data.restaurantName ||
+            (res.restaurantName ?? "")
+              .toLowerCase()
+              .includes(data.restaurantName.toLowerCase().trim())) &&
+          (!data.category ||
+            (res.category ?? "").toLowerCase().trim() ===
+              data.category.toLowerCase().trim()) &&
+          (!data.restaurantType ||
+            (res.restaurantType ?? "").toLowerCase().trim() ===
+              data.restaurantType.toLowerCase().trim()) &&
+          (!data.city ||
+            (res.city ?? "")
+              .toLowerCase()
+              .includes(data.city.toLowerCase().trim())) &&
+          (!data.state ||
+            (res.state ?? "")
+              .toLowerCase()
+              .includes(data.state.toLowerCase().trim())) &&
+          (!data.phone ||
+            (res.phone ?? "")
+              .toLowerCase()
+              .includes(data.phone.toLowerCase().trim())) &&
+          (!data.email ||
+            (res.email ?? "")
+              .toLowerCase()
+              .includes(data.email.toLowerCase().trim()))
+        );
+      });
 
-    setResults(filtered);
-
-  } catch (error) {
-    console.error("Failed to fetch restaurants:", error);
-    setResults([]);
-    
-  }
-};
-
+      setResults(filtered);
+    } catch (error) {
+      console.error("Failed to fetch restaurants:", error);
+      setResults([]);
+    }
+  };
 
   //  Delete
   const handleDeleteClick = (restaurant: Restaurant) => {
     setPendingDelete(restaurant); // store restaurant for deletion
+    setPendingAction("delete"); // mark action as delete
+    setShowConfirm(true); // open confirmation dialog
+  };
+
+  const handleRestoreClick = (restaurant: Restaurant) => {
+    setPendingDelete(restaurant); // store restaurant for restore
+    setPendingAction("restore"); // mark action as restore
     setShowConfirm(true); // open confirmation dialog
   };
 
   const handleConfirmYes = async () => {
-    if (!pendingDelete) return;
+    if (!pendingDelete || !pendingAction) return;
 
     try {
-      // Update DB
-      await softDeleteRestaurant(pendingDelete.id);
+      if (pendingAction === "delete") {
+        await softDeleteRestaurant(pendingDelete.id);
 
-      // Update full list
-      setAllRestaurants((prev) =>
-        prev.map((r) =>
-          r.id === pendingDelete.id ? { ...r, isActive: false } : r
-        )
-      );
+        // Update full list - r - copy all existing fields  isActive: false - override only this field
+        setAllRestaurants((prev) =>
+          prev.map((r) =>
+            r.id === pendingDelete.id ? { ...r, isActive: false } : r 
+          )
+        );
 
-      //  Remove from visible table
-      setResults((prev) =>
-        prev.map((r) =>
-          r.id === pendingDelete.id ? { ...r, isActive: false } : r
-        )
-      );
+        //  Remove from visible table
+        setResults((prev) =>
+          prev.map((r) =>
+            r.id === pendingDelete.id ? { ...r, isActive: false } : r
+          )
+        );
 
-      setSnackbarMessage(
-        `"${pendingDelete.restaurantName}" removed successfully`
-      );
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
+        setSnackbarMessage(
+          `"${pendingDelete.restaurantName}" deleted successfully`
+        );
+        setSnackbarSeverity("success");
+      } 
+      else if (pendingAction === "restore") {
+        await activateRestaurant(pendingDelete.id);
+
+        // update full list
+        setAllRestaurants((prev) =>
+          prev.map((r) =>
+            r.id === pendingDelete.id ? { ...r, isActive: true } : r
+          )
+        );
+
+        // update visible table
+        setResults((prev) =>
+          prev.map((r) =>
+            r.id === pendingDelete.id ? { ...r, isActive: true } : r
+          )
+        );
+
+        setSnackbarMessage(
+          `"${pendingDelete.restaurantName}" reactivated successfully`
+        );
+        setSnackbarSeverity("success");
+      }
     } catch (error) {
-      setSnackbarMessage("Failed to delete restaurant");
+      setSnackbarMessage(
+        pendingAction === "delete"
+          ? "Failed to delete restaurant"
+          : "Failed to reactive restaurant"
+      );
       setSnackbarSeverity("error");
-      setSnackbarOpen(true);
     } finally {
       setPendingDelete(null);
+      setPendingAction(null);
       setShowConfirm(false);
+      setSnackbarOpen(true);
     }
   };
 
   const handleConfirmNo = () => {
     setPendingDelete(null);
+    setPendingAction(null);
     setShowConfirm(false);
   };
 
@@ -377,24 +412,28 @@ const RestaurantSearch: React.FC = () => {
                           mr: 1,
                         }}
                         onClick={() => {
-                          if (isInactive) return; // 🚫 block edit
+                          if (isInactive) return;
                           setEditingRestaurant(r);
                           setOpenAddForm(true);
                         }}
                       />
 
-                      {/* DELETE ICON */}
-                      <MyButton
-                        variant="outline-secondary"
-                        disabled={isInactive} // disable button
-                        style={{ minWidth: 0, padding: 0 }}
-                        onClick={() => {
-                          if (isInactive) return; //  block delete
-                          handleDeleteClick(r);
-                        }}
-                      >
-                        <DeleteIcon color={isInactive ? "disabled" : "error"} />
-                      </MyButton>
+                      {/* DELETE (Active) / RESTORE (Inactive) */}
+                      {isInactive ? (
+                        <RestoreIcon
+                          color="success"
+                          sx={{ cursor: "pointer" }}
+                          onClick={() => handleRestoreClick(r)}
+                        />
+                      ) : (
+                        <MyButton
+                          variant="outline-secondary"
+                          style={{ minWidth: 0, padding: 0 }}
+                          onClick={() => handleDeleteClick(r)}
+                        >
+                          <DeleteIcon color="error" />
+                        </MyButton>
+                      )}
                     </>
                   );
                 },
@@ -440,7 +479,9 @@ const RestaurantSearch: React.FC = () => {
       {/* Confirmation Dialog */}
       <MyDialog open={showConfirm} onClose={handleConfirmNo} maxWidth="xs">
         <DialogContent sx={{ textAlign: "center" }}>
-          Are you sure you want to delete "{pendingDelete?.restaurantName}"?
+          {pendingAction === "delete"
+            ? `Are you sure you want to delete "${pendingDelete?.restaurantName}"?`
+            : `Are you sure you want to reactive "${pendingDelete?.restaurantName}"?`}
           <Stack
             direction="row"
             spacing={2}

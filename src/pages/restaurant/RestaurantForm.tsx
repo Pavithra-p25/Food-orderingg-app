@@ -22,14 +22,14 @@ import useRestaurants from "../../hooks/restaurant/useRestaurant";
 interface Props {
   show: boolean; // show or hide the dialog
   onClose: () => void; // to close the dialog
-  restaurant?: Restaurant | null;
-   onSave?: (updated: Restaurant) => void; 
+  restaurant?: Restaurant | null; //if present - edit mode
+   onSave?: (updated: Restaurant) => void; //notify parent after save 
 }
 
 const RestaurantForm: React.FC<Props> = ({
   show,
   onClose,
-  restaurant = null,
+  restaurant = null, //add mode , not null -edit mode
   onSave,
 }) => {
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
@@ -114,7 +114,7 @@ const RestaurantForm: React.FC<Props> = ({
  const onSubmit = async (data: Restaurant) => {
   try {
     setIsSubmitted(true);
-    let savedRestaurant: Restaurant;
+    let savedRestaurant: Restaurant; //using savedRestauarnt for 2 things edit and add if else
 
     if (restaurant?.id) {
       // EDIT mode → call update

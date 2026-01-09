@@ -12,6 +12,11 @@ export type RestaurantTabStatusMap = Record<RestaurantTabKey, TabStatus>;
 
 export type RestaurantType = "Veg" | "Non-Veg" | "Both" | "";
 
+export type Timestamps = {
+  createdAt: string; // ISO date
+  updatedAt: string; // ISO date
+};
+
 export type Login = {
   email: string;
   password: string;
@@ -49,7 +54,8 @@ export type Restaurant =
   Login &
   RestaurantData &
   Contact &
-  Location & {
+  Location &
+  Timestamps & {
     id: number;
     isActive?:boolean;
       // optional for new restaurants

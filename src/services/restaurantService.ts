@@ -30,6 +30,7 @@ export const updateRestaurant = async (
   return data;
 };
 
+//deactivate / soft delete -  isActive: false
 export const softDeleteRestaurant = async (
   id: number,
   payload: Partial<Restaurant>
@@ -40,3 +41,16 @@ export const softDeleteRestaurant = async (
   );
   return data;
 };
+
+//restore / enable - isActive: true
+export const activateRestaurant = async (
+  id: number,
+  payload: Partial<Restaurant>
+): Promise<Restaurant> => {
+  const data = await apiService.patch<Restaurant>(
+    `/restaurants/${id}`,
+    payload
+  );
+  return data;
+};
+

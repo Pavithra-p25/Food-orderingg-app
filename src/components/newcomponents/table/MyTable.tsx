@@ -35,7 +35,7 @@ function MyTable<T>({ columns, rows }: MyTableProps<T>) {
   const [page, setPage] = useState(0); //current page
   const [rowsPerPage, setRowsPerPage] = useState(5); //rows per page
 
-  // Reset page when rows change (e.g., after search)
+  // Reset page when rows change 
 useEffect(() => {
   setPage(0);
 }, [rows]);

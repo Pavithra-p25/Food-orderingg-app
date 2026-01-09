@@ -55,7 +55,9 @@
       "pincode": "625001",
       "country": "India",
       "acceptTerms": true,
-      "isActive": true
+      "isActive": true,
+      "createdAt": "2025-12-20T04:30:00.000Z",
+      "updatedAt": "2026-01-05T10:15:00.000Z"
     },
     {
       "email": "spicehub@gmail.com",
@@ -79,7 +81,9 @@
       "pincode": "620018",
       "country": "India",
       "acceptTerms": true,
-      "id": "f693"
+      "id": "f693",
+      "createdAt": "2025-11-10T06:45:00.000Z",
+      "updatedAt": "2026-01-09T03:47:03.253Z"
     },
     {
       "email": "annapoorna@gmail.com",
@@ -103,7 +107,9 @@
       "pincode": "636001",
       "country": "India",
       "acceptTerms": true,
-      "id": "0f88"
+      "id": "0f88",
+      "createdAt": "2025-10-01T01:30:00.000Z",
+      "updatedAt": "2026-01-07T12:10:00.000Z"
     },
     {
       "email": "bbqflae@gmail.com",
@@ -127,7 +133,9 @@
       "pincode": "638011",
       "country": "India",
       "acceptTerms": true,
-      "id": "60d2"
+      "id": "60d2",
+      "createdAt": "2025-09-15T09:00:00.000Z",
+      "updatedAt": "2026-01-03T16:40:00.000Z"
     },
     {
       "email": "pizzahu@gmail.com",
@@ -151,7 +159,9 @@
       "pincode": "600028",
       "country": "India",
       "acceptTerms": true,
-      "id": "cebe"
+      "id": "cebe",
+      "createdAt": "2025-12-05T05:50:00.000Z",
+      "updatedAt": "2026-01-08T09:30:00.000Z"
     },
     {
       "email": "burgerzone@gmail.com",
@@ -175,13 +185,15 @@
       "pincode": "624001",
       "country": "India",
       "acceptTerms": true,
-      "id": "56db"
+      "id": "56db",
+      "createdAt": "2026-01-02T10:15:00.000Z",
+      "updatedAt": "2026-01-05T14:40:00.000Z"
     },
     {
       "email": "royalcurry@gmail.com",
       "password": "Royal@123",
       "confirmPassword": "Royal@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Royal Curry House",
       "restaurantType": "Non-Veg",
       "category": "North Indian",
@@ -199,7 +211,9 @@
       "pincode": "632004",
       "country": "India",
       "acceptTerms": true,
-      "id": "c826"
+      "id": "c826",
+      "createdAt": "2026-01-01T09:30:00.000Z",
+      "updatedAt": "2026-01-06T11:20:00.000Z"
     },
     {
       "email": "tastytreats@gmail.com",
@@ -223,7 +237,9 @@
       "pincode": "613001",
       "country": "India",
       "acceptTerms": true,
-      "id": "a1ce"
+      "id": "a1ce",
+      "createdAt": "2026-01-03T08:45:00.000Z",
+      "updatedAt": "2026-01-04T16:10:00.000Z"
     },
     {
       "email": "noodlehouse@gmail.com",
@@ -247,7 +263,9 @@
       "pincode": "627007",
       "country": "India",
       "acceptTerms": true,
-      "id": "233f"
+      "id": "233f",
+      "createdAt": "2026-01-04T10:00:00.000Z",
+      "updatedAt": "2026-01-07T09:00:00.000Z"
     },
     {
       "id": "b30a",
@@ -272,7 +290,9 @@
       "pincode": "626125",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-11T18:30:00.000Z"
+      "openingDate": "2026-01-11T18:30:00.000Z",
+      "createdAt": "2026-01-06T06:30:00.000Z",
+      "updatedAt": "2026-01-08T12:45:00.000Z"
     },
     {
       "id": "b44f",
@@ -297,7 +317,9 @@
       "pincode": "626125",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-07T18:30:00.000Z"
+      "openingDate": "2026-01-07T18:30:00.000Z",
+      "createdAt": "2026-01-06T10:00:00.000Z",
+      "updatedAt": "2026-01-07T08:15:00.000Z"
     },
     {
       "id": "r101",
@@ -322,7 +344,9 @@
       "pincode": "625020",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-10T18:30:00.000Z"
+      "openingDate": "2026-01-10T18:30:00.000Z",
+      "createdAt": "2026-01-05T06:30:00.000Z",
+      "updatedAt": "2026-01-08T09:45:00.000Z"
     },
     {
       "id": "r102",
@@ -347,7 +371,9 @@
       "pincode": "630001",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-12T18:30:00.000Z"
+      "openingDate": "2026-01-12T18:30:00.000Z",
+      "createdAt": "2026-01-04T07:45:00.000Z",
+      "updatedAt": "2026-01-07T11:20:00.000Z"
     },
     {
       "id": "r103",
@@ -372,7 +398,9 @@
       "pincode": "620020",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-15T18:30:00.000Z"
+      "openingDate": "2026-01-15T18:30:00.000Z",
+      "createdAt": "2026-01-03T12:00:00.000Z",
+      "updatedAt": "2026-01-06T15:10:00.000Z"
     },
     {
       "id": "r104",
@@ -397,7 +425,9 @@
       "pincode": "600017",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-09T18:30:00.000Z"
+      "openingDate": "2026-01-09T18:30:00.000Z",
+      "createdAt": "2026-01-02T05:30:00.000Z",
+      "updatedAt": "2026-01-05T13:40:00.000Z"
     },
     {
       "id": "r105",
@@ -422,7 +452,9 @@
       "pincode": "641014",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-08T18:30:00.000Z"
+      "openingDate": "2026-01-08T18:30:00.000Z",
+      "createdAt": "2026-01-01T08:00:00.000Z",
+      "updatedAt": "2026-01-04T10:25:00.000Z"
     },
     {
       "id": "r106",
@@ -447,14 +479,16 @@
       "pincode": "632006",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-14T18:30:00.000Z"
+      "openingDate": "2026-01-14T18:30:00.000Z",
+      "createdAt": "2026-01-02T09:20:00.000Z",
+      "updatedAt": "2026-01-06T16:50:00.000Z"
     },
     {
       "id": "r107",
       "email": "sweetcorner@gmail.com",
       "password": "Sweet@123",
       "confirmPassword": "Sweet@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Sweet Corner",
       "restaurantType": "Veg",
       "category": "Dessert",
@@ -472,7 +506,9 @@
       "pincode": "625531",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-11T18:30:00.000Z"
+      "openingDate": "2026-01-11T18:30:00.000Z",
+      "createdAt": "2026-01-03T06:10:00.000Z",
+      "updatedAt": "2026-01-07T12:30:00.000Z"
     },
     {
       "id": "r108",
@@ -497,7 +533,9 @@
       "pincode": "637001",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-13T18:30:00.000Z"
+      "openingDate": "2026-01-13T18:30:00.000Z",
+      "createdAt": "2026-01-04T11:40:00.000Z",
+      "updatedAt": "2026-01-08T09:10:00.000Z"
     },
     {
       "id": "r109",
@@ -521,7 +559,9 @@
       "pincode": "605001",
       "country": "India",
       "acceptTerms": true,
-      "openingDate": "2026-01-16T18:30:00.000Z"
+      "openingDate": "2026-01-16T18:30:00.000Z",
+      "createdAt": "2026-01-05T07:00:00.000Z",
+      "updatedAt": "2026-01-08T14:35:00.000Z"
     }
   ]
 }
