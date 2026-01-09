@@ -89,7 +89,7 @@
       "email": "annapoorna@gmail.com",
       "password": "Anna@123",
       "confirmPassword": "Anna@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Annapoorna Veg",
       "restaurantType": "Veg",
       "category": "Breakfast",
@@ -109,7 +109,7 @@
       "acceptTerms": true,
       "id": "0f88",
       "createdAt": "2025-10-01T01:30:00.000Z",
-      "updatedAt": "2026-01-09T06:06:51.938Z"
+      "updatedAt": "2026-01-09T10:10:18.623Z"
     },
     {
       "email": "bbqflae@gmail.com",
@@ -353,7 +353,7 @@
       "email": "chettinad@gmail.com",
       "password": "Chetti@123",
       "confirmPassword": "Chetti@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Chettinad Palace",
       "restaurantType": "Non-Veg",
       "category": "South Indian",
@@ -373,7 +373,7 @@
       "acceptTerms": true,
       "openingDate": "2026-01-12T18:30:00.000Z",
       "createdAt": "2026-01-04T07:45:00.000Z",
-      "updatedAt": "2026-01-07T11:20:00.000Z"
+      "updatedAt": "2026-01-09T10:10:12.440Z"
     },
     {
       "id": "r103",
