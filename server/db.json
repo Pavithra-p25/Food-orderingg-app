@@ -34,7 +34,7 @@
   "restaurants": [
     {
       "id": "df0b",
-      "email": "greenlef@gmail.com",
+      "email": "greenleaff@gmail.com",
       "password": "Green@123",
       "confirmPassword": "Green@123",
       "restaurantName": "Green Leaf Veg Restaurant",
@@ -57,10 +57,10 @@
       "acceptTerms": true,
       "isActive": true,
       "createdAt": "2025-12-20T04:30:00.000Z",
-      "updatedAt": "2026-01-05T10:15:00.000Z"
+      "updatedAt": "2026-01-10T12:12:06.350Z"
     },
     {
-      "email": "spicehub@gmail.com",
+      "email": "spicehu@gmail.com",
       "password": "Spice@123",
       "confirmPassword": "Spice@123",
       "isActive": true,
@@ -83,7 +83,7 @@
       "acceptTerms": true,
       "id": "f693",
       "createdAt": "2025-11-10T06:45:00.000Z",
-      "updatedAt": "2026-01-09T05:19:19.108Z"
+      "updatedAt": "2026-01-10T12:12:26.743Z"
     },
     {
       "email": "annapoorna@gmail.com",
@@ -109,13 +109,13 @@
       "acceptTerms": true,
       "id": "0f88",
       "createdAt": "2025-10-01T01:30:00.000Z",
-      "updatedAt": "2026-01-09T10:10:18.623Z"
+      "updatedAt": "2026-01-10T12:12:06.351Z"
     },
     {
       "email": "bbqflae@gmail.com",
       "password": "BBQ@123",
       "confirmPassword": "BBQ@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "BBQ Flame",
       "restaurantType": "Non-Veg",
       "category": "Barbecue",
@@ -135,10 +135,10 @@
       "acceptTerms": true,
       "id": "60d2",
       "createdAt": "2025-09-15T09:00:00.000Z",
-      "updatedAt": "2026-01-03T16:40:00.000Z"
+      "updatedAt": "2026-01-10T12:37:43.014Z"
     },
     {
-      "email": "pizzahu@gmail.com",
+      "email": "pizzahub@gmail.com",
       "password": "Pizza@123",
       "confirmPassword": "Pizza@123",
       "isActive": true,
@@ -161,7 +161,7 @@
       "acceptTerms": true,
       "id": "cebe",
       "createdAt": "2025-12-05T05:50:00.000Z",
-      "updatedAt": "2026-01-08T09:30:00.000Z"
+      "updatedAt": "2026-01-10T05:23:59.635Z"
     },
     {
       "email": "burgerzone@gmail.com",
@@ -187,13 +187,13 @@
       "acceptTerms": true,
       "id": "56db",
       "createdAt": "2026-01-02T10:15:00.000Z",
-      "updatedAt": "2026-01-05T14:40:00.000Z"
+      "updatedAt": "2026-01-09T10:40:05.637Z"
     },
     {
       "email": "royalcurry@gmail.com",
       "password": "Royal@123",
       "confirmPassword": "Royal@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Royal Curry House",
       "restaurantType": "Non-Veg",
       "category": "North Indian",
@@ -213,7 +213,7 @@
       "acceptTerms": true,
       "id": "c826",
       "createdAt": "2026-01-01T09:30:00.000Z",
-      "updatedAt": "2026-01-06T11:20:00.000Z"
+      "updatedAt": "2026-01-10T12:37:43.020Z"
     },
     {
       "email": "tastytreats@gmail.com",
@@ -407,7 +407,7 @@
       "email": "hotbreads@gmail.com",
       "password": "Bread@123",
       "confirmPassword": "Bread@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Hot Breads",
       "restaurantType": "Veg",
       "category": "Bakery",
@@ -427,14 +427,14 @@
       "acceptTerms": true,
       "openingDate": "2026-01-09T18:30:00.000Z",
       "createdAt": "2026-01-02T05:30:00.000Z",
-      "updatedAt": "2026-01-05T13:40:00.000Z"
+      "updatedAt": "2026-01-10T12:38:18.000Z"
     },
     {
       "id": "r105",
       "email": "cafecoffee@gmail.com",
       "password": "Cafe@123",
       "confirmPassword": "Cafe@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Cafe Coffee Day",
       "restaurantType": "Veg",
       "category": "Cafe",
@@ -454,7 +454,7 @@
       "acceptTerms": true,
       "openingDate": "2026-01-08T18:30:00.000Z",
       "createdAt": "2026-01-01T08:00:00.000Z",
-      "updatedAt": "2026-01-04T10:25:00.000Z"
+      "updatedAt": "2026-01-10T12:38:18.004Z"
     },
     {
       "id": "r106",
@@ -561,7 +561,8 @@
       "acceptTerms": true,
       "openingDate": "2026-01-16T18:30:00.000Z",
       "createdAt": "2026-01-05T07:00:00.000Z",
-      "updatedAt": "2026-01-08T14:35:00.000Z"
+      "updatedAt": "2026-01-09T10:54:30.362Z",
+      "isActive": false
     },
     {
       "id": "68da",
@@ -589,6 +590,32 @@
       "isActive": true,
       "createdAt": "2026-01-09T03:55:24.152Z",
       "updatedAt": "2026-01-09T03:55:24.152Z"
+    },
+    {
+      "id": "b435",
+      "email": "greenleaf@gmail.com",
+      "password": "111111",
+      "confirmPassword": "111111",
+      "restaurantName": "green leaf restaurant ",
+      "restaurantType": "Non-Veg",
+      "category": "Fast Food",
+      "averageDeliveryTime": "30 - 40 mins",
+      "openingTime": "",
+      "closingTime": "",
+      "website": "",
+      "ownerName": "ramesh kumar",
+      "supportEmail": "vncjsin@gmail.com",
+      "phone": "986",
+      "alternatePhone": "",
+      "address": "Ashok Nagar",
+      "city": "Srivillputhur",
+      "state": "Tamil Nadu",
+      "pincode": "626125",
+      "country": "India",
+      "acceptTerms": true,
+      "isActive": true,
+      "createdAt": "2026-01-10T14:43:23.060Z",
+      "updatedAt": "2026-01-10T14:44:43.624Z"
     }
   ]
 }

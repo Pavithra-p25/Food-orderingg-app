@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Grid,
-  DialogContent,
-  Stack,
-} from "@mui/material";
-
+import { Container, Grid, DialogContent, Stack } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import { useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import RestaurantForm from "../restaurant/RestaurantForm";
 import { restaurantDefaultValues } from "./restaurantDefaultValues";
 import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
-
+import MyTab from "../../components/newcomponents/tabs/MyTab";
 import RestaurantSearchForm from "./RestaurantSearchForm";
 import RestaurantTable from "./RestaurantTable";
 
@@ -22,37 +16,32 @@ type PendingAction = "delete" | "restore" | null;
 
 const RestaurantSearch: React.FC = () => {
   const methods = useForm<Restaurant>({
-    defaultValues: {
-      ...restaurantDefaultValues,
-    },
+    defaultValues: { ...restaurantDefaultValues },
   });
 
   const { control, handleSubmit, reset } = methods;
 
-  const [results, setResults] = useState<Restaurant[]>([]); // search results
-  const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]); // all data
-
-  
+  const [results, setResults] = useState<Restaurant[]>([]);
+  const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
 
   const { getAllRestaurants, softDeleteRestaurant, activateRestaurant } =
     useRestaurants();
 
   const [openAddForm, setOpenAddForm] = useState(false);
 
-  // Snackbar states
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<
     "success" | "error" | "info" | "warning"
   >("info");
 
-  // Edit state
-  const [editingRestaurant, setEditingRestaurant] =
-    useState<Restaurant | null>(null);
+  const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(
+    null
+  );
 
-  // Confirmation dialog states
   const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<Restaurant | null>(null);
+  const [pendingIds, setPendingIds] = useState<string[]>([]);
+
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
   useEffect(() => {
@@ -60,137 +49,172 @@ const RestaurantSearch: React.FC = () => {
       try {
         const data = await getAllRestaurants();
         setAllRestaurants(data);
-        setResults(data); // show all (active + inactive)
+        setResults(data);
       } catch (error) {
         console.error("Failed to fetch restaurants:", error);
       }
     };
-
     fetchRestaurants();
   }, []);
 
   const handleReset = () => {
     reset(restaurantDefaultValues);
-    setResults(allRestaurants); // show all again
+    setResults(allRestaurants);
   };
 
   const onSubmit = async (data: any) => {
     try {
       const filtered = allRestaurants.filter((res: Restaurant) => {
+        const match = (field?: string, value?: string) =>
+          value && field?.toLowerCase().includes(value.toLowerCase().trim());
+
+        // Return true if any field matches
         return (
-          (!data.restaurantName ||
-            (res.restaurantName ?? "")
-              .toLowerCase()
-              .includes(data.restaurantName.toLowerCase().trim())) &&
-          (!data.category ||
-            (res.category ?? "").toLowerCase().trim() ===
-              data.category.toLowerCase().trim()) &&
-          (!data.restaurantType ||
-            (res.restaurantType ?? "").toLowerCase().trim() ===
-              data.restaurantType.toLowerCase().trim()) &&
-          (!data.city ||
-            (res.city ?? "")
-              .toLowerCase()
-              .includes(data.city.toLowerCase().trim())) &&
-          (!data.state ||
-            (res.state ?? "")
-              .toLowerCase()
-              .includes(data.state.toLowerCase().trim())) &&
-          (!data.phone ||
-            (res.phone ?? "")
-              .toLowerCase()
-              .includes(data.phone.toLowerCase().trim())) &&
-          (!data.email ||
-            (res.email ?? "")
-              .toLowerCase()
-              .includes(data.email.toLowerCase().trim()))
+          match(res.restaurantName, data.restaurantName) ||
+          match(res.category, data.category) ||
+          match(res.restaurantType, data.restaurantType) ||
+          match(res.city, data.city) ||
+          match(res.state, data.state) ||
+          match(res.phone, data.phone) ||
+          match(res.email, data.email)
         );
       });
 
       setResults(filtered);
     } catch (error) {
-      console.error("Failed to fetch restaurants:", error);
+      console.error("Failed to filter restaurants:", error);
       setResults([]);
     }
   };
 
-  // Delete
-  const handleDeleteClick = (restaurant: Restaurant) => {
-    setPendingDelete(restaurant);
+  const handleDeleteClick = (ids: string[]) => {
+    setPendingIds(ids);
     setPendingAction("delete");
     setShowConfirm(true);
   };
 
-  // Restore
-  const handleRestoreClick = (restaurant: Restaurant) => {
-    setPendingDelete(restaurant);
+  const handleRestoreClick = (ids: string[]) => {
+    setPendingIds(ids);
     setPendingAction("restore");
     setShowConfirm(true);
   };
 
   const handleConfirmYes = async () => {
-    if (!pendingDelete || !pendingAction) return;
+    if (pendingIds.length === 0 || !pendingAction) return;
 
     try {
       if (pendingAction === "delete") {
-        await softDeleteRestaurant(pendingDelete.id);
+        await Promise.all(pendingIds.map((id) => softDeleteRestaurant(id)));
 
         setAllRestaurants((prev) =>
           prev.map((r) =>
-            r.id === pendingDelete.id ? { ...r, isActive: false } : r
+            pendingIds.includes(r.id.toString()) ? { ...r, isActive: false } : r
           )
         );
 
         setResults((prev) =>
           prev.map((r) =>
-            r.id === pendingDelete.id ? { ...r, isActive: false } : r
+            pendingIds.includes(r.id.toString()) ? { ...r, isActive: false } : r
           )
         );
 
         setSnackbarMessage(
-          `"${pendingDelete.restaurantName}" deleted successfully`
+          pendingIds.length === 1
+            ? "Restaurant deleted successfully"
+            : `${pendingIds.length} restaurants deleted successfully`
         );
-        setSnackbarSeverity("success");
-      } else if (pendingAction === "restore") {
-        await activateRestaurant(pendingDelete.id);
-
-        setAllRestaurants((prev) =>
-          prev.map((r) =>
-            r.id === pendingDelete.id ? { ...r, isActive: true } : r
-          )
-        );
-
-        setResults((prev) =>
-          prev.map((r) =>
-            r.id === pendingDelete.id ? { ...r, isActive: true } : r
-          )
-        );
-
-        setSnackbarMessage(
-          `"${pendingDelete.restaurantName}" reactivated successfully`
-        );
-        setSnackbarSeverity("success");
       }
+
+      if (pendingAction === "restore") {
+        await Promise.all(pendingIds.map((id) => activateRestaurant(id)));
+
+        setAllRestaurants((prev) =>
+          prev.map((r) =>
+            pendingIds.includes(r.id.toString()) ? { ...r, isActive: true } : r
+          )
+        );
+
+        setResults((prev) =>
+          prev.map((r) =>
+            pendingIds.includes(r.id.toString()) ? { ...r, isActive: true } : r
+          )
+        );
+
+        setSnackbarMessage(
+          pendingIds.length === 1
+            ? "Restaurant restored successfully"
+            : `${pendingIds.length} restaurants restored successfully`
+        );
+      }
+
+      setSnackbarSeverity("success");
     } catch (error) {
       setSnackbarMessage(
         pendingAction === "delete"
-          ? "Failed to delete restaurant"
-          : "Failed to reactive restaurant"
+          ? "Failed to delete restaurant(s)"
+          : "Failed to restore restaurant(s)"
       );
       setSnackbarSeverity("error");
     } finally {
-      setPendingDelete(null);
+      setPendingIds([]);
       setPendingAction(null);
       setShowConfirm(false);
       setSnackbarOpen(true);
     }
   };
-
   const handleConfirmNo = () => {
-    setPendingDelete(null);
+    setPendingIds([]);
     setPendingAction(null);
     setShowConfirm(false);
   };
+
+  const tabs = [
+    {
+      key: "all",
+      tabName: "All",
+      tabContent: (
+        <RestaurantTable
+          results={results}
+          onEdit={(r) => {
+            setEditingRestaurant(r);
+            setOpenAddForm(true);
+          }}
+          onDelete={handleDeleteClick}
+          onRestore={handleRestoreClick}
+        />
+      ),
+    },
+    {
+      key: "active",
+      tabName: "Active",
+      tabContent: (
+        <RestaurantTable
+          results={results.filter((r) => r.isActive)}
+          onEdit={(r) => {
+            setEditingRestaurant(r);
+            setOpenAddForm(true);
+          }}
+          onDelete={handleDeleteClick}
+          onRestore={handleRestoreClick}
+        />
+      ),
+    },
+    {
+      key: "inactive",
+      tabName: "Inactive",
+      tabContent: (
+        <RestaurantTable
+          results={results.filter((r) => !r.isActive)}
+          onEdit={(r) => {
+            setEditingRestaurant(r);
+            setOpenAddForm(true);
+          }}
+          onDelete={handleDeleteClick}
+          onRestore={handleRestoreClick}
+        />
+      ),
+    },
+  ];
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -204,7 +228,7 @@ const RestaurantSearch: React.FC = () => {
             onSubmit={onSubmit}
             handleReset={handleReset}
             onAdd={() => {
-              setEditingRestaurant(null); // reset so form is empty
+              setEditingRestaurant(null);
               setOpenAddForm(true);
             }}
           />
@@ -212,14 +236,13 @@ const RestaurantSearch: React.FC = () => {
 
         {/* RESULTS TABLE */}
         <Grid size={12}>
-          <RestaurantTable
-            results={results}
-            onEdit={(r) => {
-              setEditingRestaurant(r);
-              setOpenAddForm(true);
+          <MyTab
+            tabs={tabs}
+            tabStatus={{
+              all: "neutral",
+              active: "success",
+              inactive: "error",
             }}
-            onDelete={handleDeleteClick}
-            onRestore={handleRestoreClick}
           />
         </Grid>
       </Grid>
@@ -259,9 +282,19 @@ const RestaurantSearch: React.FC = () => {
       <MyDialog open={showConfirm} onClose={handleConfirmNo} maxWidth="xs">
         <DialogContent sx={{ textAlign: "center" }}>
           {pendingAction === "delete"
-            ? `Are you sure you want to delete "${pendingDelete?.restaurantName}"?`
-            : `Are you sure you want to reactive "${pendingDelete?.restaurantName}"?`}
-          <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 3 }}>
+            ? pendingIds.length === 1
+              ? "Are you sure you want to delete this restaurant?"
+              : `Are you sure you want to delete ${pendingIds.length} restaurants?`
+            : pendingIds.length === 1
+            ? "Are you sure you want to restore this restaurant?"
+            : `Are you sure you want to restore ${pendingIds.length} restaurants?`}
+
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+            sx={{ mt: 3 }}
+          >
             <MyButton variant="outlined" onClick={handleConfirmNo}>
               No
             </MyButton>

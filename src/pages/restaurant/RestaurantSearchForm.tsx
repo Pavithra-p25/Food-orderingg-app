@@ -11,16 +11,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import { FormProvider } from "react-hook-form";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
-import { RESTAURANT_TYPES } from "../../config/constants/RestaurantConst";
-
-// Allowed restaurant types
-const categories = [
-  "North Indian",
-  "South Indian",
-  "Chinese",
-  "Fast Food",
-  "Dessert",
-];
+import { RESTAURANT_TYPES ,RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
 
 type Props = {
   methods: any;
@@ -74,7 +65,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
                 name="category"
                 control={control}
                 label="Category"
-                options={categories}
+                options={RESTAURANT_CATEGORIES}
               />
             </Grid>
 

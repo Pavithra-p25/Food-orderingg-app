@@ -7,24 +7,23 @@ export const useRestaurants = () => {
   const getAllRestaurants = async () => {
     try {
       const data = await restaurantService.getRestaurants();
-      return data ?? []; // if data is null/undefined, return empty array
+      return data ?? [];
     } catch (error) {
       console.error("Failed to fetch restaurants:", error);
       return [];
     }
   };
 
-  const getRestaurantDetails = async (id: number | string) => {
+  const getRestaurantDetails = async (id: string) => {
     try {
-      const data = await restaurantService.getRestaurantById(Number(id));
-      return data ?? null; // if no data, return null
+      const data = await restaurantService.getRestaurantById(id);
+      return data ?? null;
     } catch (error) {
       console.error("Failed to fetch restaurant details:", error);
       return null;
     }
   };
 
-  //add new restaurant
   const addRestaurant = async (formData: Restaurant) => {
     try {
       const now = nowISO();
@@ -43,8 +42,8 @@ export const useRestaurants = () => {
     }
   };
 
-  //  update restaurant
-  const updateRestaurant = async (id: number, formData: Restaurant) => {
+  
+  const updateRestaurant = async (id: string, formData: Restaurant) => {
     try {
       return await restaurantService.updateRestaurant(id, {
         ...formData,
@@ -56,7 +55,8 @@ export const useRestaurants = () => {
     }
   };
 
-  const softDeleteRestaurant = async (id: number) => {
+  
+  const softDeleteRestaurant = async (id: string) => {
     try {
       return await restaurantService.softDeleteRestaurant(id, {
         isActive: false,
@@ -68,7 +68,8 @@ export const useRestaurants = () => {
     }
   };
 
-  const activateRestaurant = async (id: number) => {
+  
+  const activateRestaurant = async (id: string) => {
     try {
       return await restaurantService.activateRestaurant(id, {
         isActive: true,

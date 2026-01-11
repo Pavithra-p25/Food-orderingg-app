@@ -7,4 +7,16 @@ export const DELIVERY_TIME_OPTIONS = [
   "30 - 40 mins",
   "40 - 50 mins",
   "50 - 60 mins",
-] ;
+];
+
+export const RESTAURANT_CATEGORIES = [
+  "North Indian",
+  "South Indian",
+  "Chinese",
+  "Fast Food",
+  "Dessert",
+  "Biryani",
+  "Snacks",
+  "Pizza",
+  "Italian",
+];

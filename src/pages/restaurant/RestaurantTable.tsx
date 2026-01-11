@@ -10,9 +10,10 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 type Props = {
   results: Restaurant[];
   onEdit: (r: Restaurant) => void;
-  onDelete: (r: Restaurant) => void;
-  onRestore: (r: Restaurant) => void;
+  onDelete: (ids: string[]) => void;
+  onRestore: (ids: string[]) => void;
 };
+
 
 const RestaurantTable: React.FC<Props> = ({
   results,
@@ -20,9 +21,29 @@ const RestaurantTable: React.FC<Props> = ({
   onDelete,
   onRestore,
 }) => {
+   // Bulk Handlers
+  const handleBulkDelete = (selectedRows: Restaurant[]) => {
+  const ids = selectedRows.map(r => r.id.toString());
+  onDelete(ids);
+};
+
+const handleBulkRestore = (selectedRows: Restaurant[]) => {
+  const ids = selectedRows.map(r => r.id.toString());
+  onRestore(ids);
+};
+
+
+
   return (
     <MyTable
       rows={results}
+      selectable
+      rowId={(r) => r.id.toString()}
+      onSelectionChange={(selectedRows) => {
+        console.log("Selected rows:", selectedRows);
+      }}
+      onBulkDelete={handleBulkDelete}
+      onBulkRestore={handleBulkRestore}
       columns={[
         {
           id: "restaurantName",
@@ -81,34 +102,30 @@ const RestaurantTable: React.FC<Props> = ({
 
             return (
               <>
-                {/* EDIT ICON */}
-                <EditNoteIcon
-                  color={isInactive ? "disabled" : "primary"}
-                  sx={{
-                    cursor: isInactive ? "not-allowed" : "pointer",
-                    mr: 1,
-                  }}
-                  onClick={() => {
-                    if (isInactive) return;
-                    onEdit(r);
-                  }}
-                />
-
-                {/* DELETE (Active) / RESTORE (Inactive) */}
                 {isInactive ? (
+                  /*  ONLY RESTORE ICON FOR INACTIVE */
                   <RestoreIcon
                     color="success"
                     sx={{ cursor: "pointer" }}
-                    onClick={() => onRestore(r)}
+                   onClick={() => onRestore([r.id.toString()])}
                   />
                 ) : (
-                  <MyButton
-                    variant="outline-secondary"
-                    style={{ minWidth: 0, padding: 0 }}
-                    onClick={() => onDelete(r)}
-                  >
-                    <DeleteIcon color="error" />
-                  </MyButton>
+                  /*  EDIT +  DELETE FOR ACTIVE */
+                  <>
+                    <EditNoteIcon
+                      color="primary"
+                      sx={{ cursor: "pointer", mr: 1 }}
+                      onClick={() => onEdit(r)}
+                    />
+
+                    <MyButton
+                      variant="outline-secondary"
+                      style={{ minWidth: 0, padding: 0 }}
+                      onClick={() => onDelete([r.id.toString()])}
+                    >
+                      <DeleteIcon color="error" />
+                    </MyButton>
+                  </>
                 )}
               </>
             );
