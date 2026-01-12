@@ -3,7 +3,14 @@ import Button from "@mui/material/Button";
 
 type MyButtonProps = {
   children?: React.ReactNode;
-  variant?: "primary" | "secondary" | "success" | "cancel" | "outline-secondary" | "outlined" | "contained";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "success"
+    | "cancel"
+    | "outline-secondary"
+    | "outlined"
+    | "contained";
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
@@ -23,16 +30,19 @@ const MyButton: React.FC<MyButtonProps> = ({
   return (
     <Button
       type={type}
-      variant={variant === "outline-secondary" || variant === "outlined" ? "outlined" : "contained"}
-
+      variant={
+        variant === "outline-secondary" || variant === "outlined"
+          ? "outlined"
+          : "contained"
+      }
       color={
         variant === "secondary" || variant === "outline-secondary"
           ? "secondary"
           : variant === "success"
-            ? "success"
-            : variant === "cancel"
-              ? "error"
-              : "primary"
+          ? "success"
+          : variant === "cancel"
+          ? "error"
+          : "primary"
       }
       style={{ height, ...style }}
       {...props}
@@ -41,4 +51,5 @@ const MyButton: React.FC<MyButtonProps> = ({
     </Button>
   );
 };
+
 export default MyButton;

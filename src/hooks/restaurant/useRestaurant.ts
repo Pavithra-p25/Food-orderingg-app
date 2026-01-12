@@ -1,10 +1,20 @@
+import { useCallback } from "react";
 import * as restaurantService from "../../services/restaurantService";
 import type { Restaurant } from "../../types/RestaurantTypes";
 
-const nowISO = () => new Date().toISOString();
+const nowISO = () => new Date().toISOString(); //return current date and time in iso format
+
+//data transfer object , user does not send id , dates , status (system controlled), so removed using omit
+type CreateRestaurantDTO = Omit<
+  Restaurant,
+  "id" | "createdAt" | "updatedAt" | "isActive"
+>;
+
+//user may update only some fields , so fields are optional (partial)
+type UpdateRestaurantDTO = Partial<CreateRestaurantDTO>;
 
 export const useRestaurants = () => {
-  const getAllRestaurants = async () => {
+  const getAllRestaurants = useCallback(async () => {
     try {
       const data = await restaurantService.getRestaurants();
       return data ?? [];
@@ -12,9 +22,9 @@ export const useRestaurants = () => {
       console.error("Failed to fetch restaurants:", error);
       return [];
     }
-  };
+  }, []);
 
-  const getRestaurantDetails = async (id: string) => {
+  const getRestaurantDetails = useCallback(async (id: string) => {
     try {
       const data = await restaurantService.getRestaurantById(id);
       return data ?? null;
@@ -22,13 +32,13 @@ export const useRestaurants = () => {
       console.error("Failed to fetch restaurant details:", error);
       return null;
     }
-  };
+  }, []);
 
-  const addRestaurant = async (formData: Restaurant) => {
+  const addRestaurant = useCallback(async (formData: CreateRestaurantDTO) => {
     try {
       const now = nowISO();
 
-      const payload: Restaurant = {
+      const payload = {
         ...formData,
         isActive: true,
         createdAt: now,
@@ -40,23 +50,24 @@ export const useRestaurants = () => {
       console.error("Failed to save restaurant:", error);
       throw error;
     }
-  };
+  }, []);
 
-  
-  const updateRestaurant = async (id: string, formData: Restaurant) => {
-    try {
-      return await restaurantService.updateRestaurant(id, {
-        ...formData,
-        updatedAt: nowISO(),
-      });
-    } catch (error) {
-      console.error("Failed to update restaurant:", error);
-      throw error;
-    }
-  };
+  const updateRestaurant = useCallback(
+    async (id: string, formData: UpdateRestaurantDTO) => {
+      try {
+        return await restaurantService.updateRestaurant(id, {
+          ...formData,
+          updatedAt: nowISO(),
+        });
+      } catch (error) {
+        console.error("Failed to update restaurant:", error);
+        throw error;
+      }
+    },
+    []
+  );
 
-  
-  const softDeleteRestaurant = async (id: string) => {
+  const softDeleteRestaurant = useCallback(async (id: string) => {
     try {
       return await restaurantService.softDeleteRestaurant(id, {
         isActive: false,
@@ -66,10 +77,9 @@ export const useRestaurants = () => {
       console.error("Failed to soft delete restaurant:", error);
       throw error;
     }
-  };
+  }, []);
 
-  
-  const activateRestaurant = async (id: string) => {
+  const activateRestaurant = useCallback(async (id: string) => {
     try {
       return await restaurantService.activateRestaurant(id, {
         isActive: true,
@@ -79,7 +89,7 @@ export const useRestaurants = () => {
       console.error("Failed to activate restaurant:", error);
       throw error;
     }
-  };
+  }, []);
 
   return {
     getAllRestaurants,

@@ -12,22 +12,21 @@ export const getRestaurantById = async (id: string): Promise<Restaurant> => {
 
 // create new restaurant
 export const createRestaurant = async (
-  payload: Restaurant
+  payload: Omit<Restaurant, "id">
 ): Promise<Restaurant> => {
   return await apiService.post<Restaurant>("/restaurants", payload);
 };
 
 export const updateRestaurant = async (
   id: string,
-  payload: Restaurant
+  payload: Partial<Restaurant>
 ): Promise<Restaurant> => {
   return await apiService.put<Restaurant>(`/restaurants/${id}`, payload);
 };
 
-
 export const softDeleteRestaurant = async (
   id: string,
-  payload: Partial<Restaurant>
+  payload: Pick<Restaurant, "isActive" | "updatedAt">
 ): Promise<Restaurant> => {
   return await apiService.patch<Restaurant>(
     `/restaurants/${id}`,
@@ -37,7 +36,7 @@ export const softDeleteRestaurant = async (
 
 export const activateRestaurant = async (
   id: string,
-  payload: Partial<Restaurant>
+  payload: Pick<Restaurant, "isActive" | "updatedAt">
 ): Promise<Restaurant> => {
   return await apiService.patch<Restaurant>(
     `/restaurants/${id}`,

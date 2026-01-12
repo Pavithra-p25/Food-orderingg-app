@@ -19,7 +19,7 @@ type Props = {
   handleSubmit: any;
   onSubmit: any;
   handleReset: () => void;
-  onAdd: () => void;
+  onAdd: () => void; //add restuarant popup
 };
 
 const RestaurantSearchForm: React.FC<Props> = ({

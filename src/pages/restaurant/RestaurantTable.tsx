@@ -12,27 +12,26 @@ type Props = {
   onEdit: (r: Restaurant) => void;
   onDelete: (ids: string[]) => void;
   onRestore: (ids: string[]) => void;
+  activeTab: "all" | "active" | "inactive";
 };
-
 
 const RestaurantTable: React.FC<Props> = ({
   results,
   onEdit,
   onDelete,
   onRestore,
+  activeTab,
 }) => {
-   // Bulk Handlers
+  // Bulk Handlers
   const handleBulkDelete = (selectedRows: Restaurant[]) => {
-  const ids = selectedRows.map(r => r.id.toString());
-  onDelete(ids);
-};
+    const ids = selectedRows.map((r) => r.id.toString());
+    onDelete(ids);
+  };
 
-const handleBulkRestore = (selectedRows: Restaurant[]) => {
-  const ids = selectedRows.map(r => r.id.toString());
-  onRestore(ids);
-};
-
-
+  const handleBulkRestore = (selectedRows: Restaurant[]) => {
+    const ids = selectedRows.map((r) => r.id.toString());
+    onRestore(ids);
+  };
 
   return (
     <MyTable
@@ -44,6 +43,7 @@ const handleBulkRestore = (selectedRows: Restaurant[]) => {
       }}
       onBulkDelete={handleBulkDelete}
       onBulkRestore={handleBulkRestore}
+      activeTab={activeTab}
       columns={[
         {
           id: "restaurantName",
@@ -71,7 +71,7 @@ const handleBulkRestore = (selectedRows: Restaurant[]) => {
         },
         {
           id: "phone",
-          label: "Phone Number",
+          label: "Phone",
           align: "center",
         },
         {
@@ -98,35 +98,60 @@ const handleBulkRestore = (selectedRows: Restaurant[]) => {
           label: "Actions",
           sortable: false,
           render: (r: Restaurant) => {
-            const isInactive = r.isActive === false;
+            const isInactive = !r.isActive;
 
-            return (
-              <>
-                {isInactive ? (
-                  /*  ONLY RESTORE ICON FOR INACTIVE */
-                  <RestoreIcon
-                    color="success"
-                    sx={{ cursor: "pointer" }}
-                   onClick={() => onRestore([r.id.toString()])}
+            if (activeTab === "active") {
+              // Active tab - show edit + delete 
+              return r.isActive ? (
+                <>
+                  <EditNoteIcon
+                    color="primary"
+                    sx={{ cursor: "pointer", mr: 1 }}
+                    onClick={() => onEdit(r)}
                   />
-                ) : (
-                  /*  EDIT +  DELETE FOR ACTIVE */
-                  <>
-                    <EditNoteIcon
-                      color="primary"
-                      sx={{ cursor: "pointer", mr: 1 }}
-                      onClick={() => onEdit(r)}
-                    />
+                  <MyButton
+                    variant="outline-secondary"
+                    style={{ minWidth: 0, padding: 0 }}
+                    onClick={() => onDelete([r.id.toString()])}
+                  >
+                    <DeleteIcon color="error" />
+                  </MyButton>
+                </>
+              ) : null;
+            }
 
-                    <MyButton
-                      variant="outline-secondary"
-                      style={{ minWidth: 0, padding: 0 }}
-                      onClick={() => onDelete([r.id.toString()])}
-                    >
-                      <DeleteIcon color="error" />
-                    </MyButton>
-                  </>
-                )}
+            if (activeTab === "inactive") {
+              // Inactive tab - show only restore
+              return isInactive ? (
+                <RestoreIcon
+                  color="success"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => onRestore([r.id.toString()])}
+                />
+              ) : null;
+            }
+
+            // All tab - show both based on status
+            return isInactive ? (
+              <RestoreIcon
+                color="success"
+                sx={{ cursor: "pointer" }}
+                onClick={() => onRestore([r.id.toString()])}
+              />
+            ) : (
+              <>
+                <EditNoteIcon
+                  color="primary"
+                  sx={{ cursor: "pointer", mr: 1 }}
+                  onClick={() => onEdit(r)}
+                />
+                <MyButton
+                  variant="outline-secondary"
+                  style={{ minWidth: 0, padding: 0 }}
+                  onClick={() => onDelete([r.id.toString()])}
+                >
+                  <DeleteIcon color="error" />
+                </MyButton>
               </>
             );
           },

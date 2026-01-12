@@ -57,10 +57,10 @@
       "acceptTerms": true,
       "isActive": true,
       "createdAt": "2025-12-20T04:30:00.000Z",
-      "updatedAt": "2026-01-10T12:12:06.350Z"
+      "updatedAt": "2026-01-11T11:22:53.506Z"
     },
     {
-      "email": "spicehu@gmail.com",
+      "email": "spiceehub@gmail.com",
       "password": "Spice@123",
       "confirmPassword": "Spice@123",
       "isActive": true,
@@ -83,13 +83,13 @@
       "acceptTerms": true,
       "id": "f693",
       "createdAt": "2025-11-10T06:45:00.000Z",
-      "updatedAt": "2026-01-10T12:12:26.743Z"
+      "updatedAt": "2026-01-11T15:28:37.068Z"
     },
     {
       "email": "annapoorna@gmail.com",
       "password": "Anna@123",
       "confirmPassword": "Anna@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Annapoorna Veg",
       "restaurantType": "Veg",
       "category": "Breakfast",
@@ -109,7 +109,7 @@
       "acceptTerms": true,
       "id": "0f88",
       "createdAt": "2025-10-01T01:30:00.000Z",
-      "updatedAt": "2026-01-10T12:12:06.351Z"
+      "updatedAt": "2026-01-11T15:28:43.552Z"
     },
     {
       "email": "bbqflae@gmail.com",
@@ -135,7 +135,7 @@
       "acceptTerms": true,
       "id": "60d2",
       "createdAt": "2025-09-15T09:00:00.000Z",
-      "updatedAt": "2026-01-10T12:37:43.014Z"
+      "updatedAt": "2026-01-11T08:57:29.618Z"
     },
     {
       "email": "pizzahub@gmail.com",
@@ -326,7 +326,7 @@
       "email": "saravanabhavan@gmail.com",
       "password": "Saravana@123",
       "confirmPassword": "Saravana@123",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "Saravana Bhavan",
       "restaurantType": "Veg",
       "category": "South Indian",
@@ -346,14 +346,14 @@
       "acceptTerms": true,
       "openingDate": "2026-01-10T18:30:00.000Z",
       "createdAt": "2026-01-05T06:30:00.000Z",
-      "updatedAt": "2026-01-08T09:45:00.000Z"
+      "updatedAt": "2026-01-11T11:13:59.217Z"
     },
     {
       "id": "r102",
       "email": "chettinad@gmail.com",
       "password": "Chetti@123",
       "confirmPassword": "Chetti@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Chettinad Palace",
       "restaurantType": "Non-Veg",
       "category": "South Indian",
@@ -373,14 +373,14 @@
       "acceptTerms": true,
       "openingDate": "2026-01-12T18:30:00.000Z",
       "createdAt": "2026-01-04T07:45:00.000Z",
-      "updatedAt": "2026-01-09T10:10:12.440Z"
+      "updatedAt": "2026-01-11T15:29:00.135Z"
     },
     {
       "id": "r103",
       "email": "bbqcity@gmail.com",
       "password": "BBQ@456",
       "confirmPassword": "BBQ@456",
-      "isActive": true,
+      "isActive": false,
       "restaurantName": "BBQ City",
       "restaurantType": "Non-Veg",
       "category": "Barbecue",
@@ -400,14 +400,14 @@
       "acceptTerms": true,
       "openingDate": "2026-01-15T18:30:00.000Z",
       "createdAt": "2026-01-03T12:00:00.000Z",
-      "updatedAt": "2026-01-06T15:10:00.000Z"
+      "updatedAt": "2026-01-11T11:13:59.220Z"
     },
     {
       "id": "r104",
       "email": "hotbreads@gmail.com",
       "password": "Bread@123",
       "confirmPassword": "Bread@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Hot Breads",
       "restaurantType": "Veg",
       "category": "Bakery",
@@ -427,7 +427,7 @@
       "acceptTerms": true,
       "openingDate": "2026-01-09T18:30:00.000Z",
       "createdAt": "2026-01-02T05:30:00.000Z",
-      "updatedAt": "2026-01-10T12:38:18.000Z"
+      "updatedAt": "2026-01-11T11:13:44.382Z"
     },
     {
       "id": "r105",

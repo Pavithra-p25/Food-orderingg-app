@@ -11,8 +11,8 @@ import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import MyTab from "../../components/newcomponents/tabs/MyTab";
 import RestaurantSearchForm from "./RestaurantSearchForm";
 import RestaurantTable from "./RestaurantTable";
-
-type PendingAction = "delete" | "restore" | null;
+// HOOK
+import { useRestaurantActions } from "../../hooks/restaurant/useRestaurantActions";
 
 const RestaurantSearch: React.FC = () => {
   const methods = useForm<Restaurant>({
@@ -23,26 +23,30 @@ const RestaurantSearch: React.FC = () => {
 
   const [results, setResults] = useState<Restaurant[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
-
+  //hook for api actions
   const { getAllRestaurants, softDeleteRestaurant, activateRestaurant } =
     useRestaurants();
 
   const [openAddForm, setOpenAddForm] = useState(false);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "info" | "warning"
-  >("info");
-
   const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(
     null
   );
 
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [pendingIds, setPendingIds] = useState<string[]>([]);
-
-  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  //ACTIONS HOOK
+  const {
+    snackbarOpen,
+    snackbarMessage,
+    snackbarSeverity,
+    showConfirm,
+    pendingAction,
+    pendingIds,
+    handleDeleteClick,
+    handleRestoreClick,
+    handleConfirmYes,
+    handleConfirmNo,
+    setSnackbarOpen,
+  } = useRestaurantActions(softDeleteRestaurant, activateRestaurant); //pass api functions to action hook to receieve state and handlers
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -58,17 +62,16 @@ const RestaurantSearch: React.FC = () => {
   }, []);
 
   const handleReset = () => {
-    reset(restaurantDefaultValues);
-    setResults(allRestaurants);
+    reset(restaurantDefaultValues); //reset search form 
+    setResults(allRestaurants); // table
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Restaurant) => {
     try {
       const filtered = allRestaurants.filter((res: Restaurant) => {
         const match = (field?: string, value?: string) =>
           value && field?.toLowerCase().includes(value.toLowerCase().trim());
 
-        // Return true if any field matches
         return (
           match(res.restaurantName, data.restaurantName) ||
           match(res.category, data.category) ||
@@ -87,87 +90,6 @@ const RestaurantSearch: React.FC = () => {
     }
   };
 
-  const handleDeleteClick = (ids: string[]) => {
-    setPendingIds(ids);
-    setPendingAction("delete");
-    setShowConfirm(true);
-  };
-
-  const handleRestoreClick = (ids: string[]) => {
-    setPendingIds(ids);
-    setPendingAction("restore");
-    setShowConfirm(true);
-  };
-
-  const handleConfirmYes = async () => {
-    if (pendingIds.length === 0 || !pendingAction) return;
-
-    try {
-      if (pendingAction === "delete") {
-        await Promise.all(pendingIds.map((id) => softDeleteRestaurant(id)));
-
-        setAllRestaurants((prev) =>
-          prev.map((r) =>
-            pendingIds.includes(r.id.toString()) ? { ...r, isActive: false } : r
-          )
-        );
-
-        setResults((prev) =>
-          prev.map((r) =>
-            pendingIds.includes(r.id.toString()) ? { ...r, isActive: false } : r
-          )
-        );
-
-        setSnackbarMessage(
-          pendingIds.length === 1
-            ? "Restaurant deleted successfully"
-            : `${pendingIds.length} restaurants deleted successfully`
-        );
-      }
-
-      if (pendingAction === "restore") {
-        await Promise.all(pendingIds.map((id) => activateRestaurant(id)));
-
-        setAllRestaurants((prev) =>
-          prev.map((r) =>
-            pendingIds.includes(r.id.toString()) ? { ...r, isActive: true } : r
-          )
-        );
-
-        setResults((prev) =>
-          prev.map((r) =>
-            pendingIds.includes(r.id.toString()) ? { ...r, isActive: true } : r
-          )
-        );
-
-        setSnackbarMessage(
-          pendingIds.length === 1
-            ? "Restaurant restored successfully"
-            : `${pendingIds.length} restaurants restored successfully`
-        );
-      }
-
-      setSnackbarSeverity("success");
-    } catch (error) {
-      setSnackbarMessage(
-        pendingAction === "delete"
-          ? "Failed to delete restaurant(s)"
-          : "Failed to restore restaurant(s)"
-      );
-      setSnackbarSeverity("error");
-    } finally {
-      setPendingIds([]);
-      setPendingAction(null);
-      setShowConfirm(false);
-      setSnackbarOpen(true);
-    }
-  };
-  const handleConfirmNo = () => {
-    setPendingIds([]);
-    setPendingAction(null);
-    setShowConfirm(false);
-  };
-
   const tabs = [
     {
       key: "all",
@@ -181,6 +103,7 @@ const RestaurantSearch: React.FC = () => {
           }}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
+          activeTab="all"
         />
       ),
     },
@@ -196,6 +119,7 @@ const RestaurantSearch: React.FC = () => {
           }}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
+          activeTab="active"
         />
       ),
     },
@@ -211,6 +135,7 @@ const RestaurantSearch: React.FC = () => {
           }}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
+          activeTab="inactive"
         />
       ),
     },
@@ -278,7 +203,7 @@ const RestaurantSearch: React.FC = () => {
         }}
       />
 
-      {/* Confirmation Dialog */}
+      {/* CONFIRMATION DIALOG */}
       <MyDialog open={showConfirm} onClose={handleConfirmNo} maxWidth="xs">
         <DialogContent sx={{ textAlign: "center" }}>
           {pendingAction === "delete"
@@ -298,14 +223,17 @@ const RestaurantSearch: React.FC = () => {
             <MyButton variant="outlined" onClick={handleConfirmNo}>
               No
             </MyButton>
-            <MyButton variant="contained" onClick={handleConfirmYes}>
+            <MyButton
+              variant="contained"
+              onClick={() => handleConfirmYes(setAllRestaurants, setResults)}
+            >
               Yes
             </MyButton>
           </Stack>
         </DialogContent>
       </MyDialog>
 
-      {/* Snackbar */}
+      {/* SNACKBAR */}
       <MySnackbar
         open={snackbarOpen}
         message={snackbarMessage}
