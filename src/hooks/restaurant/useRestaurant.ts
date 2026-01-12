@@ -5,7 +5,7 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 const nowISO = () => new Date().toISOString(); //return current date and time in iso format
 
 //data transfer object , user does not send id , dates , status (system controlled), so removed using omit
-type CreateRestaurantDTO = Omit<
+ export type CreateRestaurantDTO = Omit<
   Restaurant,
   "id" | "createdAt" | "updatedAt" | "isActive"
 >;
@@ -91,6 +91,15 @@ export const useRestaurants = () => {
     }
   }, []);
 
+  const deleteRestaurant = useCallback(async (id: string) => {
+  try {
+    return await restaurantService.deleteRestaurant(id);
+  } catch (error) {
+    console.error("Failed to delete restaurant permanently:", error);
+    throw error;
+  }
+}, []);
+
   return {
     getAllRestaurants,
     getRestaurantDetails,
@@ -98,6 +107,7 @@ export const useRestaurants = () => {
     updateRestaurant,
     softDeleteRestaurant,
     activateRestaurant,
+    deleteRestaurant,
   };
 };
 

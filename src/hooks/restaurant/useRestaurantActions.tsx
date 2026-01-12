@@ -5,7 +5,9 @@ type PendingAction = "delete" | "restore" | null;
 
 export const useRestaurantActions = (
   softDeleteRestaurant: (id: string) => Promise<any>, //api call to deactivate restuarant 
-  activateRestaurant: (id: string) => Promise<any> // to activate 
+  activateRestaurant: (id: string) => Promise<any> ,// to activate 
+  deleteRestaurant: (id: string) => Promise<any>,
+  saveDraft?: (restaurant: Restaurant) => void // optional handler for draft
 ) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false); //snack bar is opened/not
   const [snackbarMessage, setSnackbarMessage] = useState(""); //snackbar message 
@@ -31,38 +33,63 @@ export const useRestaurantActions = (
  
   //updating the state in parent component , dont need to refetch again there 
   const handleConfirmYes = async (
+    allRestaurants: Restaurant[], 
     setAllRestaurants: React.Dispatch<React.SetStateAction<Restaurant[]>>, 
     setResults: React.Dispatch<React.SetStateAction<Restaurant[]>>
   ) => {
     if (!pendingAction || pendingIds.length === 0) return; //stop execute if nothing selected
 
     try {
-      if (pendingAction === "delete") {
-        await Promise.all(pendingIds.map((id) => softDeleteRestaurant(id))); //call api for selected data 
- 
-        //loop through all restuarant and update status for selected only 
-        setAllRestaurants((prev) =>
-          prev.map((r) =>
-            pendingIds.includes(r.id.toString())
-              ? { ...r, isActive: false }
-              : r
-          )
-        );
+     if (pendingAction === "delete") {
+  await Promise.all(
+    pendingIds.map(async (id) => {
+      const restaurant = allRestaurants.find(
+        (r: Restaurant) => r.id === id
+      );
 
-        setResults((prev) =>
-          prev.map((r) =>
-            pendingIds.includes(r.id.toString())
-              ? { ...r, isActive: false }
-              : r
-          )
-        );
+      if (!restaurant) return;
 
-        setSnackbarMessage(
-          pendingIds.length === 1
-            ? "Restaurant deleted successfully"
-            : `${pendingIds.length} restaurants deleted successfully`
-        );
+      if (restaurant.status === "draft") {
+        // Permanent delete for draft
+        await deleteRestaurant(id);
+      } else {
+        // Soft delete for others
+        await softDeleteRestaurant(id);
       }
+    })
+  );
+
+  // Update state
+  setAllRestaurants((prev) =>
+    prev
+      .filter(
+        (r) => !(pendingIds.includes(r.id) && r.status === "draft")
+      )
+      .map((r) =>
+        pendingIds.includes(r.id) && r.status !== "draft"
+          ? { ...r, isActive: false }
+          : r
+      )
+  );
+
+  setResults((prev) =>
+    prev
+      .filter(
+        (r) => !(pendingIds.includes(r.id) && r.status === "draft")
+      )
+      .map((r) =>
+        pendingIds.includes(r.id) && r.status !== "draft"
+          ? { ...r, isActive: false }
+          : r
+      )
+  );
+
+  setSnackbarMessage(
+    pendingIds.length === 1
+      ? "Restaurant deleted successfully"
+      : `${pendingIds.length} restaurants deleted successfully`
+  );
+}
 
       if (pendingAction === "restore") {
         await Promise.all(pendingIds.map((id) => activateRestaurant(id)));
@@ -106,6 +133,37 @@ export const useRestaurantActions = (
     }
   };
 
+  const handleCloseDraft = async (
+  values: Restaurant,
+  onClose: () => void,
+  skipDraftRef?: React.MutableRefObject<boolean>
+) => {
+  if (skipDraftRef?.current) {
+    skipDraftRef.current = false; // reset for next time
+    onClose();
+    return;
+  }
+
+  const { id, status, isActive, ...rest } = values;
+  const hasAnyData = Object.values(rest).some(
+    (v) => v !== "" && v !== false && v !== undefined
+  );
+
+  if (hasAnyData && saveDraft) {
+    await saveDraft({
+      ...values,
+      id: id || Date.now().toString(),
+      status: "draft",
+      isActive: false,
+      createdAt: values.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  onClose();
+};
+
+
   const handleConfirmNo = () => {
     setShowConfirm(false);
     setPendingIds([]);
@@ -126,6 +184,7 @@ export const useRestaurantActions = (
     handleRestoreClick,
     handleConfirmYes,
     handleConfirmNo,
+    handleCloseDraft,
 
     // snackbar
     setSnackbarOpen,

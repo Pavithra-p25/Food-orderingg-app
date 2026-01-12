@@ -8,6 +8,9 @@ export type TabStatus = "neutral" | "error" | "success";
 
 export type RestaurantTabStatusMap = Record<RestaurantTabKey, TabStatus>;
 
+export type RestaurantStatus = "draft" | "active" | "inactive";
+
+
 /* Restaurant Types */
 
 export type RestaurantType = "Veg" | "Non-Veg" | "Both" | "";
@@ -56,7 +59,8 @@ export type Restaurant =
   Contact &
   Location &
   Timestamps & {
-    id: number;
+    id:string;
+    status: RestaurantStatus;
     isActive?:boolean; // for new restaurants
   };
 

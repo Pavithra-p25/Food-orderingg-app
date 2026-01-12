@@ -43,3 +43,7 @@ export const activateRestaurant = async (
     payload
   );
 };
+
+export const deleteRestaurant = async (id: string): Promise<void> => {
+  return await apiService.delete(`/restaurants/${id}`);
+};

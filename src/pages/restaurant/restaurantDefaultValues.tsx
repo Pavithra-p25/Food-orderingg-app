@@ -1,6 +1,13 @@
 import type { Restaurant } from "../../types/RestaurantTypes";
 
 export const restaurantDefaultValues: Restaurant = {
+  /* SYSTEM FIELDS */
+  id: "",
+  status: "draft",       // draft by default
+  isActive: false,       // not active yet
+  createdAt: new Date().toISOString(),  
+  updatedAt: new Date().toISOString(),  
+
   // Login Tab 
   email: "",
   password: "",
@@ -30,3 +37,5 @@ export const restaurantDefaultValues: Restaurant = {
   country: "",
   acceptTerms: false,
 };
+
+

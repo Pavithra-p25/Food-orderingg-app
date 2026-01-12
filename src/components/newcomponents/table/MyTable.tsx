@@ -38,7 +38,6 @@ interface MyTableProps<T> {
   // bulk actions
   onBulkDelete?: (rows: T[]) => void;
   onBulkRestore?: (rows: T[]) => void;
-  activeTab?: "all" | "active" | "inactive";
 }
 
 interface TablePaginationActionsProps {
@@ -54,6 +53,7 @@ const TablePaginationActions: React.FC<TablePaginationActionsProps> = ({
   onPageChange,
 }) => {
   const totalPages = Math.ceil(count / rowsPerPage);
+  //Calculates total pages ,Buttons disabled when at start/end
 
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -100,7 +100,6 @@ function MyTable<T>({
   onSelectionChange,
   onBulkDelete,
   onBulkRestore,
-  activeTab = "all",
 }: MyTableProps<T>) {
   const [orderBy, setOrderBy] = useState<string | null>(null);
   //store which column is sorted
@@ -114,12 +113,14 @@ function MyTable<T>({
   const [selected, setSelected] = useState<string[]>([]);
   const isSelected = (id: string) => selected.includes(id);
 
+  //handle/deselect all rows
   const handleSelectAll = (checked: boolean) => {
     const newSelected = checked ? rows.map(rowId) : [];
     setSelected(newSelected);
     onSelectionChange?.(rows.filter((r) => newSelected.includes(rowId(r))));
   };
 
+  //single row selection
   const handleRowSelect = (id: string) => {
     const newSelected = selected.includes(id)
       ? selected.filter((s) => s !== id)
@@ -167,11 +168,12 @@ function MyTable<T>({
     return sortedRows.slice(start, start + rowsPerPage);
   }, [sortedRows, page, rowsPerPage]);
 
+  //adds checkbox if selectable is true
   const selectionColumn: Column<T> = {
     id: "__select__",
     label: (
       <Checkbox
-        indeterminate={selected.length > 0 && selected.length < rows.length}
+        indeterminate={selected.length > 0 && selected.length < rows.length} //Shows a - instead of a check when only some rows are selected
         checked={rows.length > 0 && selected.length === rows.length}
         onChange={(e) => handleSelectAll(e.target.checked)}
       />
@@ -191,6 +193,7 @@ function MyTable<T>({
     return [selectionColumn, ...columns];
   }, [columns, selectable, selected, rows]);
 
+  //currently selected row objects for bulk actions
   const selectedRows = useMemo(
     () => rows.filter((r) => selected.includes(rowId(r))),
     [rows, selected]
@@ -198,63 +201,51 @@ function MyTable<T>({
 
   return (
     <Paper sx={{ width: "100%" }}>
-     {/*  Bulk Actions Toolbar */}
-{selected.length > 0 && (
-  <Box
-    sx={{
-      p: 1,
-      display: "flex",
-      gap: 1,
-      alignItems: "center",
-      backgroundColor: "#f5f5f5",
-      borderBottom: "1px solid #e0e0e0",
-    }}
-  >
-    <span>{selected.length} selected</span>
+      {/*  Bulk Actions Toolbar */}
+      {selected.length > 0 && (
+        <Box
+          sx={{
+            p: 1,
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            backgroundColor: "#f5f5f5",
+            borderBottom: "1px solid #e0e0e0",
+          }}
+        >
+          <span>{selected.length} selected</span>
 
-    {/* Delete Button */}
-    {onBulkDelete && (activeTab === "all" || activeTab === "active") && (
-      <IconButton
-        onClick={() => {
-          const rowsToDelete =
-            activeTab === "active"
-              ? selectedRows.filter((row: any) => row.isActive)
-              : selectedRows;
-          onBulkDelete(rowsToDelete);
-        }}
-        size="small"
-        sx={{
-          color: "red",
-          backgroundColor: "#fdecea",
-          "&:hover": { backgroundColor: "#f9d6d5" },
-        }}
-      >
-        <DeleteIcon fontSize="small" />
-      </IconButton>
-    )}
+          {/* Bulk Delete */}
+          {onBulkDelete && (
+            <IconButton
+              onClick={() => onBulkDelete(selectedRows)}
+              size="small"
+              sx={{
+                color: "red",
+                backgroundColor: "#fdecea",
+                "&:hover": { backgroundColor: "#f9d6d5" },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
 
-    {/* Restore Button */}
-    {onBulkRestore && (activeTab === "all" || activeTab === "inactive") && (
-      <IconButton
-        onClick={() => {
-          const rowsToRestore =
-            activeTab === "inactive"
-              ? selectedRows.filter((row: any) => !row.isActive)
-              : selectedRows;
-          onBulkRestore(rowsToRestore);
-        }}
-        size="small"
-        sx={{
-          color: "green",
-          backgroundColor: "#e6f4ea",
-          "&:hover": { backgroundColor: "#ccebd6" },
-        }}
-      >
-        <RestoreIcon fontSize="small" />
-      </IconButton>
-    )}
-  </Box>
-)}
+          {/* Bulk Restore */}
+          {onBulkRestore && (
+            <IconButton
+              onClick={() => onBulkRestore(selectedRows)}
+              size="small"
+              sx={{
+                color: "green",
+                backgroundColor: "#e6f4ea",
+                "&:hover": { backgroundColor: "#ccebd6" },
+              }}
+            >
+              <RestoreIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+      )}
 
       <TableContainer>
         <Table>

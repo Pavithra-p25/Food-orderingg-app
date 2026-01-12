@@ -18,12 +18,13 @@ import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
 import { isFieldFilled } from "../../utils/formutils";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
+import type { CreateRestaurantDTO } from "../../hooks/restaurant/useRestaurant";
 
 interface Props {
   show: boolean; // show or hide the dialog
-  onClose: () => void; // to close the dialog
+  onClose: (formValues: Restaurant) => void;
   restaurant?: Restaurant | null; //if present - edit mode
-   onSave?: (updated: Restaurant) => void; //notify parent after save 
+  onSave?: (updated: Restaurant) => void; //notify parent after save or draft
 }
 
 const RestaurantForm: React.FC<Props> = ({
@@ -49,9 +50,6 @@ const RestaurantForm: React.FC<Props> = ({
     severity: "success" as "success" | "error" | "warning" | "info",
   });
 
-  // ADDED FOR LOCAL STORAGE (load saved data)
-  const savedData = localStorage.getItem("restaurant_form_data");
-
   //json data storing
   const { addRestaurant, updateRestaurant } = useRestaurants();
 
@@ -60,9 +58,7 @@ const RestaurantForm: React.FC<Props> = ({
     mode: "onChange", // validation occurs onChange
     reValidateMode: "onChange",
     resolver: yupResolver(restaurantSchema),
-    defaultValues:
-      restaurant ||
-      (savedData ? JSON.parse(savedData) : restaurantDefaultValues),
+    defaultValues: restaurant || restaurantDefaultValues,
   });
 
   const {
@@ -73,15 +69,14 @@ const RestaurantForm: React.FC<Props> = ({
   const watchedValues = watch();
 
   useEffect(() => {
-  if (restaurant) {
-    // Edit mode → fill with restaurant data
-    methods.reset(restaurant);
-  } else {
-    // Add mode → reset to default values
-    methods.reset(restaurantDefaultValues);
-  }
-}, [restaurant, methods]);
-
+    if (restaurant) {
+      // Edit mode → fill with restaurant data
+      methods.reset(restaurant);
+    } else {
+      // Add mode → reset to default values
+      methods.reset(restaurantDefaultValues);
+    }
+  }, [restaurant, methods]);
 
   // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
@@ -99,62 +94,50 @@ const RestaurantForm: React.FC<Props> = ({
     "location",
   ];
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // ADDED FOR LOCAL STORAGE (auto save)
-  useEffect(() => {
-    if (!show || isSubmitted) return;
-
-    localStorage.setItem("restaurant_form_data", JSON.stringify(watchedValues));
-  }, [watchedValues, show, isSubmitted]);
-
-  
- 
   //submit handler
- const onSubmit = async (data: Restaurant) => {
-  try {
-    setIsSubmitted(true);
-    let savedRestaurant: Restaurant; //using savedRestauarnt for 2 things edit and add if else
+  const onSubmit = async (data: Restaurant) => {
+    try {
+      let savedRestaurant: Restaurant; //using savedRestaurant for both edit and add
 
-    if (restaurant?.id) {
-      // EDIT mode → call update
-      savedRestaurant = await updateRestaurant(restaurant.id, {
-        ...data,
-        id: restaurant.id, // ensure the ID is included
-      });
+      if (restaurant?.id) {
+        // EDIT mode → update restaurant
+        savedRestaurant = await updateRestaurant(restaurant.id, {
+          ...data,
+        });
 
+        setSnackbar({
+          open: true,
+          message: `"${data.restaurantName}" updated successfully`,
+          severity: "success",
+        });
+      } else {
+        // NEW registration → send only allowed fields
+        const { id, isActive, createdAt, updatedAt, ...rest } = data;
+
+        const createData: CreateRestaurantDTO = { ...rest };
+
+        savedRestaurant = await addRestaurant(createData);
+        setSnackbar({
+          open: true,
+          message: "Restaurant registered successfully",
+          severity: "success",
+        });
+      }
+
+      // Trigger callback so parent can update table immediately
+      if (onSave) onSave(savedRestaurant);
+
+      setTimeout(() => {
+        onClose(methods.getValues());
+      }, 1500);
+    } catch (error) {
       setSnackbar({
         open: true,
-        message: `"${data.restaurantName}" updated successfully`,
-        severity: "success",
-      });
-    } else {
-      // NEW registration → call add
-      savedRestaurant = await addRestaurant(data);
-      setSnackbar({
-        open: true,
-        message: "Restaurant registered successfully",
-        severity: "success",
+        message: "Failed to save restaurant",
+        severity: "error",
       });
     }
-
-    // Trigger callback so parent can update table immediately
-    if (onSave) onSave(savedRestaurant);
-
-    localStorage.removeItem("restaurant_form_data");
-
-    setTimeout(() => {
-      onClose();
-    }, 1500);
-  } catch (error) {
-    setSnackbar({
-      open: true,
-      message: "Failed to save restaurant",
-      severity: "error",
-    });
-  }
-};
-
+  };
 
   //useFormHandlers hook
   const {
@@ -169,24 +152,18 @@ const RestaurantForm: React.FC<Props> = ({
     tabOrder,
     tabFields: TAB_FIELDS,
     onFinalSubmit: onSubmit,
-
-    //function to check if all tabs are valid , passed to useFormHandlers, hook decide when to show register
     getIsAllTabsValid: () =>
       Object.values(TAB_FIELDS).every((fields) =>
         fields.every((field) => isFieldFilled(watchedValues[field]))
       ),
-
     onConfirmRegister: () => handleConfirmOpen("register"),
   });
 
   const tabStatusMap = Object.fromEntries(
-    //track current tab status
     tabOrder.map((tab) => {
-      const fields = TAB_FIELDS[tab]; //fields in the tab
-      const hasError = fields.some((field) => errors[field]); //any field has error
-      if (hasError) return [tab, "error"]; //rhf error
-
-      //runs per tab to check all fields filled
+      const fields = TAB_FIELDS[tab];
+      const hasError = fields.some((field) => errors[field]);
+      if (hasError) return [tab, "error"];
       const allFilled = fields.every((field) =>
         isFieldFilled(watchedValues[field])
       );
@@ -198,7 +175,7 @@ const RestaurantForm: React.FC<Props> = ({
     (status) => status === "success"
   );
 
-  const hasErrors = Object.keys(errors).length > 0; //convert errors object to array and check length
+  const hasErrors = Object.keys(errors).length > 0;
 
   // CONFIRMATION
   const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
@@ -215,16 +192,55 @@ const RestaurantForm: React.FC<Props> = ({
 
     if (actionType === "reset") {
       methods.reset(restaurantDefaultValues);
-      localStorage.removeItem("restaurant_form_data");
       setShowConfirm(false);
       return;
     }
 
     if (actionType === "cancel") {
-      onClose();
-      setShowConfirm(false);
+      handleCloseDraft();
     }
   };
+
+  // SAVE DRAFT IN JSON
+  const handleCloseDraft = async () => {
+    const values = methods.getValues();
+
+    const hasData = Object.values(values).some(
+      (v) => v !== "" && v !== false && v !== undefined
+    );
+
+    if (hasData && onSave) {
+      const draft: Restaurant = {
+        ...values,
+        id: values.id || Date.now().toString(),
+        isActive: false,
+        status: "draft",
+        createdAt: values.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await onSave(draft);
+    }
+
+    onClose(values); // close only after draft is saved
+  };
+
+  const handleDialogClose = () => {
+  const values = methods.getValues();
+  onClose(values); // close immediately
+  if (onSave) {
+    const draft: Restaurant = {
+      ...values,
+      id: values.id || Date.now().toString(),
+      isActive: false,
+      status: "draft",
+      createdAt: values.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    void onSave(draft); // fire and forget
+  }
+};
+
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
@@ -251,7 +267,7 @@ const RestaurantForm: React.FC<Props> = ({
         {/* MAIN FORM MODAL */}
         <MyDialog
           open={show}
-          onClose={onClose}
+          onClose={handleDialogClose} // <- fixed X-close
           title="Register Your Restaurant"
         >
           <Box
@@ -284,10 +300,8 @@ const RestaurantForm: React.FC<Props> = ({
                 variant="success"
                 onClick={async () => {
                   if (restaurant) {
-                    // Edit mode → update from any tab
                     await handleFinalSubmit();
                   } else {
-                    // New mode 
                     await handleNextOrRegister(activeTab, setActiveTab);
                   }
                 }}

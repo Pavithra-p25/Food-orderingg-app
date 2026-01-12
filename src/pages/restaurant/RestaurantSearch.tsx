@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { Container, Grid, DialogContent, Stack } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useForm } from "react-hook-form";
@@ -24,8 +24,14 @@ const RestaurantSearch: React.FC = () => {
   const [results, setResults] = useState<Restaurant[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
   //hook for api actions
-  const { getAllRestaurants, softDeleteRestaurant, activateRestaurant } =
-    useRestaurants();
+  const {
+    getAllRestaurants,
+    softDeleteRestaurant,
+    activateRestaurant,
+    addRestaurant,
+    deleteRestaurant,
+    updateRestaurant,
+  } = useRestaurants();
 
   const [openAddForm, setOpenAddForm] = useState(false);
 
@@ -33,7 +39,9 @@ const RestaurantSearch: React.FC = () => {
     null
   );
 
-  //ACTIONS HOOK
+  const skipDraftRef = useRef(false);
+
+  // ACTIONS HOOK
   const {
     snackbarOpen,
     snackbarMessage,
@@ -45,8 +53,68 @@ const RestaurantSearch: React.FC = () => {
     handleRestoreClick,
     handleConfirmYes,
     handleConfirmNo,
+    handleCloseDraft,
     setSnackbarOpen,
-  } = useRestaurantActions(softDeleteRestaurant, activateRestaurant); //pass api functions to action hook to receieve state and handlers
+  } = useRestaurantActions(
+    softDeleteRestaurant,
+    activateRestaurant,
+    deleteRestaurant,
+    async (draft) => {
+      // update frontend state
+      setAllRestaurants((prev) => {
+        const index = prev.findIndex((r) => r.id === draft.id);
+        if (index > -1) {
+          const copy = [...prev];
+          copy[index] = draft;
+          return copy;
+        }
+        return [...prev, draft];
+      });
+
+      setResults((prev) => {
+        const index = prev.findIndex((r) => r.id === draft.id);
+        if (index > -1) {
+          const copy = [...prev];
+          copy[index] = draft;
+          return copy;
+        }
+        return [...prev, draft];
+      });
+
+      // save draft to DB using your existing API function
+      try {
+        await addRestaurant({
+          ...draft,
+          status: "draft",
+        });
+
+        // Update frontend state to mark as inactive locally
+        setAllRestaurants((prev) => {
+          const index = prev.findIndex((r) => r.id === draft.id);
+          const newDraft = { ...draft, isActive: false };
+          if (index > -1) {
+            const copy = [...prev];
+            copy[index] = newDraft;
+            return copy;
+          }
+          return [...prev, newDraft];
+        });
+
+        setResults((prev) => {
+          const index = prev.findIndex((r) => r.id === draft.id);
+          const newDraft = { ...draft, isActive: false };
+          if (index > -1) {
+            const copy = [...prev];
+            copy[index] = newDraft;
+            return copy;
+          }
+          return [...prev, newDraft];
+        });
+      } catch (err) {
+        console.error("Failed to save draft", err);
+      }
+    }
+  );
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -62,7 +130,7 @@ const RestaurantSearch: React.FC = () => {
   }, []);
 
   const handleReset = () => {
-    reset(restaurantDefaultValues); //reset search form 
+    reset(restaurantDefaultValues); //reset search form
     setResults(allRestaurants); // table
   };
 
@@ -174,34 +242,42 @@ const RestaurantSearch: React.FC = () => {
 
       {/* ADD - EDIT RESTAURANT POPUP */}
       <RestaurantForm
-        show={openAddForm}
-        onClose={() => {
-          setOpenAddForm(false);
-          setEditingRestaurant(null);
-        }}
-        restaurant={editingRestaurant}
-        onSave={(updated) => {
-          setAllRestaurants((prev) => {
-            const index = prev.findIndex((r) => r.id === updated.id);
-            if (index > -1) {
-              const copy = [...prev];
-              copy[index] = updated;
-              return copy;
-            }
-            return [...prev, updated];
-          });
+  show={openAddForm}
+  restaurant={editingRestaurant}
+  onSave={async (updated) => {
+    if (updated.status === "draft") {
+      skipDraftRef.current = true; // only skip handleCloseDraft for publishing
 
-          setResults((prev) => {
-            const index = prev.findIndex((r) => r.id === updated.id);
-            if (index > -1) {
-              const copy = [...prev];
-              copy[index] = updated;
-              return copy;
-            }
-            return [...prev, updated];
-          });
-        }}
-      />
+      const published: Restaurant = {
+        ...updated,
+        status: "active",
+        isActive: true,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await updateRestaurant(updated.id, published);
+
+      setAllRestaurants((prev) =>
+        prev.map((r) => (r.id === published.id ? published : r))
+      );
+
+      setResults((prev) =>
+        prev.map((r) => (r.id === published.id ? published : r))
+      );
+
+      setOpenAddForm(false);
+      setEditingRestaurant(null);
+    }
+  }}
+  onClose={async (formValues) => {
+  await handleCloseDraft(formValues, () => {
+    setOpenAddForm(false);
+    setEditingRestaurant(null);
+  }, skipDraftRef);
+}}
+
+/>
+
 
       {/* CONFIRMATION DIALOG */}
       <MyDialog open={showConfirm} onClose={handleConfirmNo} maxWidth="xs">
@@ -225,7 +301,9 @@ const RestaurantSearch: React.FC = () => {
             </MyButton>
             <MyButton
               variant="contained"
-              onClick={() => handleConfirmYes(setAllRestaurants, setResults)}
+              onClick={() =>
+                handleConfirmYes(allRestaurants, setAllRestaurants, setResults)
+              }
             >
               Yes
             </MyButton>

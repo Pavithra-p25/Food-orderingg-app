@@ -33,17 +33,21 @@ const RestaurantTable: React.FC<Props> = ({
     onRestore(ids);
   };
 
+  const isActiveTab = activeTab === "active";
+  const isInactiveTab = activeTab === "inactive";
+
   return (
     <MyTable
       rows={results}
-      selectable
+      selectable={isActiveTab || isInactiveTab}
       rowId={(r) => r.id.toString()}
       onSelectionChange={(selectedRows) => {
         console.log("Selected rows:", selectedRows);
       }}
-      onBulkDelete={handleBulkDelete}
-      onBulkRestore={handleBulkRestore}
-      activeTab={activeTab}
+      /* ulk delete only in active tab */
+      onBulkDelete={isActiveTab ? handleBulkDelete : undefined}
+      /* Bulk restore only in inactive tab */
+      onBulkRestore={isInactiveTab ? handleBulkRestore : undefined}
       columns={[
         {
           id: "restaurantName",
@@ -80,82 +84,106 @@ const RestaurantTable: React.FC<Props> = ({
           align: "left",
         },
         {
-          id: "status",
-          label: "Status",
-          align: "center",
-          sortable: false,
-          render: (r: Restaurant) => (
-            <Chip
-              label={r.isActive === false ? "Inactive" : "Active"}
-              color={r.isActive === false ? "error" : "success"}
-              size="small"
-              variant="outlined"
-            />
-          ),
-        },
-        {
-          id: "actions",
-          label: "Actions",
-          sortable: false,
-          render: (r: Restaurant) => {
-            const isInactive = !r.isActive;
+  id: "status",
+  label: "Status",
+  align: "center",
+  sortable: false,
+  render: (r: Restaurant) => {
+    let label = "Active";
+    let color: "success" | "error"  = "success";
 
-            if (activeTab === "active") {
-              // Active tab - show edit + delete 
-              return r.isActive ? (
-                <>
-                  <EditNoteIcon
-                    color="primary"
-                    sx={{ cursor: "pointer", mr: 1 }}
-                    onClick={() => onEdit(r)}
-                  />
-                  <MyButton
-                    variant="outline-secondary"
-                    style={{ minWidth: 0, padding: 0 }}
-                    onClick={() => onDelete([r.id.toString()])}
-                  >
-                    <DeleteIcon color="error" />
-                  </MyButton>
-                </>
-              ) : null;
-            }
+   if (r.status === "draft") {
+      label = "Draft";
+      return (
+        <Chip
+          label={label}
+          size="small"
+          variant="outlined"
+          sx={{
+            color: "white",
+            backgroundColor: "grey",
+            borderColor: "darkgrey",
+          }}
+        />
+      );
+    } else if (r.isActive === false) {
+      label = "Inactive";
+      color = "error";
+    }
 
-            if (activeTab === "inactive") {
-              // Inactive tab - show only restore
-              return isInactive ? (
-                <RestoreIcon
-                  color="success"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => onRestore([r.id.toString()])}
-                />
-              ) : null;
-            }
+    return <Chip label={label} color={color} size="small" variant="outlined" />;
+  },
+},
+       {
+  id: "actions",
+  label: "Actions",
+  sortable: false,
+  render: (r: Restaurant) => {
+    const isDraft = r.status === "draft";
+const isInactive = !r.isActive && !isDraft;
 
-            // All tab - show both based on status
-            return isInactive ? (
-              <RestoreIcon
-                color="success"
-                sx={{ cursor: "pointer" }}
-                onClick={() => onRestore([r.id.toString()])}
-              />
-            ) : (
-              <>
-                <EditNoteIcon
-                  color="primary"
-                  sx={{ cursor: "pointer", mr: 1 }}
-                  onClick={() => onEdit(r)}
-                />
-                <MyButton
-                  variant="outline-secondary"
-                  style={{ minWidth: 0, padding: 0 }}
-                  onClick={() => onDelete([r.id.toString()])}
-                >
-                  <DeleteIcon color="error" />
-                </MyButton>
-              </>
-            );
-          },
-        },
+
+    if (activeTab === "active") {
+      // Active tab - show edit + delete for active and draft
+      return r.isActive || isDraft ? (
+        <>
+          <EditNoteIcon
+            color="primary"
+            sx={{ cursor: "pointer", mr: 1 }}
+            onClick={() => onEdit(r)}
+          />
+          <MyButton
+            variant="outline-secondary"
+            style={{ minWidth: 0, padding: 0 }}
+            onClick={() => onDelete([r.id.toString()])}
+          >
+            <DeleteIcon color="error" />
+          </MyButton>
+        </>
+      ) : null;
+    }
+
+    if (activeTab === "inactive") {
+      // Inactive tab - show only restore for inactive
+      return isInactive ? (
+        <RestoreIcon
+          color="success"
+          sx={{ cursor: "pointer" }}
+          onClick={() => onRestore([r.id.toString()])}
+        />
+      ) : null;
+    }
+
+    // All tab - show actions based on status
+    if (isInactive) {
+      return (
+        <RestoreIcon
+          color="success"
+          sx={{ cursor: "pointer" }}
+          onClick={() => onRestore([r.id.toString()])}
+        />
+      );
+    }
+
+    // Draft or active - show edit + delete
+    return (
+      <>
+        <EditNoteIcon
+          color="primary"
+          sx={{ cursor: "pointer", mr: 1 }}
+          onClick={() => onEdit(r)}
+        />
+        <MyButton
+          variant="outline-secondary"
+          style={{ minWidth: 0, padding: 0 }}
+          onClick={() => onDelete([r.id.toString()])}
+        >
+          <DeleteIcon color="error" />
+        </MyButton>
+      </>
+    );
+  },
+},
       ]}
     />
   );
