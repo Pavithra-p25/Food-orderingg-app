@@ -7,7 +7,8 @@ export const useRestaurantActions = (
   softDeleteRestaurant: (id: string) => Promise<any>, //api call to deactivate restuarant 
   activateRestaurant: (id: string) => Promise<any> ,// to activate 
   deleteRestaurant: (id: string) => Promise<any>,
-  saveDraft?: (restaurant: Restaurant) => void // optional handler for draft
+ saveDraft?: (restaurant: Restaurant) => Promise<void>
+ // optional handler for draft
 ) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false); //snack bar is opened/not
   const [snackbarMessage, setSnackbarMessage] = useState(""); //snackbar message 

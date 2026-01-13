@@ -57,7 +57,7 @@
       "acceptTerms": true,
       "isActive": true,
       "createdAt": "2025-12-20T04:30:00.000Z",
-      "updatedAt": "2026-01-11T11:22:53.506Z"
+      "updatedAt": "2026-01-13T05:06:16.467Z"
     },
     {
       "email": "spiceehub@gmail.com",
@@ -83,13 +83,13 @@
       "acceptTerms": true,
       "id": "f693",
       "createdAt": "2025-11-10T06:45:00.000Z",
-      "updatedAt": "2026-01-12T10:56:59.107Z"
+      "updatedAt": "2026-01-13T05:06:01.586Z"
     },
     {
       "email": "annapoorna@gmail.com",
       "password": "Anna@123",
       "confirmPassword": "Anna@123",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Annapoorna Veg",
       "restaurantType": "Veg",
       "category": "Breakfast",
@@ -109,7 +109,7 @@
       "acceptTerms": true,
       "id": "0f88",
       "createdAt": "2025-10-01T01:30:00.000Z",
-      "updatedAt": "2026-01-11T15:28:43.552Z"
+      "updatedAt": "2026-01-13T05:06:01.587Z"
     },
     {
       "email": "bbqflae@gmail.com",
@@ -272,7 +272,7 @@
       "email": "nice@anjaconline.org",
       "password": "111111",
       "confirmPassword": "111111",
-      "isActive": false,
+      "isActive": true,
       "restaurantName": "Nice restaurant",
       "restaurantType": "Non-Veg",
       "category": "Fast Food",
@@ -292,7 +292,7 @@
       "acceptTerms": true,
       "openingDate": "2026-01-11T18:30:00.000Z",
       "createdAt": "2026-01-06T06:30:00.000Z",
-      "updatedAt": "2026-01-08T12:45:00.000Z"
+      "updatedAt": "2026-01-13T05:06:16.468Z"
     },
     {
       "id": "b44f",
@@ -730,7 +730,7 @@
       "status": "active",
       "isActive": true,
       "createdAt": "2026-01-12T13:37:24.186Z",
-      "updatedAt": "2026-01-12T13:43:38.835Z",
+      "updatedAt": "2026-01-13T05:05:22.559Z",
       "email": "drafo@gmail.com",
       "password": "7777777",
       "confirmPassword": "7777777",
@@ -753,58 +753,31 @@
       "acceptTerms": true
     },
     {
-      "id": "1768227563427",
-      "status": "draft",
+      "id": "1768310316727",
+      "status": "active",
       "isActive": true,
-      "createdAt": "2026-01-12T14:19:23.427Z",
-      "updatedAt": "2026-01-12T14:19:23.427Z",
-      "email": "check@gmail.com",
-      "password": "",
-      "confirmPassword": "",
-      "restaurantName": "",
-      "restaurantType": "",
-      "category": "",
+      "createdAt": "2026-01-13T13:18:21.145Z",
+      "updatedAt": "2026-01-13T13:28:49.523Z",
+      "email": "savecheck@gmail.com",
+      "password": "888888",
+      "confirmPassword": "888888",
+      "restaurantName": "saveactive",
+      "restaurantType": "Both",
+      "category": "Fast Food",
       "averageDeliveryTime": "",
       "openingTime": "",
       "closingTime": "",
       "website": "",
-      "ownerName": "",
-      "supportEmail": "",
-      "phone": "",
+      "ownerName": "saver",
+      "supportEmail": "vncjsin@gmail.com",
+      "phone": "9000099999",
       "alternatePhone": "",
-      "address": "",
-      "city": "",
-      "state": "",
-      "pincode": "",
-      "country": "",
-      "acceptTerms": false
-    },
-    {
-      "id": "1768274160188",
-      "status": "draft",
-      "isActive": true,
-      "createdAt": "2026-01-13T03:16:00.188Z",
-      "updatedAt": "2026-01-13T03:16:00.188Z",
-      "email": "",
-      "password": "",
-      "confirmPassword": "",
-      "restaurantName": "",
-      "restaurantType": "",
-      "category": "",
-      "averageDeliveryTime": "",
-      "openingTime": "",
-      "closingTime": "",
-      "website": "",
-      "ownerName": "",
-      "supportEmail": "",
-      "phone": "",
-      "alternatePhone": "",
-      "address": "",
-      "city": "",
-      "state": "",
-      "pincode": "",
-      "country": "",
-      "acceptTerms": false
+      "address": "kk Nagar ",
+      "city": "Trichy",
+      "state": "Tamil Nadu",
+      "pincode": "626125",
+      "country": "India",
+      "acceptTerms": true
     }
   ]
 }

@@ -16,7 +16,7 @@ import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
-import { isFieldFilled } from "../../utils/formutils";
+import { isFieldFilled } from "../../utils/RestaurantFormUtils";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { CreateRestaurantDTO } from "../../hooks/restaurant/useRestaurant";
 
@@ -49,7 +49,6 @@ const RestaurantForm: React.FC<Props> = ({
     message: "",
     severity: "success" as "success" | "error" | "warning" | "info",
   });
-   
 
   //json data storing
   const { addRestaurant, updateRestaurant } = useRestaurants();
@@ -98,13 +97,18 @@ const RestaurantForm: React.FC<Props> = ({
   //submit handler
   const onSubmit = async (data: Restaurant) => {
     try {
-      let savedRestaurant: Restaurant; //using savedRestaurant for both edit and add
+      let savedRestaurant: Restaurant;
+
+      const finalData: Restaurant = {
+        ...data,
+        status: "active", //  promote draft → active
+        isActive: true, //  make it active
+        updatedAt: new Date().toISOString(),
+      };
 
       if (restaurant?.id) {
         // EDIT mode → update restaurant
-        savedRestaurant = await updateRestaurant(restaurant.id, {
-          ...data,
-        });
+        savedRestaurant = await updateRestaurant(restaurant.id, finalData);
 
         setSnackbar({
           open: true,
@@ -114,10 +118,13 @@ const RestaurantForm: React.FC<Props> = ({
       } else {
         // NEW registration - send only allowed fields
         const { id, isActive, createdAt, updatedAt, ...rest } = data;
-
         const createData: CreateRestaurantDTO = { ...rest };
 
-        savedRestaurant = await addRestaurant(createData);
+        savedRestaurant = await addRestaurant({
+          ...createData,
+          status: "active",
+        });
+
         setSnackbar({
           open: true,
           message: "Restaurant registered successfully",
@@ -125,7 +132,6 @@ const RestaurantForm: React.FC<Props> = ({
         });
       }
 
-      // Trigger callback so parent can update table immediately
       if (onSave) onSave(savedRestaurant);
 
       setTimeout(() => {
@@ -146,7 +152,6 @@ const RestaurantForm: React.FC<Props> = ({
     handleBack,
     handleFinalSubmit,
     handleReset,
-    handleNextOrRegister,
     handleTabChange,
   } = useFormHandlers({
     methods,
@@ -196,52 +201,39 @@ const RestaurantForm: React.FC<Props> = ({
       setShowConfirm(false);
       return;
     }
-
-    if (actionType === "cancel") {
-      handleCloseDraft();
-    }
   };
 
-  // SAVE DRAFT IN JSON
-  const handleCloseDraft = async () => {
+  // ✅ UPDATED DRAFT LOGIC (single draft only)
+  const handleSaveDraft = async () => {
+    if (!onSave) return;
+
     const values = methods.getValues();
 
     const hasData = Object.values(values).some(
       (v) => v !== "" && v !== false && v !== undefined
     );
 
-    if (hasData && onSave) {
-      const draft: Restaurant = {
-        ...values,
-        id: values.id || Date.now().toString(),
-        isActive: false,
-        status: "draft",
-        createdAt: values.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+    if (!hasData) return;
 
-      await onSave(draft);
-    }
+    const draftId = values.id || Date.now().toString();
 
-    onClose(values); // close only after draft is saved
-  };
-
-  const handleDialogClose = () => {
-  const values = methods.getValues();
-  onClose(values); // close immediately
-  if (onSave) {
     const draft: Restaurant = {
       ...values,
-      id: values.id || Date.now().toString(),
-      isActive: false,
+      id: draftId,
       status: "draft",
+      isActive: false,
       createdAt: values.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    void onSave(draft); // fire and forget
-  }
-};
 
+    methods.setValue("id", draftId); // reuse same draft id
+    await onSave(draft);
+  };
+
+  const handleDialogClose = () => {
+    const values = methods.getValues();
+    onClose(values); // just close, no draft save here
+  };
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
@@ -265,10 +257,9 @@ const RestaurantForm: React.FC<Props> = ({
   return (
     <FormProvider {...methods}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        {/* MAIN FORM MODAL */}
         <MyDialog
           open={show}
-          onClose={handleDialogClose} // <- fixed X-close
+          onClose={handleDialogClose}
           title="Register Your Restaurant"
         >
           <Box
@@ -284,9 +275,7 @@ const RestaurantForm: React.FC<Props> = ({
             />
           </Box>
 
-          {/* FOOTER */}
           <DialogActions sx={{ justifyContent: "space-between", paddingX: 3 }}>
-            {/* LEFT : BACK */}
             <MyButton
               variant="outlined"
               onClick={() => handleBack(activeTab, setActiveTab)}
@@ -295,16 +284,22 @@ const RestaurantForm: React.FC<Props> = ({
               Back
             </MyButton>
 
-            {/* CENTER */}
             <Stack direction="row" spacing={2}>
               <MyButton
                 variant="success"
                 onClick={async () => {
                   if (restaurant) {
                     await handleFinalSubmit();
-                  } else {
-                    await handleNextOrRegister(activeTab, setActiveTab);
+                    return;
                   }
+
+                  if (isAllTabsValid && isLastTab) {
+                    handleConfirmOpen("register");
+                    return;
+                  }
+
+                  await handleSaveDraft(); // save same draft
+                  handleNext(activeTab, setActiveTab);
                 }}
               >
                 {getCenterButtonLabel()}
@@ -322,7 +317,6 @@ const RestaurantForm: React.FC<Props> = ({
               </MyButton>
             </Stack>
 
-            {/* RIGHT : NEXT */}
             <MyButton
               variant="contained"
               onClick={() => handleNext(activeTab, setActiveTab)}
@@ -333,7 +327,6 @@ const RestaurantForm: React.FC<Props> = ({
           </DialogActions>
         </MyDialog>
 
-        {/* CONFIRM MODAL */}
         <MyDialog
           open={showConfirm}
           onClose={() => setShowConfirm(false)}
@@ -362,7 +355,6 @@ const RestaurantForm: React.FC<Props> = ({
           </DialogContent>
         </MyDialog>
 
-        {/* SNACKBAR */}
         <MySnackbar
           open={snackbar.open}
           message={snackbar.message}

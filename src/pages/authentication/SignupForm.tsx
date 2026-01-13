@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Form } from "react-bootstrap";
 import MyInput from "../../components/textfields/MyInput";
 import MyButton from "../../components/button/MyButton";
-import { validateRequired, validateEmail } from "../../utils/validators/commonValidators";
+import { validateRequired, validateEmail } from "../../utils/validators/GeneralValidators";
 import useUser from "../../hooks/useUser"; // custom hook
 
 interface SignupFormProps {

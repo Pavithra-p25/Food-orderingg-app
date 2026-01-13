@@ -44,12 +44,12 @@ export function useFormHandlers({
 
   const handleSave = async (activeTab: RestaurantTabKey) => {
     await trigger(tabFields[activeTab]);
-    // draft save API later
+    
   };
 
   const handleUpdate = async () => {
     await trigger();
-    // update API later
+   
   };
 
   const handleFinalSubmit = async () => {

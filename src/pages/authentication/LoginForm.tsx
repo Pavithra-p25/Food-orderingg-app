@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import MyInput from "../../components/textfields/MyInput";
-import { validateRequired } from "../../utils/validators/commonValidators";
+import { validateRequired } from "../../utils/validators/GeneralValidators";
 
 import useUser from "../../hooks/useUser"; //  hook
 

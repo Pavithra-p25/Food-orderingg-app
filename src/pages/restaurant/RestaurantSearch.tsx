@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Grid, DialogContent, Stack } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useForm } from "react-hook-form";
@@ -39,8 +39,6 @@ const RestaurantSearch: React.FC = () => {
     null
   );
 
-  const skipDraftRef = useRef(false); //to skip saving new draft when complete save the form 
-
   // ACTIONS HOOK
   const {
     snackbarOpen,
@@ -53,62 +51,45 @@ const RestaurantSearch: React.FC = () => {
     handleRestoreClick,
     handleConfirmYes,
     handleConfirmNo,
-    handleCloseDraft,
     setSnackbarOpen,
   } = useRestaurantActions(
     softDeleteRestaurant,
     activateRestaurant,
     deleteRestaurant,
     async (draft) => {
-      // update frontend state
-      setAllRestaurants((prev) => {
-        const index = prev.findIndex((r) => r.id === draft.id);
-        if (index > -1) {
-          const copy = [...prev];
-          copy[index] = draft;
-          return copy;
-        }
-        return [...prev, draft];
-      });
-
-      setResults((prev) => {
-        const index = prev.findIndex((r) => r.id === draft.id);
-        if (index > -1) {
-          const copy = [...prev];
-          copy[index] = draft;
-          return copy;
-        }
-        return [...prev, draft];
-      });
-
-      // save draft to DB using 
       try {
-        await addRestaurant({
-          ...draft,
-          status: "draft",
-        });
+        const exists = allRestaurants.some((r) => r.id === draft.id);
 
-        // Update frontend state to mark as inactive locally
+        if (!exists) {
+          //  first time draft → CREATE
+          await addRestaurant({
+            ...draft,
+            status: "draft",
+          });
+        } else {
+          //  existing draft → UPDATE
+          await updateRestaurant(draft.id, draft);
+        }
+
+        //  Update frontend state (UPSERT)
         setAllRestaurants((prev) => {
           const index = prev.findIndex((r) => r.id === draft.id);
-          const newDraft = { ...draft, isActive: false };
           if (index > -1) {
             const copy = [...prev];
-            copy[index] = newDraft;
+            copy[index] = draft;
             return copy;
           }
-          return [...prev, newDraft];
+          return [...prev, draft];
         });
 
         setResults((prev) => {
           const index = prev.findIndex((r) => r.id === draft.id);
-          const newDraft = { ...draft, isActive: false };
           if (index > -1) {
             const copy = [...prev];
-            copy[index] = newDraft;
+            copy[index] = draft;
             return copy;
           }
-          return [...prev, newDraft];
+          return [...prev, draft];
         });
       } catch (err) {
         console.error("Failed to save draft", err);
@@ -145,7 +126,7 @@ const RestaurantSearch: React.FC = () => {
     (r) => !r.isActive && r.status !== "draft"
   ).length;
 
-  //search logic 
+  //search logic
   const onSubmit = async (data: Restaurant) => {
     try {
       const filtered = allRestaurants.filter((res: Restaurant) => {
@@ -256,40 +237,48 @@ const RestaurantSearch: React.FC = () => {
       <RestaurantForm
         show={openAddForm}
         restaurant={editingRestaurant}
-        onSave={async (updated) => {
-          if (updated.status === "draft") {
-            skipDraftRef.current = true; 
-
-            const published: Restaurant = {
-              ...updated,
-              status: "active",
-              isActive: true,
-              updatedAt: new Date().toISOString(),
-            };
-
-            await updateRestaurant(updated.id, published);
-
-            setAllRestaurants((prev) =>
-              prev.map((r) => (r.id === published.id ? published : r))
-            );
-
-            setResults((prev) =>
-              prev.map((r) => (r.id === published.id ? published : r))
-            );
-
-            setOpenAddForm(false);
-            setEditingRestaurant(null);
-          }
+        onClose={() => {
+          setOpenAddForm(false);
+          setEditingRestaurant(null);
         }}
-        onClose={async (formValues) => {
-          await handleCloseDraft(
-            formValues,
-            () => {
-              setOpenAddForm(false);
-              setEditingRestaurant(null);
-            },
-            skipDraftRef
-          );
+        onSave={async (draft) => {
+          try {
+            const exists = allRestaurants.some((r) => r.id === draft.id);
+
+            if (!exists) {
+              // first time draft - CREATE
+              await addRestaurant({
+                ...draft,
+                status: "draft",
+              });
+            } else {
+              // existing draft - UPDATE
+              await updateRestaurant(draft.id, draft);
+            }
+
+            // Update frontend state (UPSERT)
+            setAllRestaurants((prev) => {
+              const index = prev.findIndex((r) => r.id === draft.id);
+              if (index > -1) {
+                const copy = [...prev];
+                copy[index] = draft;
+                return copy;
+              }
+              return [...prev, draft];
+            });
+
+            setResults((prev) => {
+              const index = prev.findIndex((r) => r.id === draft.id);
+              if (index > -1) {
+                const copy = [...prev];
+                copy[index] = draft;
+                return copy;
+              }
+              return [...prev, draft];
+            });
+          } catch (err) {
+            console.error("Failed to save draft", err);
+          }
         }}
       />
 
