@@ -59,7 +59,7 @@ export type Restaurant =
   Contact &
   Location &
   Timestamps & {
-    id:string;
+    id:string ;
     status: RestaurantStatus;
     isActive?:boolean; // for new restaurants
   };

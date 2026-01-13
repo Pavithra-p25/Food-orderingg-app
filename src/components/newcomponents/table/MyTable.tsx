@@ -11,6 +11,8 @@ import {
   TablePagination,
   Box,
   Checkbox,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import LastPageIcon from "@mui/icons-material/LastPage";
@@ -199,6 +201,8 @@ function MyTable<T>({
     [rows, selected]
   );
 
+  const [dense, setDense] = useState(false);
+
   return (
     <Paper sx={{ width: "100%" }}>
       {/*  Bulk Actions Toolbar */}
@@ -248,7 +252,7 @@ function MyTable<T>({
       )}
 
       <TableContainer>
-        <Table>
+        <Table size={dense ? "small" : "medium"}>
           <TableHead>
             <TableRow>
               {finalColumns.map((col, index) => (
@@ -274,7 +278,6 @@ function MyTable<T>({
               ))}
             </TableRow>
           </TableHead>
-
           <TableBody>
             {paginatedRows.map((row, rowIndex) => (
               <TableRow key={rowIndex}>
@@ -299,11 +302,24 @@ function MyTable<T>({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-end",
+          alignItems: "center",
+          justifyContent: "space-between",
           borderTop: "1px solid #e0e0e0",
           px: 2,
         }}
       >
+        {/* Dense padding toggle - LEFT */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={dense}
+              onChange={(e) => setDense(e.target.checked)}
+            />
+          }
+          label="Dense padding"
+        />
+
+        {/* Pagination - RIGHT */}
         <TablePagination
           component="div"
           count={rows.length}

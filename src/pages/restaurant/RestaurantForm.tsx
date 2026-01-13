@@ -49,6 +49,7 @@ const RestaurantForm: React.FC<Props> = ({
     message: "",
     severity: "success" as "success" | "error" | "warning" | "info",
   });
+   
 
   //json data storing
   const { addRestaurant, updateRestaurant } = useRestaurants();
@@ -70,10 +71,10 @@ const RestaurantForm: React.FC<Props> = ({
 
   useEffect(() => {
     if (restaurant) {
-      // Edit mode → fill with restaurant data
+      // Edit mode - fill with restaurant data
       methods.reset(restaurant);
     } else {
-      // Add mode → reset to default values
+      // Add mode - reset to default values
       methods.reset(restaurantDefaultValues);
     }
   }, [restaurant, methods]);
@@ -111,7 +112,7 @@ const RestaurantForm: React.FC<Props> = ({
           severity: "success",
         });
       } else {
-        // NEW registration → send only allowed fields
+        // NEW registration - send only allowed fields
         const { id, isActive, createdAt, updatedAt, ...rest } = data;
 
         const createData: CreateRestaurantDTO = { ...rest };

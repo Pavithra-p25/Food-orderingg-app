@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container, Grid, DialogContent, Stack } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useForm } from "react-hook-form";
@@ -39,7 +39,7 @@ const RestaurantSearch: React.FC = () => {
     null
   );
 
-  const skipDraftRef = useRef(false);
+  const skipDraftRef = useRef(false); //to skip saving new draft when complete save the form 
 
   // ACTIONS HOOK
   const {
@@ -81,7 +81,7 @@ const RestaurantSearch: React.FC = () => {
         return [...prev, draft];
       });
 
-      // save draft to DB using your existing API function
+      // save draft to DB using 
       try {
         await addRestaurant({
           ...draft,
@@ -134,6 +134,18 @@ const RestaurantSearch: React.FC = () => {
     setResults(allRestaurants); // table
   };
 
+  //to show count of datas
+  const allCount = results.length;
+
+  const activeCount = results.filter(
+    (r) => r.isActive && r.status !== "draft"
+  ).length;
+
+  const inactiveCount = results.filter(
+    (r) => !r.isActive && r.status !== "draft"
+  ).length;
+
+  //search logic 
   const onSubmit = async (data: Restaurant) => {
     try {
       const filtered = allRestaurants.filter((res: Restaurant) => {
@@ -161,7 +173,7 @@ const RestaurantSearch: React.FC = () => {
   const tabs = [
     {
       key: "all",
-      tabName: "All",
+      tabName: `All (${allCount})`,
       tabContent: (
         <RestaurantTable
           results={results}
@@ -177,10 +189,10 @@ const RestaurantSearch: React.FC = () => {
     },
     {
       key: "active",
-      tabName: "Active",
+      tabName: `Active (${activeCount})`,
       tabContent: (
         <RestaurantTable
-          results={results.filter((r) => r.isActive)}
+          results={results.filter((r) => r.isActive && r.status !== "draft")}
           onEdit={(r) => {
             setEditingRestaurant(r);
             setOpenAddForm(true);
@@ -193,10 +205,10 @@ const RestaurantSearch: React.FC = () => {
     },
     {
       key: "inactive",
-      tabName: "Inactive",
+      tabName: `Inactive (${inactiveCount})`,
       tabContent: (
         <RestaurantTable
-          results={results.filter((r) => !r.isActive)}
+          results={results.filter((r) => !r.isActive && r.status !== "draft")}
           onEdit={(r) => {
             setEditingRestaurant(r);
             setOpenAddForm(true);
@@ -242,42 +254,44 @@ const RestaurantSearch: React.FC = () => {
 
       {/* ADD - EDIT RESTAURANT POPUP */}
       <RestaurantForm
-  show={openAddForm}
-  restaurant={editingRestaurant}
-  onSave={async (updated) => {
-    if (updated.status === "draft") {
-      skipDraftRef.current = true; // only skip handleCloseDraft for publishing
+        show={openAddForm}
+        restaurant={editingRestaurant}
+        onSave={async (updated) => {
+          if (updated.status === "draft") {
+            skipDraftRef.current = true; 
 
-      const published: Restaurant = {
-        ...updated,
-        status: "active",
-        isActive: true,
-        updatedAt: new Date().toISOString(),
-      };
+            const published: Restaurant = {
+              ...updated,
+              status: "active",
+              isActive: true,
+              updatedAt: new Date().toISOString(),
+            };
 
-      await updateRestaurant(updated.id, published);
+            await updateRestaurant(updated.id, published);
 
-      setAllRestaurants((prev) =>
-        prev.map((r) => (r.id === published.id ? published : r))
-      );
+            setAllRestaurants((prev) =>
+              prev.map((r) => (r.id === published.id ? published : r))
+            );
 
-      setResults((prev) =>
-        prev.map((r) => (r.id === published.id ? published : r))
-      );
+            setResults((prev) =>
+              prev.map((r) => (r.id === published.id ? published : r))
+            );
 
-      setOpenAddForm(false);
-      setEditingRestaurant(null);
-    }
-  }}
-  onClose={async (formValues) => {
-  await handleCloseDraft(formValues, () => {
-    setOpenAddForm(false);
-    setEditingRestaurant(null);
-  }, skipDraftRef);
-}}
-
-/>
-
+            setOpenAddForm(false);
+            setEditingRestaurant(null);
+          }
+        }}
+        onClose={async (formValues) => {
+          await handleCloseDraft(
+            formValues,
+            () => {
+              setOpenAddForm(false);
+              setEditingRestaurant(null);
+            },
+            skipDraftRef
+          );
+        }}
+      />
 
       {/* CONFIRMATION DIALOG */}
       <MyDialog open={showConfirm} onClose={handleConfirmNo} maxWidth="xs">
