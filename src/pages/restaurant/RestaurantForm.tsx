@@ -203,37 +203,33 @@ const RestaurantForm: React.FC<Props> = ({
     }
   };
 
-  // ✅ UPDATED DRAFT LOGIC (single draft only)
   const handleSaveDraft = async () => {
-    if (!onSave) return;
+  if (!onSave) return;
 
-    const values = methods.getValues();
+  // ✅ DO NOT save if user didn't touch anything
+  if (!isDirty) return;
 
-    const hasData = Object.values(values).some(
-      (v) => v !== "" && v !== false && v !== undefined
-    );
+  const values = methods.getValues();
 
-    if (!hasData) return;
+  const draftId = values.id || Date.now().toString();
 
-    const draftId = values.id || Date.now().toString();
-
-    const draft: Restaurant = {
-      ...values,
-      id: draftId,
-      status: "draft",
-      isActive: false,
-      createdAt: values.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    methods.setValue("id", draftId); // reuse same draft id
-    await onSave(draft);
+  const draft: Restaurant = {
+    ...values,
+    id: draftId,
+    status: "draft",
+    isActive: false,
+    createdAt: values.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
-  const handleDialogClose = () => {
-    const values = methods.getValues();
-    onClose(values); // just close, no draft save here
-  };
+  methods.setValue("id", draftId);
+  await onSave(draft);
+};
+
+const handleDialogClose = () => {
+  const values = methods.getValues();
+  onClose(values); // close dialog, no draft save here
+};
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },

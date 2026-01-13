@@ -42,16 +42,6 @@ export function useFormHandlers({
     }
   };
 
-  const handleSave = async (activeTab: RestaurantTabKey) => {
-    await trigger(tabFields[activeTab]);
-    
-  };
-
-  const handleUpdate = async () => {
-    await trigger();
-   
-  };
-
   const handleFinalSubmit = async () => {
     const isValid = await trigger();
     if (!isValid) return;
@@ -110,8 +100,6 @@ export function useFormHandlers({
   return {
     handleNext,
     handleBack,
-    handleSave,
-    handleUpdate,
     handleFinalSubmit,
     handleReset,
     handleNextOrRegister,

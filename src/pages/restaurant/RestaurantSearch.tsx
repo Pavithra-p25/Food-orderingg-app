@@ -61,17 +61,17 @@ const RestaurantSearch: React.FC = () => {
         const exists = allRestaurants.some((r) => r.id === draft.id);
 
         if (!exists) {
-          //  first time draft → CREATE
+          //  first time draft - CREATE
           await addRestaurant({
             ...draft,
             status: "draft",
           });
         } else {
-          //  existing draft → UPDATE
+          //  existing draft - UPDATE
           await updateRestaurant(draft.id, draft);
         }
 
-        //  Update frontend state (UPSERT)
+        //  Update frontend state 
         setAllRestaurants((prev) => {
           const index = prev.findIndex((r) => r.id === draft.id);
           if (index > -1) {
