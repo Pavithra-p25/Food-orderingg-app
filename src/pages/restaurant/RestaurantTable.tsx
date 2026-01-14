@@ -12,7 +12,8 @@ type Props = {
   onEdit: (r: Restaurant) => void;
   onDelete: (ids: string[]) => void;
   onRestore: (ids: string[]) => void;
-  activeTab: "all" | "active" | "inactive";
+  activeTab: "all" | "active" | "inactive" | "Groupby";
+  enableGrouping?: boolean;
 };
 
 const RestaurantTable: React.FC<Props> = ({
@@ -36,11 +37,29 @@ const RestaurantTable: React.FC<Props> = ({
   const isActiveTab = activeTab === "active";
   const isInactiveTab = activeTab === "inactive";
 
+  const columnGroups = [
+  {
+    label: "Restaurant Info",
+    columns: ["restaurantName", "category", "restaurantType"],
+  },
+  {
+    label: "Location",
+    columns: ["city", "state"],
+  },
+  {
+    label: "Contact",
+    columns: ["phone", "email"],
+  },
+  
+];
+
+
   return (
     <MyTable
       rows={results}
       selectable={isActiveTab || isInactiveTab}
       rowId={(r) => r.id.toString()}
+      columnGroups={activeTab === "Groupby" ? columnGroups : undefined}
       onSelectionChange={(selectedRows) => {
         console.log("Selected rows:", selectedRows);
       }}

@@ -31,10 +31,16 @@ interface Column<T> {
   cellAlign?: (row: any) => "left" | "center" | "right";
 }
 
+type ColumnGroup = {
+  label: string;
+  columns: string[]; // column ids
+};
+
 interface MyTableProps<T> {
   columns: Column<T>[];
   rows: T[];
   selectable?: boolean;
+  columnGroups?: ColumnGroup[];
   rowId?: (row: T) => string;
   onSelectionChange?: (rows: T[]) => void;
   // bulk actions
@@ -48,6 +54,7 @@ interface TablePaginationActionsProps {
   rowsPerPage: number;
   onPageChange: (_: any, newPage: number) => void;
 }
+
 const TablePaginationActions: React.FC<TablePaginationActionsProps> = ({
   count,
   page,
@@ -98,6 +105,7 @@ function MyTable<T>({
   columns,
   rows,
   selectable = false,
+  columnGroups,
   rowId = (row: any) => row.id,
   onSelectionChange,
   onBulkDelete,
@@ -203,6 +211,12 @@ function MyTable<T>({
 
   const [dense, setDense] = useState(false);
 
+  //to group column
+  const getGroupColSpan = (group: ColumnGroup) =>
+    finalColumns.filter(
+      (c) => typeof c.id === "string" && group.columns.includes(c.id)
+    ).length;
+
   return (
     <Paper sx={{ width: "100%" }}>
       {/*  Bulk Actions Toolbar */}
@@ -254,6 +268,55 @@ function MyTable<T>({
       <TableContainer>
         <Table size={dense ? "small" : "medium"}>
           <TableHead>
+            {/* ===== GROUP HEADER ROW ===== */}
+            {columnGroups && columnGroups.length > 0 && (
+              <TableRow>
+                {finalColumns.map((col, index) => {
+                  // Selection column → empty cell
+                  if (col.id === "__select__") {
+                    return <TableCell key={index} />;
+                  }
+
+                  // Find which group this column belongs to
+                  const group = columnGroups.find(
+                    (g) =>
+                      typeof col.id === "string" && g.columns.includes(col.id)
+                  );
+
+                  // Render group header only once (first column of that group)
+                  if (group && group.columns[0] === col.id) {
+                    return (
+                      <TableCell
+                        key={group.label}
+                        align="center"
+                        colSpan={getGroupColSpan(group)}
+                        sx={{
+                          fontWeight: "bold",
+
+                          borderBottom: "1px solid #dcdcdc",
+
+                          borderRight:
+                            columnGroups.indexOf(group) !==
+                            columnGroups.length - 1
+                              ? "2px solid #bdbdbd"
+                              : "none",
+                        }}
+                      >
+                        {group.label}
+                      </TableCell>
+                    );
+                  }
+
+                  // Skip rendering other columns of same group
+                  if (group) return null;
+
+                  // Columns without group
+                  return <TableCell key={index} />;
+                })}
+              </TableRow>
+            )}
+
+            {/* ===== NORMAL COLUMN HEADER ROW ===== */}
             <TableRow>
               {finalColumns.map((col, index) => (
                 <TableCell
@@ -278,6 +341,7 @@ function MyTable<T>({
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {paginatedRows.map((row, rowIndex) => (
               <TableRow key={rowIndex}>

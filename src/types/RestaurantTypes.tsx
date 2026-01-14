@@ -2,7 +2,7 @@ import type { FieldErrors, Control } from "react-hook-form";
 
 /* Tab Types*/
 
-export type RestaurantTabKey = "login" | "restaurant" | "contact" | "location";
+export type RestaurantTabKey = "login" | "restaurant" | "contact" | "location" | "Group by";
 
 export type TabStatus = "neutral" | "error" | "success";
 

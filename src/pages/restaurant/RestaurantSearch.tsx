@@ -71,7 +71,7 @@ const RestaurantSearch: React.FC = () => {
           await updateRestaurant(draft.id, draft);
         }
 
-        //  Update frontend state 
+        //  Update frontend state
         setAllRestaurants((prev) => {
           const index = prev.findIndex((r) => r.id === draft.id);
           if (index > -1) {
@@ -151,6 +151,10 @@ const RestaurantSearch: React.FC = () => {
     }
   };
 
+  const activeRestaurants = results.filter(
+    (r) => r.isActive && r.status !== "draft"
+  );
+
   const tabs = [
     {
       key: "all",
@@ -197,6 +201,23 @@ const RestaurantSearch: React.FC = () => {
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="inactive"
+        />
+      ),
+    },
+    {
+      key: "groupBy",
+      tabName: "Group By",
+      tabContent: (
+        <RestaurantTable
+          results={activeRestaurants}
+          onEdit={(r) => {
+            setEditingRestaurant(r);
+            setOpenAddForm(true);
+          }}
+          onDelete={handleDeleteClick}
+          onRestore={handleRestoreClick}
+          activeTab="Groupby"
+          enableGrouping
         />
       ),
     },
