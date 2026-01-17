@@ -367,7 +367,13 @@ function MyTable<T>({
                         rowSpan={2}
                         sx={{
                           fontWeight: "bold",
+                          height: 96, 
+                          verticalAlign: "middle", 
+                          backgroundColor: "#9e9e9e", 
                           borderBottom: "1px solid #dcdcdc",
+                          position: enableGroupScroll ? "sticky" : "static",
+                          top: 0,
+                          zIndex: 4,
                         }}
                       >
                         {col.label}
