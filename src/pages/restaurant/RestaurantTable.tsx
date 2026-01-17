@@ -6,6 +6,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import MyTable from "../../components/newcomponents/table/MyTable";
 import { Chip } from "@mui/material";
 import type { Restaurant } from "../../types/RestaurantTypes";
+import { Box } from "@mui/material";
 
 type Props = {
   results: Restaurant[];
@@ -16,6 +17,13 @@ type Props = {
   enableGrouping?: boolean;
 };
 
+type TableRow =
+  | Restaurant
+  | { id: string; isGroup: true; label: string; count: number };
+
+// Type guard to check if row is a Restaurant
+const isRestaurant = (row: TableRow): row is Restaurant => !("isGroup" in row);
+
 const RestaurantTable: React.FC<Props> = ({
   results,
   onEdit,
@@ -23,6 +31,31 @@ const RestaurantTable: React.FC<Props> = ({
   onRestore,
   activeTab,
 }) => {
+  // Group restaurants by category
+  const groupByCategory = (rows: Restaurant[]): TableRow[] => {
+    const grouped = rows.reduce<Record<string, Restaurant[]>>((acc, row) => {
+      const key = row.category || "Others"; // group by category
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(row);
+      return acc;
+    }, {});
+
+    // Convert to a flat array with group headers
+    return Object.entries(grouped).flatMap(([category, items]) => [
+      {
+        id: `group-${category}`,
+        isGroup: true as const, // literal true
+        label: category,
+        count: items.length,
+      },
+      ...items,
+    ]);
+  };
+
+  // Use grouped rows only for Group By tab
+  const tableRows: TableRow[] =
+    activeTab === "Groupby" ? groupByCategory(results) : results;
+
   // Bulk Handlers
   const handleBulkDelete = (selectedRows: Restaurant[]) => {
     const ids = selectedRows.map((r) => r.id.toString());
@@ -38,40 +71,105 @@ const RestaurantTable: React.FC<Props> = ({
   const isInactiveTab = activeTab === "inactive";
 
   const columnGroups = [
-  {
-    label: "Restaurant Info",
-    columns: ["restaurantName", "category", "restaurantType"],
-  },
-  {
-    label: "Location",
-    columns: ["city", "state"],
-  },
-  {
-    label: "Contact",
-    columns: ["phone", "email"],
-  },
-  
-];
-
+    {
+      label: "Restaurant Info",
+      columns: ["restaurantName", "category", "restaurantType"],
+    },
+    {
+      label: "Location",
+      columns: ["city", "state"],
+    },
+    {
+      label: "Contact",
+      columns: ["phone", "email"],
+    },
+  ];
 
   return (
     <MyTable
-      rows={results}
+      rows={tableRows}
       selectable={isActiveTab || isInactiveTab}
       rowId={(r) => r.id.toString()}
       columnGroups={activeTab === "Groupby" ? columnGroups : undefined}
+      pagination={activeTab !== "Groupby"}
+      enableGroupScroll={activeTab === "Groupby"}
       onSelectionChange={(selectedRows) => {
         console.log("Selected rows:", selectedRows);
       }}
+      enableExpand={activeTab === "all"}
+      expandedContent={
+        activeTab === "all"
+          ? (row) =>
+              isRestaurant(row) && (
+                <Box sx={{ p: 2 }}>
+                  {/* Heading */}
+                  <Box
+                    sx={{
+                      mb: 1,
+                      fontWeight: "bold",
+                      fontSize: 14,
+                      color: "gray",
+                    }}
+                  >
+                    More Restaurant Info
+                  </Box>
+
+                  {/* Row */}
+                  <Box sx={{ display: "flex", gap: 4, mb: 2 }}>
+                    <Box>
+                      <Box sx={{ fontSize: 12, color: "grey" }}>Owner Name</Box>
+                      <Box>{row.ownerName || "N/A"}</Box>
+                    </Box>
+
+                    <Box>
+                      <Box sx={{ fontSize: 12, color: "grey" }}>
+                        Alternate Phone
+                      </Box>
+                      <Box>{row.alternatePhone || "N/A"}</Box>
+                    </Box>
+
+                    <Box>
+                      <Box sx={{ fontSize: 12, color: "grey" }}>
+                        Average Delivery Time
+                      </Box>
+                      <Box>
+                        {row.averageDeliveryTime
+                          ? `${row.averageDeliveryTime}`
+                          : "N/A"}
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              )
+          : undefined
+      }
       /* bulk delete only in active tab */
-      onBulkDelete={isActiveTab ? handleBulkDelete : undefined}
+      onBulkDelete={
+        isActiveTab
+          ? (rows) => handleBulkDelete(rows.filter(isRestaurant))
+          : undefined
+      }
       /* Bulk restore only in inactive tab */
-      onBulkRestore={isInactiveTab ? handleBulkRestore : undefined}
+      onBulkRestore={
+        isInactiveTab
+          ? (rows) => handleBulkRestore(rows.filter(isRestaurant))
+          : undefined
+      }
       columns={[
         {
           id: "restaurantName",
           label: "Restaurant Name",
           align: "left",
+          render: (row: TableRow) => {
+            if (!isRestaurant(row)) {
+              return (
+                <strong>
+                  {row.label} ({row.count})
+                </strong>
+              );
+            }
+            return row.restaurantName;
+          },
         },
         {
           id: "category",
@@ -107,11 +205,13 @@ const RestaurantTable: React.FC<Props> = ({
           label: "Status",
           align: "center",
           sortable: false,
-          render: (r: Restaurant) => {
+          render: (row: TableRow) => {
+            if (!isRestaurant(row)) return null;
+
             let label = "Active";
             let color: "success" | "error" = "success";
 
-            if (r.status === "draft") {
+            if (row.status === "draft") {
               label = "Draft";
               return (
                 <Chip
@@ -125,7 +225,7 @@ const RestaurantTable: React.FC<Props> = ({
                   }}
                 />
               );
-            } else if (r.isActive === false) {
+            } else if (row.isActive === false) {
               label = "Inactive";
               color = "error";
             }
@@ -144,23 +244,24 @@ const RestaurantTable: React.FC<Props> = ({
           id: "actions",
           label: "Actions",
           sortable: false,
-          render: (r: Restaurant) => {
-            const isDraft = r.status === "draft";
-            const isInactive = !r.isActive && !isDraft;
+          render: (row: TableRow) => {
+            if (!isRestaurant(row)) return null;
+
+            const isDraft = row.status === "draft";
+            const isInactive = !row.isActive && !isDraft;
 
             if (activeTab === "active") {
-              // Active tab - show edit + delete for active and draft
-              return r.isActive || isDraft ? (
+              return row.isActive || isDraft ? (
                 <>
                   <EditNoteIcon
                     color="primary"
                     sx={{ cursor: "pointer", mr: 1 }}
-                    onClick={() => onEdit(r)}
+                    onClick={() => onEdit(row)}
                   />
                   <MyButton
                     variant="outline-secondary"
                     style={{ minWidth: 0, padding: 0 }}
-                    onClick={() => onDelete([r.id.toString()])}
+                    onClick={() => onDelete([row.id.toString()])}
                   >
                     <DeleteIcon color="error" />
                   </MyButton>
@@ -169,39 +270,38 @@ const RestaurantTable: React.FC<Props> = ({
             }
 
             if (activeTab === "inactive") {
-              // Inactive tab - show only restore for inactive
               return isInactive ? (
                 <RestoreIcon
                   color="success"
                   sx={{ cursor: "pointer" }}
-                  onClick={() => onRestore([r.id.toString()])}
+                  onClick={() => onRestore([row.id.toString()])}
                 />
               ) : null;
             }
 
-            // All tab - show actions based on status
+            // All tab
             if (isInactive) {
               return (
                 <RestoreIcon
                   color="success"
                   sx={{ cursor: "pointer" }}
-                  onClick={() => onRestore([r.id.toString()])}
+                  onClick={() => onRestore([row.id.toString()])}
                 />
               );
             }
 
-            // Draft or active - show edit + delete
+            // Draft or active
             return (
               <>
                 <EditNoteIcon
                   color="primary"
                   sx={{ cursor: "pointer", mr: 1 }}
-                  onClick={() => onEdit(r)}
+                  onClick={() => onEdit(row)}
                 />
                 <MyButton
                   variant="outline-secondary"
                   style={{ minWidth: 0, padding: 0 }}
-                  onClick={() => onDelete([r.id.toString()])}
+                  onClick={() => onDelete([row.id.toString()])}
                 >
                   <DeleteIcon color="error" />
                 </MyButton>
