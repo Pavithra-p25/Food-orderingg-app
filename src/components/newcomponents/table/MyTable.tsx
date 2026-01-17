@@ -342,16 +342,20 @@ function MyTable<T>({
             : {}
         }
       >
-        <Table
-          stickyHeader={enableGroupScroll}
-          size={dense ? "small" : "medium"}
-        >
+        <Table size={dense ? "small" : "medium"}>
           <TableHead>
-            {/* ===== GROUP HEADER ROW ===== */}
+            {/* GROUP HEADER ROW */}
             {columnGroups && columnGroups.length > 0 && (
-              <TableRow>
+              <TableRow
+                sx={{
+                  position: enableGroupScroll ? "sticky" : "static",
+                  top: 0,
+                  zIndex: 3,
+                  backgroundColor: "white",
+                }}
+              >
                 {finalColumns.map((col, index) => {
-                  // Status & Actions → rowSpan 2 in Groupby
+                  // Status & Actions - rowSpan 2 in Groupby
                   if (
                     enableGroupScroll &&
                     (col.id === "status" || col.id === "actions")
@@ -371,7 +375,7 @@ function MyTable<T>({
                     );
                   }
 
-                  // Selection column → empty cell
+                  // Selection column - empty cell
                   if (col.id === "__select__") {
                     return <TableCell key={index} />;
                   }
@@ -415,47 +419,51 @@ function MyTable<T>({
             )}
 
             {/*  NORMAL COLUMN HEADER ROW  */}
-            {/*  NORMAL COLUMN HEADER ROW  */}
-<TableRow>
-  {finalColumns.map((col, index) => {
-    // Status & Actions already rendered with rowSpan in group header
-    if (
-      enableGroupScroll &&
-      (col.id === "status" || col.id === "actions")
-    ) {
-      return null;
-    }
+            <TableRow
+              sx={{
+                position: enableGroupScroll ? "sticky" : "static",
+                top: 48,
+                zIndex: 2,
+                backgroundColor: "white",
+              }}
+            >
+              {finalColumns.map((col, index) => {
+                if (
+                  enableGroupScroll &&
+                  (col.id === "status" || col.id === "actions")
+                ) {
+                  return null;
+                }
 
-    return (
-      <TableCell
-        key={index}
-        align="center"
-        sx={{
-          width: col.id === "actions" ? 90 : undefined,
-          borderRight:
-            enableGroupScroll &&
-            typeof col.id === "string" &&
-            isGroupEndColumn(col.id)
-              ? "2px solid #bdbdbd"
-              : "none",
-        }}
-      >
-        {col.sortable !== false ? (
-          <TableSortLabel
-            active={orderBy === col.id}
-            direction={orderBy === col.id ? order : "asc"}
-            onClick={() => handleSort(col.id as string)}
-          >
-            {col.label}
-          </TableSortLabel>
-        ) : (
-          col.label
-        )}
-      </TableCell>
-    );
-  })}
-</TableRow>
-
+                return (
+                  <TableCell
+                    key={index}
+                    align="center"
+                    sx={{
+                      width: col.id === "actions" ? 90 : undefined,
+                      borderRight:
+                        enableGroupScroll &&
+                        typeof col.id === "string" &&
+                        isGroupEndColumn(col.id)
+                          ? "2px solid #bdbdbd"
+                          : "none",
+                    }}
+                  >
+                    {col.sortable !== false ? (
+                      <TableSortLabel
+                        active={orderBy === col.id}
+                        direction={orderBy === col.id ? order : "asc"}
+                        onClick={() => handleSort(col.id as string)}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    ) : (
+                      col.label
+                    )}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
           </TableHead>
 
           <TableBody>
