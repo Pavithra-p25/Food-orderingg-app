@@ -24,19 +24,20 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import Collapse from "@mui/material/Collapse";
+import { TableVirtuoso } from "react-virtuoso";
 
 interface Column<T> {
-  id: keyof T | string; // column key
-  label: string | React.ReactNode; //column heading
-  render?: (row: T) => React.ReactNode; //what to show in cell
-  sortable?: boolean; // enable / disable sorting
+  id: keyof T | string;
+  label: string | React.ReactNode;
+  render?: (row: T) => React.ReactNode;
+  sortable?: boolean;
   align?: "left" | "center" | "right";
   cellAlign?: (row: any) => "left" | "center" | "right";
 }
 
 type ColumnGroup = {
   label: string;
-  columns: string[]; // column ids
+  columns: string[];
 };
 
 interface MyTableProps<T> {
@@ -46,13 +47,13 @@ interface MyTableProps<T> {
   columnGroups?: ColumnGroup[];
   rowId?: (row: T) => string;
   onSelectionChange?: (rows: T[]) => void;
-  // bulk actions
   onBulkDelete?: (rows: T[]) => void;
   onBulkRestore?: (rows: T[]) => void;
   expandedContent?: (row: T) => React.ReactNode;
   enableExpand?: boolean;
   pagination?: boolean;
   enableGroupScroll?: boolean;
+  activeTab?: string;
 }
 
 interface TablePaginationActionsProps {
@@ -69,7 +70,6 @@ const TablePaginationActions: React.FC<TablePaginationActionsProps> = ({
   onPageChange,
 }) => {
   const totalPages = Math.ceil(count / rowsPerPage);
-  //Calculates total pages ,Buttons disabled when at start/end
 
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -121,30 +121,26 @@ function MyTable<T>({
   enableExpand,
   pagination = true,
   enableGroupScroll = false,
+  activeTab,
 }: MyTableProps<T>) {
   const [orderBy, setOrderBy] = useState<string | null>(null);
-  //store which column is sorted
-  const [order, setOrder] = useState<"asc" | "desc">("asc"); //sort order
-
-  //  pagination states
-  const [page, setPage] = useState(0); //current page
-  const [rowsPerPage, setRowsPerPage] = useState(5); //rows per page
-
-  //checkbox select
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selected, setSelected] = useState<string[]>([]);
-  const isSelected = (id: string) => selected.includes(id);
-
-  //common expand icon
   const [expandAll, setExpandAll] = useState(false);
+  const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
+  const [dense, setDense] = useState(false);
 
-  //handle/deselect all rows
   const handleSelectAll = (checked: boolean) => {
-    const newSelected = checked ? rows.map(rowId) : [];
+    const newSelected = checked
+      ? rows.filter((r: any) => !r.isGroup).map(rowId)
+      : [];
+
     setSelected(newSelected);
     onSelectionChange?.(rows.filter((r) => newSelected.includes(rowId(r))));
   };
 
-  //single row selection
   const handleRowSelect = (id: string) => {
     const newSelected = selected.includes(id)
       ? selected.filter((s) => s !== id)
@@ -154,11 +150,26 @@ function MyTable<T>({
     onSelectionChange?.(rows.filter((r) => newSelected.includes(rowId(r))));
   };
 
-  // Reset page when rows change
+  const isGroupRowOpen = (groupId: string) => openRows[groupId];
+
+  useEffect(() => setPage(0), [rows]);
+
   useEffect(() => {
-    setSelected([]);
-    setPage(0);
-  }, [rows]);
+    if (activeTab !== undefined) {
+      setSelected([]);
+      onSelectionChange?.([]);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!enableExpand) return;
+
+    const allRowsState: Record<string, boolean> = {};
+    rows.forEach((row) => {
+      allRowsState[rowId(row)] = expandAll;
+    });
+    setOpenRows(allRowsState);
+  }, [expandAll, rows, enableExpand]);
 
   const handleSort = (id: string) => {
     if (orderBy === id) {
@@ -170,45 +181,27 @@ function MyTable<T>({
   };
 
   const sortedRows = useMemo(() => {
-    //prevent sorting on every render
-    if (orderBy === null) return rows; //no column selected return original data
-
+    if (orderBy === null) return rows;
     const column = columns.find((c) => c.id === orderBy);
     if (!column || column.sortable === false) return rows;
 
     return [...rows].sort((a: any, b: any) => {
       const aVal = a[column.id];
       const bVal = b[column.id];
-
       if (aVal < bVal) return order === "asc" ? -1 : 1;
       if (aVal > bVal) return order === "asc" ? 1 : -1;
       return 0;
     });
   }, [rows, orderBy, order, columns]);
 
-  //pagination logic
   const visibleRows = useMemo(() => {
     if (!pagination) return sortedRows;
-
     const start = page * rowsPerPage;
     return sortedRows.slice(start, start + rowsPerPage);
   }, [sortedRows, page, rowsPerPage, pagination]);
 
-  const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
-
-  const toggleRow = (id: string) => {
+  const toggleRow = (id: string) =>
     setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-  useEffect(() => {
-    if (!enableExpand) return;
-
-    const allRowsState: Record<string, boolean> = {};
-    rows.forEach((row) => {
-      allRowsState[rowId(row)] = expandAll;
-    });
-
-    setOpenRows(allRowsState);
-  }, [expandAll, rows, enableExpand]);
 
   const expandColumn: Column<T> = {
     id: "__expand__",
@@ -221,72 +214,88 @@ function MyTable<T>({
     align: "center",
     render: (row: T) => {
       const id = rowId(row);
-      const open = openRows[id];
-
       return (
         <IconButton size="small" onClick={() => toggleRow(id)}>
-          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          {openRows[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
         </IconButton>
       );
     },
   };
 
-  //adds checkbox if selectable is true
+  const selectableRows = rows.filter((r: any) => !r.isGroup);
+
   const selectionColumn: Column<T> = {
     id: "__select__",
     label: (
       <Checkbox
-        indeterminate={selected.length > 0 && selected.length < rows.length} //Shows a - instead of a check when only some rows are selected
-        checked={rows.length > 0 && selected.length === rows.length}
-        onChange={(e) => handleSelectAll(e.target.checked)}
+        indeterminate={
+          selected.length > 0 && selected.length < selectableRows.length
+        }
+        checked={
+          selectableRows.length > 0 && selected.length === selectableRows.length
+        }
+        onClick={(e) => e.stopPropagation()}
+        onChange={(_, checked) => handleSelectAll(checked)}
       />
     ),
     sortable: false,
     align: "center",
-    render: (row: T) => (
-      <Checkbox
-        checked={isSelected(rowId(row))}
-        onChange={() => handleRowSelect(rowId(row))}
-      />
-    ),
+    render: (row: any) => {
+      if (row.isGroup) return null;
+      return (
+        <Checkbox
+          checked={selected.includes(rowId(row))}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRowSelect(rowId(row));
+          }}
+        />
+      );
+    },
   };
+
   const finalColumns = useMemo(() => {
     let cols = columns;
-
     if (selectable) cols = [selectionColumn, ...cols];
-
-    if (enableExpand) {
-      cols = [expandColumn, ...cols]; //only when enabled
-    }
-
+    if (enableExpand) cols = [expandColumn, ...cols];
     return cols;
-  }, [columns, selectable, enableExpand]);
+  }, [columns, selectable, enableExpand, selected, openRows]);
 
-  //currently selected row objects for bulk actions
   const selectedRows = useMemo(
-    () => rows.filter((r) => selected.includes(rowId(r))),
-    [rows, selected]
+    () => rows.filter((r: any) => !r.isGroup && selected.includes(rowId(r))),
+    [rows, selected],
   );
 
-  const [dense, setDense] = useState(false);
-
-  //to group column
   const getGroupColSpan = (group: ColumnGroup) =>
     finalColumns.filter(
-      (c) => typeof c.id === "string" && group.columns.includes(c.id)
+      (c) => typeof c.id === "string" && group.columns.includes(c.id),
     ).length;
 
   const isGroupEndColumn = (colId: string) => {
     if (!columnGroups) return false;
-
     return columnGroups.some(
-      (group) => group.columns[group.columns.length - 1] === colId
+      (group) => group.columns[group.columns.length - 1] === colId,
     );
   };
 
+  const shouldRenderRow = (row: any, index: number) => {
+    if (!row.isGroup) {
+      const parentGroup = visibleRows
+        .slice(0, index)
+        .reverse()
+        .find((r: any) => r.isGroup);
+      if (parentGroup) return openRows[rowId(parentGroup)];
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    console.log("Selected rows changed:", selectedRows);
+  }, [selectedRows]);
+
   return (
     <Paper sx={{ width: "100%" }}>
-      {/*  Bulk Actions Toolbar */}
+      {/* Bulk Actions Toolbar */}
       {selected.length > 0 && (
         <Box
           sx={{
@@ -299,8 +308,6 @@ function MyTable<T>({
           }}
         >
           <span>{selected.length} selected</span>
-
-          {/* Bulk Delete */}
           {onBulkDelete && (
             <IconButton
               onClick={() => onBulkDelete(selectedRows)}
@@ -314,8 +321,6 @@ function MyTable<T>({
               <DeleteIcon fontSize="small" />
             </IconButton>
           )}
-
-          {/* Bulk Restore */}
           {onBulkRestore && (
             <IconButton
               onClick={() => onBulkRestore(selectedRows)}
@@ -333,14 +338,10 @@ function MyTable<T>({
       )}
 
       <TableContainer
-        sx={
-          enableGroupScroll
-            ? {
-                maxHeight: 400,
-                overflowY: "auto",
-              }
-            : {}
-        }
+        sx={{
+          maxHeight: 450,
+          overflowY: "auto",
+        }}
       >
         <Table size={dense ? "small" : "medium"}>
           <TableHead>
@@ -348,14 +349,13 @@ function MyTable<T>({
             {columnGroups && columnGroups.length > 0 && (
               <TableRow
                 sx={{
-                  position: enableGroupScroll ? "sticky" : "static",
+                  position: "sticky",
                   top: 0,
                   zIndex: 3,
                   backgroundColor: "white",
                 }}
               >
                 {finalColumns.map((col, index) => {
-                  // Status & Actions - rowSpan 2 in Groupby
                   if (
                     enableGroupScroll &&
                     (col.id === "status" || col.id === "actions")
@@ -363,36 +363,40 @@ function MyTable<T>({
                     return (
                       <TableCell
                         key={col.id}
-                        align="center"
                         rowSpan={2}
+                        align="center"
                         sx={{
                           fontWeight: "bold",
-                          height: 96, 
-                          verticalAlign: "middle", 
-                          backgroundColor: "#9e9e9e", 
+                          backgroundColor: "#9e9e9e",
                           borderBottom: "1px solid #dcdcdc",
-                          position: enableGroupScroll ? "sticky" : "static",
+                          position: "sticky",
                           top: 0,
                           zIndex: 4,
+                          padding: 0,
                         }}
                       >
-                        {col.label}
+                        <Box
+                          sx={{
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            px: 2,
+                          }}
+                        >
+                          {col.label}
+                        </Box>
                       </TableCell>
                     );
                   }
 
-                  // Selection column - empty cell
-                  if (col.id === "__select__") {
-                    return <TableCell key={index} />;
-                  }
+                  if (col.id === "__select__") return <TableCell key={index} />;
 
-                  // Find which group this column belongs to
                   const group = columnGroups.find(
                     (g) =>
-                      typeof col.id === "string" && g.columns.includes(col.id)
+                      typeof col.id === "string" && g.columns.includes(col.id),
                   );
 
-                  // Render group header only once (first column of that group)
                   if (group && group.columns[0] === col.id) {
                     return (
                       <TableCell
@@ -415,20 +419,18 @@ function MyTable<T>({
                     );
                   }
 
-                  // Skip rendering other columns of same group
                   if (group) return null;
 
-                  // Columns without group
                   return <TableCell key={index} />;
                 })}
               </TableRow>
             )}
 
-            {/*  NORMAL COLUMN HEADER ROW  */}
+            {/* NORMAL COLUMN HEADER ROW */}
             <TableRow
               sx={{
-                position: enableGroupScroll ? "sticky" : "static",
-                top: 48,
+                position: "sticky",
+                top: columnGroups && columnGroups.length > 0 ? 55 : 0,
                 zIndex: 2,
                 backgroundColor: "white",
               }}
@@ -473,13 +475,14 @@ function MyTable<T>({
           </TableHead>
 
           <TableBody>
-            {visibleRows.map((row) => {
+            {visibleRows.map((row: any, rowIndex) => {
+              if (!shouldRenderRow(row, rowIndex)) return null;
+
               const id = rowId(row);
               const open = openRows[id];
 
               return (
                 <React.Fragment key={id}>
-                  {/* MAIN ROW */}
                   <TableRow>
                     {finalColumns.map((col, colIndex) => {
                       const alignment = col.cellAlign
@@ -500,13 +503,44 @@ function MyTable<T>({
                                 : "none",
                           }}
                         >
-                          {col.render ? col.render(row) : (row as any)[col.id]}
+                          {row.isGroup && colIndex === 0 ? (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() =>
+                                  setOpenRows((prev) => ({
+                                    ...prev,
+                                    [id]: !prev[id],
+                                  }))
+                                }
+                              >
+                                {isGroupRowOpen(id) ? (
+                                  <KeyboardArrowUpIcon />
+                                ) : (
+                                  <KeyboardArrowDownIcon />
+                                )}
+                              </IconButton>
+
+                              <strong>
+                                {row.label} ({row.count})
+                              </strong>
+                            </Box>
+                          ) : col.render ? (
+                            col.render(row)
+                          ) : (
+                            (row as any)[col.id]
+                          )}
                         </TableCell>
                       );
                     })}
                   </TableRow>
 
-                  {/* COLLAPSIBLE ROW */}
                   {enableExpand && expandedContent && (
                     <TableRow>
                       <TableCell
@@ -526,6 +560,30 @@ function MyTable<T>({
         </Table>
       </TableContainer>
 
+      <TableVirtuoso
+        data={rows}
+        fixedHeaderContent={() => (
+          <TableHead>
+            <TableRow>
+              {finalColumns.map((col) => (
+                <TableCell key={String(col.id)}>{col.label}</TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+        )}
+        itemContent={(_index: number, row: T) => (
+          <TableRow key={rowId(row)}>
+            {finalColumns.map((col) => (
+              <TableCell key={String(col.id)}>
+                {col.render
+                  ? col.render(row)
+                  : String(row[col.id as keyof T] ?? "")}
+              </TableCell>
+            ))}
+          </TableRow>
+        )}
+      />
+
       {pagination && (
         <Box
           sx={{
@@ -536,7 +594,6 @@ function MyTable<T>({
             px: 2,
           }}
         >
-          {/* Dense padding toggle - LEFT */}
           <FormControlLabel
             control={
               <Switch
@@ -547,7 +604,6 @@ function MyTable<T>({
             label="Dense padding"
           />
 
-          {/* Pagination - RIGHT */}
           <TablePagination
             component="div"
             count={rows.length}
@@ -566,4 +622,5 @@ function MyTable<T>({
     </Paper>
   );
 }
+
 export default MyTable;
