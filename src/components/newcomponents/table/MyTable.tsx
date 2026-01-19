@@ -131,6 +131,8 @@ function MyTable<T>({
   const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
   const [dense, setDense] = useState(false);
 
+  
+
   const handleSelectAll = (checked: boolean) => {
     const newSelected = checked
       ? rows.filter((r: any) => !r.isGroup).map(rowId)

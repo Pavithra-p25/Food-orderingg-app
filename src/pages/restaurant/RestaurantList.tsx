@@ -16,8 +16,9 @@ import { useNavigate } from "react-router-dom";
 import { useFilter } from "../../context/FilterContext";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import RestaurantForm from "./RestaurantForm";
+import  useRestaurants from "../../hooks/restaurant/useRestaurant";
 
-/* ---------------- STATE TYPE ---------------- */
+/* STATE TYPE  */
 interface ListingState {
   search: string;
   showForm: boolean;
@@ -48,25 +49,28 @@ const RestaurantListing: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { getAllRestaurants } = useRestaurants();
+
+
   //  FETCH RESTAURANTS
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      setLoading(true);
-      setError(null);
+ useEffect(() => {
+  const fetchRestaurants = async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const res = await fetch("http://localhost:3000/restaurants");
-        const data: Restaurant[] = await res.json();
-        setRestaurants(data);
-      } catch (err) {
-        setError("Failed to load restaurants");
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      const data = await getAllRestaurants();
+      setRestaurants(data);
+    } catch (err) {
+      setError("Failed to load restaurants");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchRestaurants();
-  }, []);
+  fetchRestaurants();
+}, [getAllRestaurants]);
+
 
   // FILTER LOGIC
   const filteredRestaurants = restaurants.filter((r) => {
