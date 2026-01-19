@@ -255,7 +255,8 @@ const RestaurantTable: React.FC<Props> = ({
 
             if (activeTab === "active") {
               return row.isActive || isDraft ? (
-                <>
+               
+                <Box sx={{ display: "flex", flexWrap: "nowrap", gap: 1 }}>
                   <EditNoteIcon
                     color="primary"
                     sx={{ cursor: "pointer", mr: 1 }}
@@ -268,7 +269,9 @@ const RestaurantTable: React.FC<Props> = ({
                   >
                     <DeleteIcon color="error" />
                   </MyButton>
-                </>
+                  </Box>
+              
+                
               ) : null;
             }
 
