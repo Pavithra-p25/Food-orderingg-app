@@ -107,8 +107,6 @@ const TablePaginationActions: React.FC<TablePaginationActionsProps> = ({
   );
 };
 
-
-
 function MyTable<T>({
   columns,
   rows,
@@ -205,59 +203,75 @@ function MyTable<T>({
     setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
   const isGroupByTab = activeTab === "Groupby";
 
-const toggleAllGroups = () => {
-  const groupRows = rows.filter((r: any) => r.isGroup);
+  const toggleAllGroups = () => {
+    const groupRows = rows.filter((r: any) => r.isGroup);
 
-  const shouldOpen = groupRows.some(
-    (g: any) => !openRows[rowId(g)]
-  );
+    const shouldOpen = groupRows.some((g: any) => !openRows[rowId(g)]);
 
-  const newState: Record<string, boolean> = {};
-  groupRows.forEach((g: any) => {
-    newState[rowId(g)] = shouldOpen;
-  });
+    const newState: Record<string, boolean> = {};
+    groupRows.forEach((g: any) => {
+      newState[rowId(g)] = shouldOpen;
+    });
 
-  setOpenRows((prev: Record<string, boolean>) => ({
-    ...prev,
-    ...newState,
-  }));
-};
+    setOpenRows((prev: Record<string, boolean>) => ({
+      ...prev,
+      ...newState,
+    }));
+  };
 
-
-const expandColumn: Column<T> = {
-  id: "__expand__",
-  label: (
-    <IconButton
-      size="small"
-      onClick={() => {
-        if (isGroupByTab) {
-          toggleAllGroups(); // ✅ GROUP BY TAB
-        } else {
-          setExpandAll((prev) => !prev); // ✅ OTHER TABS
-        }
-      }}
-    >
-      {isGroupByTab
-        ? Object.values(openRows).some(Boolean)
-          ? <KeyboardArrowUpIcon />
-          : <KeyboardArrowDownIcon />
-        : expandAll
-        ? <KeyboardArrowUpIcon />
-        : <KeyboardArrowDownIcon />
-      }
-    </IconButton>
-  ),
-  sortable: false,
-  align: "center",
-  render: (row: T) => {
-    const id = rowId(row);
-    return (
-      <IconButton size="small" onClick={() => toggleRow(id)}>
-        {openRows[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+  const expandColumn: Column<T> = {
+    id: "__expand__",
+    label: (
+      <IconButton
+        size="small"
+        onClick={() => {
+          if (isGroupByTab) {
+            toggleAllGroups();
+          } else {
+            setExpandAll((prev) => !prev);
+          }
+        }}
+        sx={{
+         cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 30,
+        height: 30,
+        }}
+      >
+        {isGroupByTab ? (
+          Object.values(openRows).some(Boolean) ? (
+            <KeyboardArrowUpIcon fontSize="small" />
+          ) : (
+            <KeyboardArrowDownIcon fontSize="small" />
+          )
+        ) : expandAll ? (
+          <KeyboardArrowUpIcon fontSize="small" />
+        ) : (
+          <KeyboardArrowDownIcon fontSize="small" />
+        )}
       </IconButton>
-    );
-  },
-};
+    ),
+    sortable: false,
+    align: "center",
+    render: (row: T) => {
+      const id = rowId(row);
+      return (
+        <IconButton
+          size="small"
+          onClick={() => toggleRow(id)}
+          sx={{ width: 32, height: 32, minWidth: 32, padding: 0 }}
+        >
+          {openRows[id] ? (
+            <KeyboardArrowUpIcon fontSize="small" />
+          ) : (
+            <KeyboardArrowDownIcon fontSize="small" />
+          )}
+        </IconButton>
+      );
+    },
+  };
 
   const selectableRows = rows.filter((r: any) => !r.isGroup);
 
@@ -568,7 +582,7 @@ const expandColumn: Column<T> = {
                                 {row.label} ({row.count})
                               </strong>
                             </Box>
-                          ) : col.render ? (
+                          ) : row.isGroup ? null : col.render ? ( // skip rendering for other columns in group rows
                             col.render(row)
                           ) : (
                             (row as any)[col.id]

@@ -177,6 +177,7 @@ const RestaurantTable: React.FC<Props> = ({
           id: "category",
           label: "Category",
           align: "left",
+          
         },
         {
           id: "restaurantType",
