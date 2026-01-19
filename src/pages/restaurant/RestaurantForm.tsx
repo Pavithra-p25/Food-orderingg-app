@@ -84,6 +84,7 @@ const RestaurantForm: React.FC<Props> = ({
     restaurant: ["restaurantName", "restaurantType", "category"],
     contact: ["ownerName", "supportEmail", "phone"],
     location: ["address", "city", "state", "country", "pincode", "acceptTerms"],
+    "Group by":[],
   };
 
   //tab navigation order
@@ -101,13 +102,13 @@ const RestaurantForm: React.FC<Props> = ({
 
       const finalData: Restaurant = {
         ...data,
-        status: "active", //  promote draft → active
+        status: "active", //  promote draft - active
         isActive: true, //  make it active
         updatedAt: new Date().toISOString(),
       };
 
       if (restaurant?.id) {
-        // EDIT mode → update restaurant
+        // EDIT mode - update restaurant
         savedRestaurant = await updateRestaurant(restaurant.id, finalData);
 
         setSnackbar({
@@ -206,7 +207,6 @@ const RestaurantForm: React.FC<Props> = ({
   const handleSaveDraft = async () => {
   if (!onSave) return;
 
-  // ✅ DO NOT save if user didn't touch anything
   if (!isDirty) return;
 
   const values = methods.getValues();

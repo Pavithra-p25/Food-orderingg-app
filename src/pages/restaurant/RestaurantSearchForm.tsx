@@ -51,7 +51,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
         {/* FORM */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="restaurantName"
                 control={control}
@@ -60,7 +60,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyDropdown
                 name="category"
                 control={control}
@@ -69,7 +69,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyDropdown
                 name="restaurantType"
                 control={control}
@@ -78,7 +78,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="city"
                 control={control}
@@ -87,7 +87,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="state"
                 control={control}
@@ -96,7 +96,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="email"
                 control={control}
@@ -105,7 +105,7 @@ const RestaurantSearchForm: React.FC<Props> = ({
               />
             </Grid>
 
-            <Grid size={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="phone"
                 control={control}
@@ -115,10 +115,10 @@ const RestaurantSearchForm: React.FC<Props> = ({
             </Grid>
 
             <Grid
-              size={12}
+              size={{ xs: 12 }}
               sx={{
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: { xs: "center", md: "flex-end" },
                 gap: 2,
                 mt: 2,
               }}

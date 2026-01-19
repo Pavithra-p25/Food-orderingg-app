@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import RestaurantForm from "./pages/restaurant/RestaurantForm";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
 import RestaurantSearch from "./pages/restaurant/RestaurantSearch";
+import RestaurantListing from "./pages/restaurant/RestaurantList";
 
 
 const AddRestaurantModal = () => {
@@ -45,8 +46,8 @@ const App: React.FC = () => {
             <main className="flex-grow-1 pt-5">
               <Routes>
 
-               {/*} <Route path="/restaurants" element={<RestaurantsPage />} />*/}
-            {/*  <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */} 
+              <Route path="/restaurants" element={<RestaurantListing />} />
+        {/*}   <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */} 
                 <Route path="/RestaurantSearch" element={<RestaurantSearch/>}/>
 
                 <Route path="/add-restaurant" element={<AddRestaurantModal />} />

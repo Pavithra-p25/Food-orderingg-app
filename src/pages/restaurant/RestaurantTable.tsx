@@ -97,7 +97,8 @@ const RestaurantTable: React.FC<Props> = ({
       onSelectionChange={(selectedRows) => {
         console.log("Selected rows:", selectedRows);
       }}
-      enableExpand={activeTab === "all"}
+     enableExpand={activeTab === "all" || activeTab === "Groupby"}
+
       expandedContent={
         activeTab === "all"
           ? (row) =>

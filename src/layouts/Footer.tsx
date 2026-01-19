@@ -1,49 +1,83 @@
 import React, { useContext } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Box, Container, Grid, Typography, IconButton } from "@mui/material";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import TwitterIcon from "@mui/icons-material/Twitter";
 import { ThemeContext } from "../context/ThemeContext";
 
 const Footer: React.FC = () => {
   const { darkMode } = useContext(ThemeContext);
 
   return (
-    <footer
-      className={`mt-4 py-4 ${
-        darkMode ? "bg-dark text-white" : "bg-light text-dark"
-      }`}
+    <Box
+      component="footer"
+      sx={{
+        mt: 4,
+        py: 4,
+        backgroundColor: darkMode ? "grey.900" : "grey.100",
+        color: darkMode ? "common.white" : "common.black",
+      }}
     >
       <Container>
-        <Row className="gy-4 align-items-center">
-          {/* Brand Section */}
-          <Col md={4}>
-            <h4 className="fw-bold">FoodExpress</h4>
-            <p>Fastest food delivery at your doorstep.</p>
-          </Col>
+        <Grid container spacing={4} alignItems="center">
+          {/* Brand */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="h5" fontWeight="bold">
+              FoodExpress
+            </Typography>
+            <Typography variant="body2">
+              Fastest food delivery at your doorstep.
+            </Typography>
+          </Grid>
 
-          {/*  Contact */}
-          <Col md={4}>
-            <h5 className="fw-semibold mb-2">Contact</h5>
-            <p className="m-0">Email: support@foodexpress.com</p>
-            <p className="m-0">Phone: +91 9876543210</p>
-          </Col>
+          {/* Contact */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              Contact
+            </Typography>
+            <Typography variant="body2">
+              Email: support@foodexpress.com
+            </Typography>
+            <Typography variant="body2">
+              Phone: +91 9876543210
+            </Typography>
+          </Grid>
 
           {/* Social Icons */}
-          <Col
-            md={4}
-            className="d-flex justify-content-md-end justify-content-start gap-3 fs-4"
+          <Grid
+            size={{ xs: 12, md: 4 }}
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "flex-start", md: "flex-end" },
+              gap: 1,
+            }}
           >
-            <i className="bi bi-facebook"></i>
-            <i className="bi bi-instagram"></i>
-            <i className="bi bi-youtube"></i>
-            <i className="bi bi-twitter"></i>
-          </Col>
-        </Row>
+            <IconButton color="inherit">
+              <FacebookIcon />
+            </IconButton>
+            <IconButton color="inherit">
+              <InstagramIcon />
+            </IconButton>
+            <IconButton color="inherit">
+              <YouTubeIcon />
+            </IconButton>
+            <IconButton color="inherit">
+              <TwitterIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
 
-        {/* Bottom Line */}
-        <div className="text-center mt-4">
+        {/* Bottom line */}
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{ mt: 4, opacity: 0.8 }}
+        >
           © 2025 FoodExpress. All rights reserved.
-        </div>
+        </Typography>
       </Container>
-    </footer>
+    </Box>
   );
 };
 

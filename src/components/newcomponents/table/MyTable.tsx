@@ -24,7 +24,6 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import Collapse from "@mui/material/Collapse";
-import { TableVirtuoso } from "react-virtuoso";
 
 interface Column<T> {
   id: keyof T | string;
@@ -107,6 +106,8 @@ const TablePaginationActions: React.FC<TablePaginationActionsProps> = ({
     </Box>
   );
 };
+
+
 
 function MyTable<T>({
   columns,
@@ -202,25 +203,61 @@ function MyTable<T>({
 
   const toggleRow = (id: string) =>
     setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));
+  const isGroupByTab = activeTab === "Groupby";
 
-  const expandColumn: Column<T> = {
-    id: "__expand__",
-    label: (
-      <IconButton size="small" onClick={() => setExpandAll((prev) => !prev)}>
-        {expandAll ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+const toggleAllGroups = () => {
+  const groupRows = rows.filter((r: any) => r.isGroup);
+
+  const shouldOpen = groupRows.some(
+    (g: any) => !openRows[rowId(g)]
+  );
+
+  const newState: Record<string, boolean> = {};
+  groupRows.forEach((g: any) => {
+    newState[rowId(g)] = shouldOpen;
+  });
+
+  setOpenRows((prev: Record<string, boolean>) => ({
+    ...prev,
+    ...newState,
+  }));
+};
+
+
+const expandColumn: Column<T> = {
+  id: "__expand__",
+  label: (
+    <IconButton
+      size="small"
+      onClick={() => {
+        if (isGroupByTab) {
+          toggleAllGroups(); // ✅ GROUP BY TAB
+        } else {
+          setExpandAll((prev) => !prev); // ✅ OTHER TABS
+        }
+      }}
+    >
+      {isGroupByTab
+        ? Object.values(openRows).some(Boolean)
+          ? <KeyboardArrowUpIcon />
+          : <KeyboardArrowDownIcon />
+        : expandAll
+        ? <KeyboardArrowUpIcon />
+        : <KeyboardArrowDownIcon />
+      }
+    </IconButton>
+  ),
+  sortable: false,
+  align: "center",
+  render: (row: T) => {
+    const id = rowId(row);
+    return (
+      <IconButton size="small" onClick={() => toggleRow(id)}>
+        {openRows[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
       </IconButton>
-    ),
-    sortable: false,
-    align: "center",
-    render: (row: T) => {
-      const id = rowId(row);
-      return (
-        <IconButton size="small" onClick={() => toggleRow(id)}>
-          {openRows[id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </IconButton>
-      );
-    },
-  };
+    );
+  },
+};
 
   const selectableRows = rows.filter((r: any) => !r.isGroup);
 
@@ -559,30 +596,6 @@ function MyTable<T>({
           </TableBody>
         </Table>
       </TableContainer>
-
-      <TableVirtuoso
-        data={rows}
-        fixedHeaderContent={() => (
-          <TableHead>
-            <TableRow>
-              {finalColumns.map((col) => (
-                <TableCell key={String(col.id)}>{col.label}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-        )}
-        itemContent={(_index: number, row: T) => (
-          <TableRow key={rowId(row)}>
-            {finalColumns.map((col) => (
-              <TableCell key={String(col.id)}>
-                {col.render
-                  ? col.render(row)
-                  : String(row[col.id as keyof T] ?? "")}
-              </TableCell>
-            ))}
-          </TableRow>
-        )}
-      />
 
       {pagination && (
         <Box
