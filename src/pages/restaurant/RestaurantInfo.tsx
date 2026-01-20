@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Box,
   Container,
   Typography,
-  TextField,
-  Button,
   Paper,
   Fade,
   IconButton,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import StoreIcon from "@mui/icons-material/Store";
@@ -22,8 +16,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
+import MyInput from "../../components/newcomponents/textfields/MyInput";
+import MyButton from "../../components/newcomponents/button/MyButton";
+import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
 
-//  Types 
+//  Types
 type Contact = {
   name: string;
   phone: string;
@@ -43,13 +40,12 @@ type FormValues = {
   branches: Branch[];
 };
 
-//  Branch Accordion 
+//  Branch Accordion
 const BranchAccordion = ({
   branchIndex,
   expanded,
   handleChange,
   control,
-  register,
   branchArray,
   errors,
   trigger,
@@ -69,163 +65,151 @@ const BranchAccordion = ({
   });
 
   return (
-    <Accordion
+    <MyAccordion
       expanded={expanded === `branch-${branchIndex}`}
       onChange={handleChange(`branch-${branchIndex}`)}
       sx={{ mb: 2 }}
+      summary={
+        <>
+          <StoreIcon color="secondary" />
+          <Typography ml={1} fontWeight={600}>
+            Branch Details {branchIndex + 1}
+          </Typography>
+        </>
+      }
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <StoreIcon color="secondary" />
-        <Typography ml={1} fontWeight={600}>
-          Branch Details {branchIndex + 1}
-        </Typography>
-      </AccordionSummary>
-
-      <AccordionDetails>
-        <Fade in={expanded === `branch-${branchIndex}`}>
-          <Box>
-            {branchIndex === branchArray.fields.length - 1 && (
-              <Box display="flex" justifyContent="flex-end" mb={2}>
-                <Button
-                  color="primary"
-                  startIcon={<AddIcon />}
-                  onClick={() =>
-                    branchArray.append({
-                      branchName: "",
-                      branchCode: "",
-                      branchContacts: [{ name: "", phone: "", email: "" }],
-                    })
-                  }
-                >
-                  Add Branch
-                </Button>
-              </Box>
-            )}
-
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  label="Branch Name"
-                  fullWidth
-                  {...register(`branches.${branchIndex}.branchName` as const)}
-                  error={!!errors.branches?.[branchIndex]?.branchName}
-                  helperText={
-                    errors.branches?.[branchIndex]?.branchName?.message
-                  }
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  label="Branch Code"
-                  fullWidth
-                  {...register(`branches.${branchIndex}.branchCode` as const)}
-                  error={!!errors.branches?.[branchIndex]?.branchCode}
-                  helperText={
-                    errors.branches?.[branchIndex]?.branchCode?.message
-                  }
-                />
-              </Grid>
-            </Grid>
-
-            {/* Branch Contacts */}
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              mt={3}
-            >
-              <Box display="flex" alignItems="center" gap={1}>
-                <ContactsIcon color="secondary" />
-                <Typography fontWeight={600}>Branch Contacts</Typography>
-              </Box>
-           
-              <Button
-                startIcon={<AddIcon />}
-                onClick={async () => {
-                  const lastIndex = branchContacts.fields.length - 1;
-                  const valid = await trigger([
-                    `branches.${branchIndex}.branchContacts.${lastIndex}.name`,
-                    `branches.${branchIndex}.branchContacts.${lastIndex}.phone`,
-                  ]);
-                  if (!valid) return;
-
-                  branchContacts.append({ name: "", phone: "", email: "" });
-                }}
-                size="small"
+      <Fade in={expanded === `branch-${branchIndex}`}>
+        <Box>
+          {branchIndex === branchArray.fields.length - 1 && (
+            <Box display="flex" justifyContent="flex-end" mb={2}>
+              <MyButton
+                variant="text"
+                onClick={() =>
+                  branchArray.append({
+                    branchName: "",
+                    branchCode: "",
+                    branchContacts: [{ name: "", phone: "", email: "" }],
+                  })
+                }
               >
-                Add Contact
-              </Button>
+                <AddIcon style={{ marginRight: 4 }} />
+                Add Branch
+              </MyButton>
+            </Box>
+          )}
+
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <MyInput<FormValues>
+                name={`branches.${branchIndex}.branchName`}
+                control={control}
+                label="Branch Name"
+                errorMessage={
+                  errors.branches?.[branchIndex]?.branchName?.message
+                }
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <MyInput<FormValues>
+                name={`branches.${branchIndex}.branchCode`}
+                control={control}
+                label="Branch Code"
+                errorMessage={
+                  errors.branches?.[branchIndex]?.branchCode?.message
+                }
+              />
+            </Grid>
+          </Grid>
+
+          {/* Branch Contacts */}
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            mt={3}
+          >
+            <Box display="flex" alignItems="center" gap={1}>
+              <ContactsIcon color="secondary" />
+              <Typography fontWeight={600}>Branch Contacts</Typography>
             </Box>
 
-            {branchContacts.fields.map((contact, contactIndex) => {
-              const contactErrors =
-                errors.branches?.[branchIndex]?.branchContacts?.[
-                  contactIndex
-                ] || {};
-              return (
-                <Box key={contact.id} mt={2}>
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField
-                        label="Contact Name"
-                        fullWidth
-                        {...register(
-                          `branches.${branchIndex}.branchContacts.${contactIndex}.name` as const,
-                        )}
-                        error={!!contactErrors.name}
-                        helperText={contactErrors.name?.message}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField
-                        label="Phone"
-                        fullWidth
-                        {...register(
-                          `branches.${branchIndex}.branchContacts.${contactIndex}.phone` as const,
-                        )}
-                        error={!!contactErrors.phone}
-                        helperText={contactErrors.phone?.message}
-                      />
-                    </Grid>
-                  </Grid>
+            <MyButton
+              variant="primary"
+              onClick={async () => {
+                const lastIndex = branchContacts.fields.length - 1;
+                const valid = await trigger([
+                  `branches.${branchIndex}.branchContacts.${lastIndex}.name`,
+                  `branches.${branchIndex}.branchContacts.${lastIndex}.phone`,
+                ]);
+                if (!valid) return;
 
-                  <Grid container spacing={2} mt={1} alignItems="center">
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField
-                        label="Email"
-                        fullWidth
-                        {...register(
-                          `branches.${branchIndex}.branchContacts.${contactIndex}.email` as const,
-                        )}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
-                      <IconButton
-                        onClick={() => branchContacts.remove(contactIndex)}
-                        disabled={branchContacts.fields.length === 1}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </Box>
-              );
-            })}
-
-            {branchArray.fields.length > 1 && (
-              <Box mt={2} display="flex" justifyContent="flex-start">
-                <Button
-                  color="error"
-                  onClick={() => branchArray.remove(branchIndex)}
-                >
-                  Remove Branch
-                </Button>
-              </Box>
-            )}
+                branchContacts.append({ name: "", phone: "", email: "" });
+              }}
+            >
+              <AddIcon style={{ marginRight: 4 }} />
+              Add Contact
+            </MyButton>
           </Box>
-        </Fade>
-      </AccordionDetails>
-    </Accordion>
+
+          {branchContacts.fields.map((contact, contactIndex) => {
+            const contactErrors =
+              errors.branches?.[branchIndex]?.branchContacts?.[contactIndex] ||
+              {};
+            return (
+              <Box key={contact.id} mt={2}>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <MyInput<FormValues>
+                      name={`branches.${branchIndex}.branchContacts.${contactIndex}.name`}
+                      control={control}
+                      label="Contact Name"
+                      errorMessage={contactErrors.name?.message}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <MyInput<FormValues>
+                      name={`branches.${branchIndex}.branchContacts.${contactIndex}.phone`}
+                      control={control}
+                      label="Phone"
+                      errorMessage={contactErrors.phone?.message}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid container spacing={2} mt={1} alignItems="center">
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <MyInput<FormValues>
+                      name={`branches.${branchIndex}.branchContacts.${contactIndex}.email`}
+                      control={control}
+                      label="Email"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
+                    <IconButton
+                      onClick={() => branchContacts.remove(contactIndex)}
+                      disabled={branchContacts.fields.length === 1}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </Box>
+            );
+          })}
+
+          {branchArray.fields.length > 1 && (
+            <Box mt={2} display="flex" justifyContent="flex-start">
+              <MyButton
+                variant="cancel"
+                onClick={() => branchArray.remove(branchIndex)}
+              >
+                Remove Branch
+              </MyButton>
+            </Box>
+          )}
+        </Box>
+      </Fade>
+    </MyAccordion>
   );
 };
 
@@ -251,7 +235,7 @@ const RestaurantInfo = () => {
       ],
     },
     resolver: yupResolver(restaurantInfoSchema) as any,
-    mode: "onChange", 
+    mode: "onChange",
     reValidateMode: "onChange",
   });
 
@@ -283,134 +267,122 @@ const RestaurantInfo = () => {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* RESTAURANT DETAILS */}
-          <Accordion
+          <MyAccordion
             expanded={expanded === "restaurant"}
             onChange={handleChange("restaurant")}
             sx={{ mb: 2 }}
+            summary={
+              <>
+                <RestaurantIcon color="primary" />
+                <Typography ml={1} fontWeight={600}>
+                  Restaurant Details
+                </Typography>
+              </>
+            }
           >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <RestaurantIcon color="primary" />
-              <Typography ml={1} fontWeight={600}>
-                Restaurant Details
-              </Typography>
-            </AccordionSummary>
-
-            <AccordionDetails>
-              <Fade in={expanded === "restaurant"}>
-                <Box>
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField
-                        label="Restaurant Name"
-                        fullWidth
-                        {...register("restaurantName")}
-                        error={!!errors.restaurantName}
-                        helperText={errors.restaurantName?.message}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextField
-                        label="Owner Name"
-                        fullWidth
-                        {...register("ownerName")}
-                        error={!!errors.ownerName}
-                        helperText={errors.ownerName?.message}
-                      />
-                    </Grid>
+            <Fade in={expanded === "restaurant"}>
+              <Box>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <MyInput<FormValues>
+                      name="restaurantName"
+                      control={control}
+                      label="Restaurant Name"
+                      errorMessage={errors.restaurantName?.message}
+                    />
                   </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <MyInput<FormValues>
+                      name="ownerName"
+                      control={control}
+                      label="Owner Name"
+                      errorMessage={errors.ownerName?.message}
+                    />
+                  </Grid>
+                </Grid>
 
-                  {/* Restaurant Contacts */}
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    mt={3}
-                  >
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <ContactsIcon color="primary" />
-                      <Typography fontWeight={600}>Contact Persons</Typography>
-                    </Box>
-                    
-                    <Button
-                      startIcon={<AddIcon />}
-                      onClick={async () => {
-                        // Trigger validation for last contact
-                        const lastIndex = restaurantContacts.fields.length - 1;
-                        const valid = await trigger([
-                          `restaurantContacts.${lastIndex}.name`,
-                          `restaurantContacts.${lastIndex}.phone`,
-                        ]);
-                        if (!valid) return; // stop if last contact is invalid
-
-                        restaurantContacts.append({
-                          name: "",
-                          phone: "",
-                          email: "",
-                        });
-                      }}
-                      size="small"
-                    >
-                      Add Contact
-                    </Button>
+                {/* Restaurant Contacts */}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  mt={3}
+                >
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <ContactsIcon color="primary" />
+                    <Typography fontWeight={600}>Contact Persons</Typography>
                   </Box>
 
-                  {restaurantContacts.fields.map((field, index) => {
-                    const contactErrors =
-                      errors.restaurantContacts?.[index] || {};
-                    return (
-                      <Box key={field.id} mt={2}>
-                        <Grid container spacing={2}>
-                          <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField
-                              label="Contact Name"
-                              fullWidth
-                              {...register(
-                                `restaurantContacts.${index}.name` as const,
-                              )}
-                              error={!!contactErrors.name}
-                              helperText={contactErrors.name?.message}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField
-                              label="Phone"
-                              fullWidth
-                              {...register(
-                                `restaurantContacts.${index}.phone` as const,
-                              )}
-                              error={!!contactErrors.phone}
-                              helperText={contactErrors.phone?.message}
-                            />
-                          </Grid>
-                        </Grid>
+                  <MyButton
+                    variant="primary"
+                    onClick={async () => {
+                      const lastIndex = restaurantContacts.fields.length - 1;
+                      const valid = await trigger([
+                        `restaurantContacts.${lastIndex}.name`,
+                        `restaurantContacts.${lastIndex}.phone`,
+                      ]);
+                      if (!valid) return;
 
-                        <Grid container spacing={2} mt={1} alignItems="center">
-                          <Grid size={{ xs: 12, sm: 6 }}>
-                            <TextField
-                              label="Email"
-                              type="email"
-                              fullWidth
-                              {...register(
-                                `restaurantContacts.${index}.email` as const,
-                              )}
-                            />
-                          </Grid>
-                          <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
-                            <IconButton
-                              onClick={() => restaurantContacts.remove(index)}
-                              disabled={restaurantContacts.fields.length === 1}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    );
-                  })}
+                      restaurantContacts.append({
+                        name: "",
+                        phone: "",
+                        email: "",
+                      });
+                    }}
+                  >
+                    <AddIcon style={{ marginRight: 4 }} />
+                    Add Contact
+                  </MyButton>
                 </Box>
-              </Fade>
-            </AccordionDetails>
-          </Accordion>
+
+                {restaurantContacts.fields.map((field, index) => {
+                  const contactErrors =
+                    errors.restaurantContacts?.[index] || {};
+                  return (
+                    <Box key={field.id} mt={2}>
+                      <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <MyInput<FormValues>
+                            name={`restaurantContacts.${index}.name`}
+                            control={control}
+                            label="Contact Name"
+                            errorMessage={contactErrors.name?.message}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <MyInput<FormValues>
+                            name={`restaurantContacts.${index}.phone`}
+                            control={control}
+                            label="Phone"
+                            errorMessage={contactErrors.phone?.message}
+                          />
+                        </Grid>
+                      </Grid>
+
+                      <Grid container spacing={2} mt={1} alignItems="center">
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <MyInput<FormValues>
+                            name={`restaurantContacts.${index}.email`}
+                            control={control}
+                            label="Email"
+                            type="email"
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
+                          <IconButton
+                            onClick={() => restaurantContacts.remove(index)}
+                            disabled={restaurantContacts.fields.length === 1}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Fade>
+          </MyAccordion>
 
           {/* BRANCH DETAILS */}
           {branchArray.fields.map((branch, branchIndex) => (
@@ -429,14 +401,13 @@ const RestaurantInfo = () => {
 
           {/* SUBMIT BUTTON */}
           <Box display="flex" justifyContent="center" mt={4}>
-            <Button
+            <MyButton
               type="submit"
-              variant="contained"
-              size="large"
+              variant="primary"
               sx={{ px: 6, py: 1.5, borderRadius: 3 }}
             >
               Submit
-            </Button>
+            </MyButton>
           </Box>
         </form>
       </Paper>

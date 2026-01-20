@@ -52,7 +52,7 @@ const App: React.FC = () => {
                     element={<AddRestaurantModal />}
                   />
 
-                  <Route path="restaurantinfo" element ={<RestaurantInfo/>}/>
+                  <Route path="/restaurantinfo" element ={<RestaurantInfo/>}/>
                 </Routes>
               </main>
 

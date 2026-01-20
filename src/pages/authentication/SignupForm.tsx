@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import { Modal, Form } from "react-bootstrap";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Box,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import MyInput from "../../components/textfields/MyInput";
 import MyButton from "../../components/button/MyButton";
-import { validateRequired, validateEmail } from "../../utils/validators/GeneralValidators";
-import useUser from "../../hooks/useUser"; // custom hook
+import {
+  validateRequired,
+  validateEmail,
+} from "../../utils/validators/GeneralValidators";
+import useUser from "../../hooks/useUser"; 
 
 interface SignupFormProps {
   show: boolean;
@@ -63,9 +74,17 @@ const SignupForm: React.FC<SignupFormProps> = ({
 
     const fields = [
       { name: "fullName", value: form.fullName, label: "Full name" },
-      { name: "emailOrUsername", value: form.emailOrUsername, label: "Email or username" },
+      {
+        name: "emailOrUsername",
+        value: form.emailOrUsername,
+        label: "Email or username",
+      },
       { name: "password", value: form.password, label: "Password" },
-      { name: "confirmPassword", value: form.confirmPassword, label: "Confirm password" },
+      {
+        name: "confirmPassword",
+        value: form.confirmPassword,
+        label: "Confirm password",
+      },
     ];
 
     fields.forEach((field) => {
@@ -73,18 +92,12 @@ const SignupForm: React.FC<SignupFormProps> = ({
       if (error) newErrors[field.name as keyof Errors] = error;
     });
 
-    if (
-      !newErrors.emailOrUsername &&
-      form.emailOrUsername.includes("@")
-    ) {
+    if (!newErrors.emailOrUsername && form.emailOrUsername.includes("@")) {
       const emailError = validateEmail(form.emailOrUsername);
       if (emailError) newErrors.emailOrUsername = emailError;
     }
 
-    if (
-      !newErrors.confirmPassword &&
-      form.password !== form.confirmPassword
-    ) {
+    if (!newErrors.confirmPassword && form.password !== form.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
@@ -99,7 +112,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
       const existingUser = users.find(
         (u) =>
           u.emailOrUsername.trim().toLowerCase() ===
-          form.emailOrUsername.trim().toLowerCase()
+          form.emailOrUsername.trim().toLowerCase(),
       );
 
       if (existingUser) {
@@ -122,32 +135,35 @@ const SignupForm: React.FC<SignupFormProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={onClose} centered backdrop="static">
-      <Modal.Header closeButton className="border-0 pb-0">
-        <Modal.Title className="w-100 text-center fw-bold">
-          Sign Up
-        </Modal.Title>
-      </Modal.Header>
+    <Dialog open={show} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
+        Sign Up
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
-      <Modal.Body>
-        <p className="text-center text-muted mb-4">
+      <DialogContent>
+        <Typography align="center" color="text.secondary" mb={4}>
           Already have an account?{" "}
           <span
-            className="text-danger fw-semibold"
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", color: "red", fontWeight: 600 }}
             onClick={onLoginClick}
           >
             Login
           </span>
-        </p>
+        </Typography>
 
-        <Form>
+        <Box component="form">
           <MyInput
             label="Full Name"
             placeholder="Enter your full name"
             value={form.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            error={errors.fullName} // pass error 
+            error={errors.fullName} // pass error
             required
           />
 
@@ -156,58 +172,85 @@ const SignupForm: React.FC<SignupFormProps> = ({
             placeholder="Enter email or username"
             value={form.emailOrUsername}
             onChange={(e) => handleChange("emailOrUsername", e.target.value)}
-            error={errors.emailOrUsername} 
+            error={errors.emailOrUsername}
             required
           />
 
-          <div className="position-relative">
+          <Box position="relative">
             <MyInput
               label="Password"
               type={visibility.showPassword ? "text" : "password"}
               placeholder="Create a password"
               value={form.password}
               onChange={(e) => handleChange("password", e.target.value)}
-              error={errors.password} 
+              error={errors.password}
               required
             />
             <span
               onClick={() =>
-                setVisibility((p) => ({ ...p, showPassword: !p.showPassword }))
+                setVisibility((p) => ({
+                  ...p,
+                  showPassword: !p.showPassword,
+                }))
               }
-              style={{ position: "absolute", right: "12px", top: "42px", cursor: "pointer" }}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "42px",
+                cursor: "pointer",
+              }}
             >
-              <i className={`bi ${visibility.showPassword ? "bi-eye-slash" : "bi-eye"}`} />
+              <i
+                className={`bi ${
+                  visibility.showPassword ? "bi-eye-slash" : "bi-eye"
+                }`}
+              />
             </span>
-          </div>
+          </Box>
 
-         <div className="position-relative">
-  <MyInput
-    label="Confirm Password"
-    type={visibility.showConfirmPassword ? "text" : "password"}
-    placeholder="Re-enter password"
-    value={form.confirmPassword}
-    onChange={(e) => handleChange("confirmPassword", e.target.value)}
-    error={errors.confirmPassword} // only mismatch error
-  />
-
-
-            
+          <Box position="relative">
+            <MyInput
+              label="Confirm Password"
+              type={visibility.showConfirmPassword ? "text" : "password"}
+              placeholder="Re-enter password"
+              value={form.confirmPassword}
+              onChange={(e) => handleChange("confirmPassword", e.target.value)}
+              error={errors.confirmPassword} // only mismatch error
+            />
             <span
               onClick={() =>
-                setVisibility((p) => ({ ...p, showConfirmPassword: !p.showConfirmPassword }))
+                setVisibility((p) => ({
+                  ...p,
+                  showConfirmPassword: !p.showConfirmPassword,
+                }))
               }
-              style={{ position: "absolute", right: "12px", top: "42px", cursor: "pointer" }}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "42px",
+                cursor: "pointer",
+              }}
             >
-              <i className={`bi ${visibility.showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`} />
+              <i
+                className={`bi ${
+                  visibility.showConfirmPassword ? "bi-eye-slash" : "bi-eye"
+                }`}
+              />
             </span>
-          </div>
-          
-          <MyButton className="w-100 mt-3" onClick={handleSignup} type="button">
-            Sign Up
-          </MyButton>
-        </Form>
-      </Modal.Body>
-    </Modal>
+          </Box>
+
+          <Box display="flex" justifyContent="center">
+            <MyButton
+              className="w-50 mt-3"
+              onClick={handleSignup}
+              type="button"
+            >
+              Sign Up
+            </MyButton>
+          </Box>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 

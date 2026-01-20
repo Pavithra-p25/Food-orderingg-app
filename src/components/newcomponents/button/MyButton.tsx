@@ -10,6 +10,7 @@ type MyButtonProps = {
     | "success"
     | "cancel"
     | "outline-secondary"
+    | "text"
     | "outlined"
     | "contained";
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -30,6 +31,9 @@ const MyButton: React.FC<MyButtonProps> = ({
   style,
   ...props
 }) => {
+
+  
+  
   return (
     <Button
       type={type}
