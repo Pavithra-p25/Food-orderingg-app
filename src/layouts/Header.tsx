@@ -1,16 +1,37 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Box,
+  Button,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Switch,
+  Menu,
+  MenuItem,
+  Divider,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
+import StoreIcon from "@mui/icons-material/Store";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SearchIcon from "@mui/icons-material/Search";
+import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
+
 import { ThemeContext } from "../context/ThemeContext";
-import "../components/Button/Button.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "../styles/theme.css";
-import "../styles/sidebar.css";
-import "./header.css";
 import LoginForm from "../pages/authentication/LoginForm";
 import SignupForm from "../pages/authentication/SignupForm";
 import MyToast from "../components/toast/MyToast";
+import { ListItemButton } from "@mui/material";
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -20,14 +41,13 @@ interface HeaderState {
   collapsed: boolean;
   foodMode: FoodMode;
   user: any | null;
-  toastMessage: string; // for MyToast
+  toastMessage: string;
   showToast: boolean;
 }
 
 const Header: React.FC = () => {
   const { darkMode, setDarkMode } = useContext(ThemeContext);
 
-  // single state object
   const [state, setState] = useState<HeaderState>({
     showLoginForm: false,
     showSignupForm: false,
@@ -38,89 +58,82 @@ const Header: React.FC = () => {
     showToast: false,
   });
 
-  // Load user from localStorage
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser)
+    if (storedUser) {
       setState((prev) => ({ ...prev, user: JSON.parse(storedUser) }));
+    }
   }, []);
 
-  // Dark mode effect
   useEffect(() => {
     document.body.classList.toggle("dark-mode", darkMode);
   }, [darkMode]);
 
-  // Veg/Non-Veg toggle buttons
   const FoodToggle = (
-    <div
-      className="btn-group w-100" // full width in container
-      style={{ maxWidth: "220px" }} // optional max width for larger screens
-    >
+    <Box display="flex" width="220px">
       <Button
-        variant={state.foodMode === "veg" ? "success" : "outline-success"}
+        fullWidth
+        variant={state.foodMode === "veg" ? "contained" : "outlined"}
+        color="success"
         onClick={() =>
           setState((prev) => ({
             ...prev,
             foodMode: prev.foodMode === "veg" ? null : "veg",
           }))
         }
-        style={{ flex: 1, whiteSpace: "nowrap" }}
       >
         Veg
       </Button>
       <Button
-        variant={state.foodMode === "nonveg" ? "danger" : "outline-danger"}
+        fullWidth
+        variant={state.foodMode === "nonveg" ? "contained" : "outlined"}
+        color="error"
         onClick={() =>
           setState((prev) => ({
             ...prev,
             foodMode: prev.foodMode === "nonveg" ? null : "nonveg",
           }))
         }
-        style={{ flex: 1, whiteSpace: "nowrap" }}
       >
         Non-Veg
       </Button>
-    </div>
+    </Box>
   );
 
-  // Dark Mode toggle
   const DarkToggle = (
-    <div className="d-flex align-items-center gap-1 ms-2">
-      <span style={{ color: darkMode ? "white" : "black" }}>Dark</span>
-      <div className="form-check form-switch">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          checked={darkMode}
-          onChange={() => setDarkMode(!darkMode)}
-        />
-      </div>
-    </div>
+    <Box display="flex" alignItems="center" gap={1}>
+      <Typography>{darkMode ? "Dark" : "Light"}</Typography>
+      <Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
+    </Box>
   );
 
-  // Person section
   const PersonSection = () => {
     if (state.user) {
-      // Logged-in user: show dropdown
       return (
-        <Dropdown align="end">
-          <Dropdown.Toggle
-            as="div"
-            id="dropdown-person"
-            className="d-flex align-items-center"
+        <>
+          <Box
+            display="flex"
+            alignItems="center"
+            sx={{ cursor: "pointer" }}
+            onClick={(e) => setAnchorEl(e.currentTarget)}
           >
-            <i
-              className="bi bi-person-circle fs-5"
-              style={{ cursor: "pointer" }}
-            ></i>{" "}
-            <span className="username ms-1">{state.user.fullName}</span>
-          </Dropdown.Toggle>
+            <PersonIcon />
+            <Typography ml={1}>{state.user.fullName}</Typography>
+          </Box>
 
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={() => alert("Go to profile page")}>
-              <i className="bi bi-person-lines-fill me-2"></i>My Profile
-            </Dropdown.Item>
-            <Dropdown.Item
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            <MenuItem onClick={() => alert("Go to profile page")}>
+              <PersonIcon fontSize="small" sx={{ mr: 1 }} />
+              My Profile
+            </MenuItem>
+            <Divider />
+            <MenuItem
               onClick={() => {
                 localStorage.removeItem("user");
                 setState((prev) => ({
@@ -129,158 +142,150 @@ const Header: React.FC = () => {
                   showToast: true,
                   toastMessage: "Logged out successfully",
                 }));
+                setAnchorEl(null);
               }}
             >
-              {" "}
-              <i className="bi bi-box-arrow-right me-2"></i>
+              <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
               Logout
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      );
-    } else {
-      // Not logged in: show icon with "Login" text
-      return (
-        <div
-          className="d-flex align-items-center"
-          style={{ cursor: "pointer" }}
-          onClick={() => setState((prev) => ({ ...prev, showLoginForm: true }))}
-        >
-          <i className="bi bi-person-circle fs-5"></i>
-          <span className="ms-1">Login</span>
-        </div>
+            </MenuItem>
+          </Menu>
+        </>
       );
     }
+
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{ cursor: "pointer" }}
+        onClick={() => setState((prev) => ({ ...prev, showLoginForm: true }))}
+      >
+        <PersonIcon />
+        <Typography ml={1}>Login</Typography>
+      </Box>
+    );
   };
 
   return (
     <>
-      {/* Navbar */}
-      <Navbar
-        expand="lg"
-        bg={darkMode ? "dark" : "light"}
-        variant={darkMode ? "dark" : "light"}
-        className="shadow-sm px-3 fixed-top"
-      >
-        <Container fluid className="px-2 position-relative">
-          {/* Left section */}
-          <div className="header-left">
-            <Button
-              style={{ marginLeft: "-8px" }}
-              variant="outline-secondary"
-              onClick={() =>
-                setState((prev) => ({ ...prev, collapsed: !prev.collapsed }))
-              }
-            >
-              <i className="bi bi-list"></i>
-            </Button>
-          </div>
+      {/* AppBar */}
+      <AppBar position="fixed" color={darkMode ? "default" : "inherit"}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <IconButton
+            sx={{ color: "#333333" }}
+            onClick={() =>
+              setState((prev) => ({ ...prev, collapsed: !prev.collapsed }))
+            }
+          >
+            <MenuIcon />
+          </IconButton>
 
-          {/* App title */}
-          <div className="header-title">
-            <Navbar.Brand
-              href="#"
-              className="fw-bold fs-4"
-              style={{ color: darkMode ? "white" : "#e23744" }}
-            >
-              FoodExpress
-            </Navbar.Brand>
-          </div>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            sx={{ color: darkMode ? "white" : "#e23744" }}
+          >
+            FoodExpress
+          </Typography>
 
-          {/* Right section */}
-          <div className="header-right d-none d-lg-flex">
+          <Box display={{ xs: "none", lg: "flex" }} gap={2}>
             {DarkToggle}
             {FoodToggle}
             <PersonSection />
-          </div>
+          </Box>
 
-          {/* Mobile right section */}
-          <div className="header-right d-flex d-lg-none">
+          <Box display={{ xs: "flex", lg: "none" }}>
             <PersonSection />
-          </div>
-        </Container>
-      </Navbar>
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-      {/* Mobile Drawer */}
-      <div
-        className={`sidebar ${state.collapsed ? "collapsed" : "expanded"} ${
-          darkMode ? "dark" : ""
-        }`}
+      {/* Sidebar */}
+      <Drawer
+        variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
+        open={!state.collapsed}
+        onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
+        sx={{
+          width: state.collapsed ? 72 : 260,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: state.collapsed ? 72 : 260,
+            boxSizing: "border-box",
+            top: "64px", // height of AppBar
+            transition: "width 0.3s",
+            overflowX: "hidden",
+          },
+        }}
       >
-        <div className="d-flex flex-column ">
-          <Nav className="flex-column gap-3 mt-3">
-            <Nav.Link
-              as={Link}
-              to="/"
-              className="sidebar-link"
-              onClick={() => setState((prev) => ({ ...prev, collapsed: true }))}
-            >
-              <i className="bi bi-house-door-fill"></i>
-              {!state.collapsed && <span>Home</span>}
-            </Nav.Link>
+        <Box
+          sx={{
+            mt: "8px",
+            ml: "8px",
+            pt: 0,
+          }}
+        >
+          <List>
+            {[
+              { text: "Home", icon: <HomeIcon />, to: "/" },
+              { text: "Restaurants", icon: <StoreIcon />, to: "/restaurants" },
+              { text: "Cart", icon: <ShoppingCartIcon />, to: "/cart" },
+              { text: "Favorites", icon: <FavoriteIcon />, to: "/favorites" },
+              {
+                text: "Add Restaurant",
+                icon: <AddCircleIcon />,
+                to: "/add-restaurant",
+              },
+              {
+                text: "Search Restaurant",
+                icon: <SearchIcon />,
+                to: "/RestaurantSearch",
+              },
+            ].map((item) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block" }}
+              >
+                <ListItemButton
+                  component={Link}
+                  to={item.to}
+                  onClick={() =>
+                    window.innerWidth < 1200 &&
+                    setState((prev) => ({ ...prev, collapsed: true }))
+                  }
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: state.collapsed ? "center" : "flex-start",
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: state.collapsed ? "auto" : 2,
+                      justifyContent: "center",
+                      color: "#333333",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
 
-            <Nav.Link
-              as={Link}
-              to="/restaurants"
-              className="sidebar-link"
-              onClick={() => setState((prev) => ({ ...prev, collapsed: true }))}
-            >
-              <i className="bi bi-shop"></i>
-              {!state.collapsed && <span>Restaurants</span>}
-            </Nav.Link>
+                  {!state.collapsed && <ListItemText primary={item.text} />}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
 
-            <Nav.Link
-              as={Link}
-              to="/cart"
-              className="sidebar-link"
-              onClick={() => setState((prev) => ({ ...prev, collapsed: true }))}
-            >
-              <i className="bi bi-cart4"></i>
-              {!state.collapsed && <span>Cart</span>}
-            </Nav.Link>
+          <Divider />
 
-            <Nav.Link
-              as={Link}
-              to="/favorites"
-              className="sidebar-link"
-              onClick={() => setState((prev) => ({ ...prev, collapsed: true }))}
-            >
-              <i className="bi bi-heart-fill"></i>
-              {!state.collapsed && <span>Favorites</span>}
-            </Nav.Link>
+          <Box p={2} display={{ lg: "none" }} gap={2}>
+            {FoodToggle}
+            {DarkToggle}
+          </Box>
+        </Box>
+      </Drawer>
 
-            <Nav.Link
-              as={Link}
-              to="/add-restaurant"
-              className="sidebar-link"
-              onClick={() => setState((prev) => ({ ...prev, collapsed: true }))}
-            >
-              <i className="bi bi-plus-circle-fill"></i>
-              {!state.collapsed && <span>Add Restaurant</span>}
-            </Nav.Link>
-
-            <Nav.Link
-              as={Link}
-              to="/RestaurantSearch"
-              className="sidebar-link"
-              onClick={() => setState((prev) => ({ ...prev, collapsed: true }))}
-            >
-              <i className="bi bi-search"></i>
-              {!state.collapsed && <span>Search Restaurant</span>}
-            </Nav.Link>
-          </Nav>
-
-          {/*  in mobile sidebar  */}
-          {!state.collapsed && (
-            <div className="d-flex flex-column gap-2 d-lg-none mt-2 px-2">
-              {FoodToggle}
-              {DarkToggle}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Login Modal */}
+      {/* Login */}
       {state.showLoginForm && (
         <LoginForm
           show={state.showLoginForm}
@@ -306,7 +311,7 @@ const Header: React.FC = () => {
         />
       )}
 
-      {/* Signup Modal */}
+      {/* Signup */}
       {state.showSignupForm && (
         <SignupForm
           show={state.showSignupForm}
@@ -323,7 +328,7 @@ const Header: React.FC = () => {
         />
       )}
 
-      {/* MyToast */}
+      {/* Toast */}
       {state.showToast && (
         <MyToast
           show={state.showToast}

@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useFilter } from "../../context/FilterContext";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import RestaurantForm from "./RestaurantForm";
-import  useRestaurants from "../../hooks/restaurant/useRestaurant";
+import useRestaurants from "../../hooks/restaurant/useRestaurant";
 
 /* STATE TYPE  */
 interface ListingState {
@@ -51,26 +51,24 @@ const RestaurantListing: React.FC = () => {
 
   const { getAllRestaurants } = useRestaurants();
 
-
   //  FETCH RESTAURANTS
- useEffect(() => {
-  const fetchRestaurants = async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const data = await getAllRestaurants();
-      setRestaurants(data);
-    } catch (err) {
-      setError("Failed to load restaurants");
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const data = await getAllRestaurants();
+        setRestaurants(data);
+      } catch (err) {
+        setError("Failed to load restaurants");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchRestaurants();
-}, [getAllRestaurants]);
-
+    fetchRestaurants();
+  }, [getAllRestaurants]);
 
   // FILTER LOGIC
   const filteredRestaurants = restaurants.filter((r) => {
@@ -81,13 +79,18 @@ const RestaurantListing: React.FC = () => {
     if (!category.trim()) return matchesName;
 
     return (
-      matchesName &&
-      r.category.toLowerCase().includes(category.toLowerCase())
+      matchesName && r.category.toLowerCase().includes(category.toLowerCase())
     );
   });
 
   return (
-    <Box sx={{ p: 3, mt: 8 }}>
+    <Box
+      sx={{
+        p: 3,
+        mt: 8,
+        ml: { lg: "72px" }, // offset for collapsed sidebar
+      }}
+    >
       {loading && <Typography>Loading restaurants...</Typography>}
       {error && <Typography color="error">{error}</Typography>}
 
@@ -165,9 +168,7 @@ const RestaurantListing: React.FC = () => {
                       fullWidth
                       variant="contained"
                       sx={{ mt: 2 }}
-                      onClick={() =>
-                        navigate(`/restaurants/${restaurant.id}`)
-                      }
+                      onClick={() => navigate(`/restaurants/${restaurant.id}`)}
                     >
                       View Menu
                     </Button>
@@ -208,9 +209,7 @@ const RestaurantListing: React.FC = () => {
           </Typography>
           <Button
             variant="contained"
-            onClick={() =>
-              setState((prev) => ({ ...prev, showForm: true }))
-            }
+            onClick={() => setState((prev) => ({ ...prev, showForm: true }))}
           >
             Register Now
           </Button>
@@ -219,9 +218,7 @@ const RestaurantListing: React.FC = () => {
 
       <RestaurantForm
         show={showForm}
-        onClose={() =>
-          setState((prev) => ({ ...prev, showForm: false }))
-        }
+        onClose={() => setState((prev) => ({ ...prev, showForm: false }))}
       />
     </Box>
   );
