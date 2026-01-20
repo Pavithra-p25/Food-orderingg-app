@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "@mui/material/Button";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 type MyButtonProps = {
   children?: React.ReactNode;
@@ -17,6 +18,7 @@ type MyButtonProps = {
   fullWidth?: boolean;
   height?: number | string;
   style?: React.CSSProperties;
+  sx?: SxProps<Theme>;
 };
 
 const MyButton: React.FC<MyButtonProps> = ({
@@ -24,6 +26,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   variant = "primary",
   type = "button",
   height,
+  sx,
   style,
   ...props
 }) => {
@@ -39,12 +42,13 @@ const MyButton: React.FC<MyButtonProps> = ({
         variant === "secondary" || variant === "outline-secondary"
           ? "secondary"
           : variant === "success"
-          ? "success"
-          : variant === "cancel"
-          ? "error"
-          : "primary"
+            ? "success"
+            : variant === "cancel"
+              ? "error"
+              : "primary"
       }
       style={{ height, ...style }}
+      sx={sx}
       {...props}
     >
       {children}

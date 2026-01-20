@@ -9,9 +9,9 @@ import {
   TextField,
   Select,
   MenuItem,
-  Button,
   Paper,
 } from "@mui/material";
+import MyButton from "../../components/newcomponents/button/MyButton";
 import { useNavigate } from "react-router-dom";
 import { useFilter } from "../../context/FilterContext";
 import type { Restaurant } from "../../types/RestaurantTypes";
@@ -49,6 +49,8 @@ const RestaurantListing: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [visibleCount, setVisibleCount] = useState<number>(9);
+
   const { getAllRestaurants } = useRestaurants();
 
   //  FETCH RESTAURANTS
@@ -82,6 +84,12 @@ const RestaurantListing: React.FC = () => {
       matchesName && r.category.toLowerCase().includes(category.toLowerCase())
     );
   });
+
+  useEffect(() => {
+    setVisibleCount(9);
+  }, [search, category, filterType]);
+
+  const visibleRestaurants = filteredRestaurants.slice(0, visibleCount);
 
   return (
     <Box
@@ -142,7 +150,7 @@ const RestaurantListing: React.FC = () => {
 
           {/* Cards */}
           <Grid container spacing={3}>
-            {filteredRestaurants.map((restaurant) => (
+            {visibleRestaurants.map((restaurant) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={restaurant.id}>
                 <Card>
                   <CardMedia
@@ -164,14 +172,14 @@ const RestaurantListing: React.FC = () => {
                       ⏱ {restaurant.averageDeliveryTime}
                     </Typography>
 
-                    <Button
+                    <MyButton
                       fullWidth
-                      variant="contained"
+                      variant="cancel"
                       sx={{ mt: 2 }}
                       onClick={() => navigate(`/restaurants/${restaurant.id}`)}
                     >
                       View Menu
-                    </Button>
+                    </MyButton>
                   </CardContent>
                 </Card>
               </Grid>
@@ -191,15 +199,34 @@ const RestaurantListing: React.FC = () => {
           )}
 
           {/* Load More */}
-          <Box textAlign="center" mt={4}>
-            <Button variant="contained">Load More</Button>
-          </Box>
+          {filteredRestaurants.length > 9 && (
+            <Box textAlign="center" mt={4}>
+              <MyButton
+                variant="cancel"
+                onClick={() =>
+                  setVisibleCount(
+                    visibleCount === 9 ? filteredRestaurants.length : 9,
+                  )
+                }
+              >
+                {visibleCount === 9 ? "Load More" : "Show Less"}
+              </MyButton>
+            </Box>
+          )}
         </Grid>
       </Grid>
 
       {/* Join Us */}
       <Box mt={6}>
-        <Card sx={{ p: 4, textAlign: "center" }}>
+        <Card
+          sx={{
+            p: 4,
+            textAlign: "center",
+            background: "linear-gradient(135deg, #ffffff 0%, #ff4d4d 100%)",
+            color: "#333333",
+            borderRadius: 3,
+          }}
+        >
           <Typography variant="h5" mb={2}>
             Own a Restaurant? Join Us Today!
           </Typography>
@@ -207,12 +234,12 @@ const RestaurantListing: React.FC = () => {
             Reach thousands of hungry customers. Sign up now and start receiving
             orders online.
           </Typography>
-          <Button
-            variant="contained"
+          <MyButton
+            variant="cancel"
             onClick={() => setState((prev) => ({ ...prev, showForm: true }))}
           >
             Register Now
-          </Button>
+          </MyButton>
         </Card>
       </Box>
 
