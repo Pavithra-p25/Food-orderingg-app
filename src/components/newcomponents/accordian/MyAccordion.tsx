@@ -4,27 +4,26 @@ import {
   AccordionSummary,
   AccordionDetails,
   Box,
+  type AccordionProps,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-type MyAccordionProps = {
-  expanded: boolean;
-  onChange: (_: React.SyntheticEvent, isExpanded: boolean) => void;
+export type MyAccordionProps = {
   summary: ReactNode;
   children: ReactNode;
-  sx?: object;
-};
+} & AccordionProps;
 
 const MyAccordion: React.FC<MyAccordionProps> = ({
-  expanded,
-  onChange,
   summary,
   children,
-  sx,
+  ...props
 }) => {
   return (
-    <Accordion expanded={expanded} onChange={onChange} sx={sx}>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>{summary}</AccordionSummary>
+    <Accordion disableGutters {...props}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        {summary}
+      </AccordionSummary>
+
       <AccordionDetails>
         <Box>{children}</Box>
       </AccordionDetails>

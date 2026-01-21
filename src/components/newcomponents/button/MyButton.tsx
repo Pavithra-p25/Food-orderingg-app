@@ -10,6 +10,7 @@ type MyButtonProps = {
     | "success"
     | "cancel"
     | "outline-secondary"
+    | "outlined-cancel"
     | "text"
     | "outlined"
     | "contained";
@@ -31,26 +32,30 @@ const MyButton: React.FC<MyButtonProps> = ({
   style,
   ...props
 }) => {
+  // Determine color
+  let buttonColor: "primary" | "secondary" | "success" | "error" = "primary";
 
-  
-  
+  if (variant === "secondary" || variant === "outline-secondary") {
+    buttonColor = "secondary";
+  } else if (variant === "success") {
+    buttonColor = "success";
+  } else if (variant === "cancel" || variant === "outlined-cancel") {
+    buttonColor = "error"; // <-- RED
+  }
+
+  // Determine variant
+  const buttonVariant =
+    variant === "outlined" ||
+    variant === "outline-secondary" ||
+    variant === "outlined-cancel"
+      ? "outlined"
+      : "contained";
+
   return (
     <Button
       type={type}
-      variant={
-        variant === "outline-secondary" || variant === "outlined"
-          ? "outlined"
-          : "contained"
-      }
-      color={
-        variant === "secondary" || variant === "outline-secondary"
-          ? "secondary"
-          : variant === "success"
-            ? "success"
-            : variant === "cancel"
-              ? "error"
-              : "primary"
-      }
+      variant={buttonVariant}
+      color={buttonColor} // <-- THIS WAS MISSING
       style={{ height, ...style }}
       sx={sx}
       {...props}

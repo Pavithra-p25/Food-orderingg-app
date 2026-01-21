@@ -1,247 +1,299 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Fade,
-  IconButton,
-} from "@mui/material";
+import React from "react";
+import { Box, Container, Typography, Paper, IconButton } from "@mui/material";
+import { Controller } from "react-hook-form";
 import Grid from "@mui/material/Grid";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import ContactsIcon from "@mui/icons-material/Contacts";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import StoreIcon from "@mui/icons-material/Store";
 import AddIcon from "@mui/icons-material/Add";
+import DescriptionIcon from "@mui/icons-material/Description";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useForm, useFieldArray } from "react-hook-form";
+import { FormProvider, useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
+import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import type { FormValues } from "../../types/RestaurantInfoTypes";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
+import Tooltip from "@mui/material/Tooltip";
 
-//  Types
-type Contact = {
-  name: string;
-  phone: string;
-  email?: string;
-};
+import type {
+  Control,
+  FieldErrors,
+  UseFieldArrayReturn,
+  UseFormTrigger,
+} from "react-hook-form";
 
-type Branch = {
-  branchName: string;
-  branchCode: string;
-  branchContacts: Contact[];
-};
-
-type FormValues = {
-  restaurantName: string;
-  ownerName: string;
-  restaurantContacts: Contact[];
-  branches: Branch[];
+type BranchAccordionProps = {
+  branchIndex: number;
+  control: Control<FormValues>;
+  branchArray: UseFieldArrayReturn<FormValues, "branches">;
+  errors: FieldErrors<FormValues>;
+  trigger: UseFormTrigger<FormValues>;
+  expanded: boolean;
+  onToggle: () => void;
+  onBranchAdded: (index: number) => void;
 };
 
 //  Branch Accordion
-const BranchAccordion = ({
+const BranchAccordion: React.FC<BranchAccordionProps> = ({
   branchIndex,
-  expanded,
-  handleChange,
   control,
   branchArray,
   errors,
   trigger,
-}: {
-  branchIndex: number;
-  expanded: string | false;
-  handleChange: (panel: string) => (e: any, isExpanded: boolean) => void;
-  control: any;
-  register: any;
-  branchArray: any;
-  errors: any;
-  trigger: any;
+  expanded,
+  onToggle,
+  onBranchAdded,
 }) => {
-  const branchContacts = useFieldArray({
+  const complianceArray = useFieldArray({
     control,
-    name: `branches.${branchIndex}.branchContacts`,
+    name: `branches.${branchIndex}.complianceDetails`,
   });
+
+  //add branch
+  const addBranch = async () => {
+    if (branchArray.fields.length >= 3) return;
+
+    const valid = await trigger("branches");
+    if (valid) {
+      const newIndex = branchArray.fields.length;
+
+      branchArray.append({
+        branchName: "",
+        branchCode: "",
+        complianceDetails: [
+          { licenseType: "", licenseNumber: "", validFrom: "", validTill: "" },
+        ],
+      });
+
+      onBranchAdded(newIndex);
+    }
+  };
+
+  // Add License
+  const addLicense = async () => {
+    // Validate only this branch's complianceDetails
+    const valid = await trigger(`branches.${branchIndex}.complianceDetails`);
+    if (valid) {
+      complianceArray.append({
+        licenseType: "",
+        licenseNumber: "",
+        validFrom: "",
+        validTill: "",
+      });
+    }
+  };
 
   return (
     <MyAccordion
-      expanded={expanded === `branch-${branchIndex}`}
-      onChange={handleChange(`branch-${branchIndex}`)}
+      expanded={expanded}
+      onChange={onToggle}
       sx={{ mb: 2 }}
       summary={
-        <>
-          <StoreIcon color="secondary" />
-          <Typography ml={1} fontWeight={600}>
-            Branch Details {branchIndex + 1}
-          </Typography>
-        </>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          width="100%"
+        >
+          {/* LEFT: ICON + TITLE */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <StoreIcon color="secondary" />
+            <Typography fontWeight={600}>
+              Branch Details {branchIndex + 1}
+            </Typography>
+          </Box>
+
+          {/* ADD BRANCH BUTTON */}
+          {branchIndex === branchArray.fields.length - 1 && (
+            <MyButton
+              variant="outlined"
+              onClick={addBranch}
+              disabled={branchArray.fields.length >= 3}
+            >
+              <AddIcon sx={{ mr: 0.5 }} />
+              Add Branch
+            </MyButton>
+          )}
+        </Box>
       }
     >
-      <Fade in={expanded === `branch-${branchIndex}`}>
-        <Box>
-          {branchIndex === branchArray.fields.length - 1 && (
-            <Box display="flex" justifyContent="flex-end" mb={2}>
-              <MyButton
-                variant="text"
-                onClick={() =>
-                  branchArray.append({
-                    branchName: "",
-                    branchCode: "",
-                    branchContacts: [{ name: "", phone: "", email: "" }],
-                  })
-                }
-              >
-                <AddIcon style={{ marginRight: 4 }} />
-                Add Branch
-              </MyButton>
-            </Box>
-          )}
-
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <MyInput<FormValues>
-                name={`branches.${branchIndex}.branchName`}
-                control={control}
-                label="Branch Name"
-                errorMessage={
-                  errors.branches?.[branchIndex]?.branchName?.message
-                }
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <MyInput<FormValues>
-                name={`branches.${branchIndex}.branchCode`}
-                control={control}
-                label="Branch Code"
-                errorMessage={
-                  errors.branches?.[branchIndex]?.branchCode?.message
-                }
-              />
-            </Grid>
+      <Box>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <MyInput<FormValues>
+              name={`branches.${branchIndex}.branchName`}
+              control={control}
+              label="Branch Name"
+              required
+              errorMessage={errors.branches?.[branchIndex]?.branchName?.message}
+            />
           </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <MyInput<FormValues>
+              name={`branches.${branchIndex}.branchCode`}
+              control={control}
+              required
+              label="Branch Code"
+              errorMessage={errors.branches?.[branchIndex]?.branchCode?.message}
+            />
+          </Grid>
+        </Grid>
 
-          {/* Branch Contacts */}
+        <Box mt={3}>
+          {/* HEADER */}
           <Box
             display="flex"
             alignItems="center"
             justifyContent="space-between"
-            mt={3}
+            mb={2}
           >
             <Box display="flex" alignItems="center" gap={1}>
-              <ContactsIcon color="secondary" />
-              <Typography fontWeight={600}>Branch Contacts</Typography>
+              <DescriptionIcon color="secondary" />
+              <Typography fontWeight={700}>Compliance Details</Typography>
             </Box>
 
-            <MyButton
-              variant="primary"
-              onClick={async () => {
-                const lastIndex = branchContacts.fields.length - 1;
-                const valid = await trigger([
-                  `branches.${branchIndex}.branchContacts.${lastIndex}.name`,
-                  `branches.${branchIndex}.branchContacts.${lastIndex}.phone`,
-                ]);
-                if (!valid) return;
-
-                branchContacts.append({ name: "", phone: "", email: "" });
-              }}
-            >
-              <AddIcon style={{ marginRight: 4 }} />
-              Add Contact
+            <MyButton variant="outlined" onClick={addLicense}>
+              <AddIcon sx={{ mr: 0.5 }} />
+              Add License
             </MyButton>
           </Box>
 
-          {branchContacts.fields.map((contact, contactIndex) => {
-            const contactErrors =
-              errors.branches?.[branchIndex]?.branchContacts?.[contactIndex] ||
-              {};
-            return (
-              <Box key={contact.id} mt={2}>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <MyInput<FormValues>
-                      name={`branches.${branchIndex}.branchContacts.${contactIndex}.name`}
-                      control={control}
-                      label="Contact Name"
-                      errorMessage={contactErrors.name?.message}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <MyInput<FormValues>
-                      name={`branches.${branchIndex}.branchContacts.${contactIndex}.phone`}
-                      control={control}
-                      label="Phone"
-                      errorMessage={contactErrors.phone?.message}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Grid container spacing={2} mt={1} alignItems="center">
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <MyInput<FormValues>
-                      name={`branches.${branchIndex}.branchContacts.${contactIndex}.email`}
-                      control={control}
-                      label="Email"
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
-                    <IconButton
-                      onClick={() => branchContacts.remove(contactIndex)}
-                      disabled={branchContacts.fields.length === 1}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </Box>
-            );
-          })}
-
-          {branchArray.fields.length > 1 && (
-            <Box mt={2} display="flex" justifyContent="flex-start">
-              <MyButton
-                variant="cancel"
-                onClick={() => branchArray.remove(branchIndex)}
+          {complianceArray.fields.map((item, cIndex) => (
+            <Paper
+              key={item.id}
+              elevation={3}
+              sx={{
+                p: 3,
+                mb: 3,
+                borderRadius: 3,
+                backgroundColor: "grey.50",
+              }}
+            >
+              {/* CARD HEADER */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
               >
-                Remove Branch
-              </MyButton>
-            </Box>
-          )}
+                <Typography fontWeight={600}>License {cIndex + 1}</Typography>
+
+                <IconButton
+                  color="error"
+                  disabled={complianceArray.fields.length === 1}
+                  onClick={() => complianceArray.remove(cIndex)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+
+              {/* FIELDS */}
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <MyInput<FormValues>
+                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.licenseType`}
+                    control={control}
+                    label="License Type"
+                    required
+                    errorMessage={
+                      errors.branches?.[branchIndex]?.complianceDetails?.[
+                        cIndex
+                      ]?.licenseType?.message
+                    }
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <MyInput<FormValues>
+                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.licenseNumber`}
+                    control={control}
+                    label="License Number"
+                    required
+                    errorMessage={
+                      errors.branches?.[branchIndex]?.complianceDetails?.[
+                        cIndex
+                      ]?.licenseNumber?.message
+                    }
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <MyDatePicker
+                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.validFrom`}
+                    label="Valid From"
+                    disablePast={false}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <MyDatePicker
+                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.validTill`}
+                    label="Valid Till"
+                    disableFuture={false}
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
+          ))}
         </Box>
-      </Fade>
+
+        {branchArray.fields.length > 1 && (
+          <Box mt={2} display="flex" justifyContent="flex-start">
+            <MyButton
+              variant="outlined-cancel"
+              onClick={() => branchArray.remove(branchIndex)}
+            >
+              Remove Branch
+            </MyButton>
+          </Box>
+        )}
+      </Box>
     </MyAccordion>
   );
 };
 
 //  Main Component
 const RestaurantInfo = () => {
-  const [expanded, setExpanded] = useState<string | false>("restaurant");
-
-  const {
-    register,
-    control,
-    handleSubmit,
-    trigger,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     defaultValues: {
-      restaurantContacts: [{ name: "", phone: "", email: "" }],
+      restaurantName: "",
+      ownerName: "",
+      menuItems: [{ itemName: "", category: "", price: 0, file: null }],
       branches: [
         {
           branchName: "",
           branchCode: "",
-          branchContacts: [{ name: "", phone: "", email: "" }],
+          complianceDetails: [
+            {
+              licenseType: "",
+              licenseNumber: "",
+              validFrom: "",
+              validTill: "",
+            },
+          ],
         },
       ],
     },
-    resolver: yupResolver(restaurantInfoSchema) as any,
+    resolver: yupResolver(restaurantInfoSchema),
     mode: "onChange",
-    reValidateMode: "onChange",
   });
 
-  const restaurantContacts = useFieldArray({
+  const {
     control,
-    name: "restaurantContacts",
+    handleSubmit,
+    trigger,
+    formState: { errors },
+  } = methods;
+
+  const menuItemsArray = useFieldArray({
+    control,
+    name: "menuItems",
   });
 
   const branchArray = useFieldArray({
@@ -249,169 +301,283 @@ const RestaurantInfo = () => {
     name: "branches",
   });
 
-  const handleChange =
-    (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
-    };
-
   const onSubmit = (data: FormValues) => {
     console.log("FINAL SUBMIT DATA:", data);
   };
 
+  const [expandedRestaurant, setExpandedRestaurant] = React.useState(false);
+  const [expandedBranches, setExpandedBranches] = React.useState<number[]>([]);
+
+  const [expandAll, setExpandAll] = React.useState(false);
+
+  // Add Menu Item
+  const addMenuItem = async () => {
+    const valid = await trigger("menuItems"); // validate current form
+    if (valid) {
+      menuItemsArray.append({
+        itemName: "",
+        category: "",
+        price: 0,
+        file: null,
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    if (expandAll) {
+      setExpandedRestaurant(true);
+      setExpandedBranches(branchArray.fields.map((_, index) => index));
+    } else {
+      setExpandedRestaurant(false);
+      setExpandedBranches([]);
+    }
+  }, [expandAll, branchArray.fields.length]);
+
   return (
-    <Container maxWidth="md">
-      <Paper elevation={8} sx={{ p: 4, mt: 4, borderRadius: 4 }}>
-        <Typography variant="h5" fontWeight="bold" mb={3}>
-          Restaurant Information
-        </Typography>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* RESTAURANT DETAILS */}
-          <MyAccordion
-            expanded={expanded === "restaurant"}
-            onChange={handleChange("restaurant")}
-            sx={{ mb: 2 }}
-            summary={
-              <>
-                <RestaurantIcon color="primary" />
-                <Typography ml={1} fontWeight={600}>
-                  Restaurant Details
+    <FormProvider {...methods}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Container maxWidth="md">
+          <Paper elevation={8} sx={{ p: 4, mt: 4, borderRadius: 4 }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={3}
+            >
+              <Box flex={1} display="flex" justifyContent="center">
+                <Typography variant="h5" fontWeight="bold">
+                  Restaurant Information
                 </Typography>
-              </>
-            }
-          >
-            <Fade in={expanded === "restaurant"}>
-              <Box>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <MyInput<FormValues>
-                      name="restaurantName"
-                      control={control}
-                      label="Restaurant Name"
-                      errorMessage={errors.restaurantName?.message}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <MyInput<FormValues>
-                      name="ownerName"
-                      control={control}
-                      label="Owner Name"
-                      errorMessage={errors.ownerName?.message}
-                    />
-                  </Grid>
-                </Grid>
+              </Box>
 
-                {/* Restaurant Contacts */}
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  mt={3}
+              <Tooltip
+                title={expandAll ? "Collapse All Forms" : "Expand All Forms"}
+              >
+                <IconButton
+                  onClick={() => setExpandAll((prev) => !prev)}
+                  sx={{
+                    backgroundColor: "primary.light",
+                    color: "primary.main",
+                    transform: expandAll ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      backgroundColor: "primary.main",
+                      color: "white",
+                    },
+                  }}
                 >
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <ContactsIcon color="primary" />
-                    <Typography fontWeight={600}>Contact Persons</Typography>
-                  </Box>
+                  <UnfoldMoreIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
 
-                  <MyButton
-                    variant="primary"
-                    onClick={async () => {
-                      const lastIndex = restaurantContacts.fields.length - 1;
-                      const valid = await trigger([
-                        `restaurantContacts.${lastIndex}.name`,
-                        `restaurantContacts.${lastIndex}.phone`,
-                      ]);
-                      if (!valid) return;
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              {/* RESTAURANT DETAILS */}
+              <MyAccordion
+                expanded={expandedRestaurant} // controlled by state
+                onChange={() => setExpandedRestaurant((prev) => !prev)} // toggle state
+                sx={{ mb: 2 }}
+                summary={
+                  <>
+                    <RestaurantIcon color="primary" />
+                    <Typography ml={1} fontWeight={600}>
+                      Restaurant Details
+                    </Typography>
+                  </>
+                }
+              >
+                <Box>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <MyInput<FormValues>
+                        name="restaurantName"
+                        control={control}
+                        label="Restaurant Name"
+                        required
+                        errorMessage={errors.restaurantName?.message}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <MyInput<FormValues>
+                        name="ownerName"
+                        control={control}
+                        required
+                        label="Owner Name"
+                        errorMessage={errors.ownerName?.message}
+                      />
+                    </Grid>
+                  </Grid>
 
-                      restaurantContacts.append({
-                        name: "",
-                        phone: "",
-                        email: "",
-                      });
-                    }}
-                  >
-                    <AddIcon style={{ marginRight: 4 }} />
-                    Add Contact
-                  </MyButton>
-                </Box>
+                  <Box mt={3}>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      mb={2}
+                    >
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <RestaurantMenuIcon color="primary" />
+                        <Typography fontWeight={700}>Menu Items</Typography>
+                      </Box>
 
-                {restaurantContacts.fields.map((field, index) => {
-                  const contactErrors =
-                    errors.restaurantContacts?.[index] || {};
-                  return (
-                    <Box key={field.id} mt={2}>
-                      <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <MyInput<FormValues>
-                            name={`restaurantContacts.${index}.name`}
-                            control={control}
-                            label="Contact Name"
-                            errorMessage={contactErrors.name?.message}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <MyInput<FormValues>
-                            name={`restaurantContacts.${index}.phone`}
-                            control={control}
-                            label="Phone"
-                            errorMessage={contactErrors.phone?.message}
-                          />
-                        </Grid>
-                      </Grid>
+                      <MyButton variant="outlined" onClick={addMenuItem}>
+                        <AddIcon sx={{ mr: 0.5 }} />
+                        Add Menu Item
+                      </MyButton>
+                    </Box>
 
-                      <Grid container spacing={2} mt={1} alignItems="center">
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <MyInput<FormValues>
-                            name={`restaurantContacts.${index}.email`}
-                            control={control}
-                            label="Email"
-                            type="email"
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
+                    {menuItemsArray.fields.map((item, index) => (
+                      <Paper
+                        key={item.id}
+                        elevation={4}
+                        sx={{
+                          p: 3,
+                          mb: 3,
+                          borderRadius: 3,
+                          backgroundColor: "grey.50",
+                          position: "relative",
+                        }}
+                      >
+                        {/* HEADER */}
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          mb={2}
+                        >
+                          <Typography fontWeight={600}>
+                            Item {index + 1}
+                          </Typography>
+
                           <IconButton
-                            onClick={() => restaurantContacts.remove(index)}
-                            disabled={restaurantContacts.fields.length === 1}
+                            onClick={() => menuItemsArray.remove(index)}
+                            disabled={menuItemsArray.fields.length === 1}
+                            color="error"
                           >
                             <DeleteIcon />
                           </IconButton>
+                        </Box>
+
+                        {/* FIELDS */}
+                        <Grid container spacing={2}>
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <MyInput<FormValues>
+                              name={`menuItems.${index}.itemName`}
+                              control={control}
+                              label="Item Name"
+                              required
+                              errorMessage={
+                                errors.menuItems?.[index]?.itemName?.message
+                              }
+                            />
+                          </Grid>
+
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <MyInput<FormValues>
+                              name={`menuItems.${index}.category`}
+                              control={control}
+                              label="Category"
+                              required
+                              errorMessage={
+                                errors.menuItems?.[index]?.category?.message
+                              }
+                            />
+                          </Grid>
+
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <MyInput<FormValues>
+                              name={`menuItems.${index}.price`}
+                              control={control}
+                              label="Price"
+                              required
+                              type="number"
+                              errorMessage={
+                                errors.menuItems?.[index]?.price?.message
+                              }
+                            />
+                          </Grid>
+
+                          {/* FILE UPLOAD */}
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <Controller
+                              name={`menuItems.${index}.file`}
+                              control={control}
+                              render={({ field }) => (
+                                <>
+                                  <MyButton
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ height: 56 }}
+                                    onClick={() =>
+                                      document
+                                        .getElementById(`menu-file-${index}`)
+                                        ?.click()
+                                    }
+                                  >
+                                    {field.value?.name ?? "Upload Item Image"}
+                                  </MyButton>
+
+                                  <input
+                                    type="file"
+                                    hidden
+                                    id={`menu-file-${index}`}
+                                    accept="image/*"
+                                    onChange={(e) =>
+                                      field.onChange(
+                                        e.target.files?.[0] || null,
+                                      )
+                                    }
+                                  />
+                                </>
+                              )}
+                            />
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    </Box>
-                  );
-                })}
+                      </Paper>
+                    ))}
+                  </Box>
+                </Box>
+              </MyAccordion>
+
+              {/* BRANCH DETAILS */}
+              {branchArray.fields.map((branch, branchIndex) => (
+                <BranchAccordion
+                  key={branch.id}
+                  branchIndex={branchIndex}
+                  control={control}
+                  branchArray={branchArray}
+                  errors={errors}
+                  trigger={trigger}
+                  expanded={expandedBranches.includes(branchIndex)}
+                  onToggle={() =>
+                    setExpandedBranches(
+                      (prev) =>
+                        prev.includes(branchIndex)
+                          ? prev.filter((i) => i !== branchIndex) // close
+                          : [...prev, branchIndex], // open
+                    )
+                  }
+                  onBranchAdded={(newIndex: number) =>
+                    setExpandedBranches((prev) => [...prev, newIndex])
+                  }
+                />
+              ))}
+
+              {/* SUBMIT BUTTON */}
+              <Box display="flex" justifyContent="center" mt={4}>
+                <MyButton
+                  type="submit"
+                  variant="primary"
+                  sx={{ px: 3, py: 1, borderRadius: 2 }}
+                >
+                  Submit
+                </MyButton>
               </Box>
-            </Fade>
-          </MyAccordion>
-
-          {/* BRANCH DETAILS */}
-          {branchArray.fields.map((branch, branchIndex) => (
-            <BranchAccordion
-              key={branch.id}
-              branchIndex={branchIndex}
-              expanded={expanded}
-              handleChange={handleChange}
-              control={control}
-              register={register}
-              branchArray={branchArray}
-              errors={errors}
-              trigger={trigger}
-            />
-          ))}
-
-          {/* SUBMIT BUTTON */}
-          <Box display="flex" justifyContent="center" mt={4}>
-            <MyButton
-              type="submit"
-              variant="primary"
-              sx={{ px: 6, py: 1.5, borderRadius: 3 }}
-            >
-              Submit
-            </MyButton>
-          </Box>
-        </form>
-      </Paper>
-    </Container>
+            </form>
+          </Paper>
+        </Container>
+      </LocalizationProvider>
+    </FormProvider>
   );
 };
 
