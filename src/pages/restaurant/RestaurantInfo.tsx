@@ -17,9 +17,15 @@ import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
 import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import type { FormValues } from "../../types/RestaurantInfoTypes";
+import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import Tooltip from "@mui/material/Tooltip";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
+import MyTable from "../../components/newcomponents/table/MyTable";
+import CheckIcon from "@mui/icons-material/Check";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
 
 import type {
   Control,
@@ -30,13 +36,18 @@ import type {
 
 type BranchAccordionProps = {
   branchIndex: number;
-  control: Control<FormValues>;
-  branchArray: UseFieldArrayReturn<FormValues, "branches">;
-  errors: FieldErrors<FormValues>;
-  trigger: UseFormTrigger<FormValues>;
+  control: Control<RestaurantInfoValues>;
+  branchArray: UseFieldArrayReturn<RestaurantInfoValues, "branches">;
+  errors: FieldErrors<RestaurantInfoValues>;
+  trigger: UseFormTrigger<RestaurantInfoValues>;
   expanded: boolean;
   onToggle: () => void;
   onBranchAdded: (index: number) => void;
+};
+
+type ComplianceRow = {
+  id: string;
+  _index: number;
 };
 
 //  Branch Accordion
@@ -58,7 +69,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
   //add branch
   const addBranch = async () => {
     if (branchArray.fields.length >= 3) return;
-
     const valid = await trigger("branches");
     if (valid) {
       const newIndex = branchArray.fields.length;
@@ -86,13 +96,152 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         validFrom: "",
         validTill: "",
       });
+      setComplianceEditable((prev) => [...prev, true]);
     }
   };
+
+  const complianceRows = complianceArray.fields.map((field, index) => ({
+    id: field.id,
+    _index: index,
+  }));
+
+  const [complianceEditable, setComplianceEditable] = React.useState<boolean[]>(
+    complianceArray.fields.map(() => true),
+  );
+
+  const handleSaveCompliance = async (index: number) => {
+    const valid = await trigger([
+      `branches.${branchIndex}.complianceDetails.${index}.licenseType`,
+      `branches.${branchIndex}.complianceDetails.${index}.licenseNumber`,
+      `branches.${branchIndex}.complianceDetails.${index}.validFrom`,
+      `branches.${branchIndex}.complianceDetails.${index}.validTill`,
+    ]);
+
+    if (valid) {
+      setComplianceEditable((prev) =>
+        prev.map((v, i) => (i === index ? false : v)),
+      );
+    }
+  };
+
+  const handleEditCompliance = (index: number) => {
+    setComplianceEditable((prev) =>
+      prev.map((v, i) => (i === index ? true : v)),
+    );
+  };
+
+  const complianceColumns = [
+    {
+      id: "licenseType",
+      label: "License Type",
+      render: (row: ComplianceRow) => (
+        <MyInput<RestaurantInfoValues>
+          name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseType`}
+          size="small"
+          sx={{ minWidth: 160 }}
+          control={control}
+          label="License Type"
+          required
+          disabled={!complianceEditable[row._index]}
+          errorMessage={
+            errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+              ?.licenseType?.message
+          }
+        />
+      ),
+    },
+    {
+      id: "licenseNumber",
+      label: "License Number",
+      render: (row: ComplianceRow) => (
+        <MyInput<RestaurantInfoValues>
+          name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`}
+          size="small"
+          sx={{ minWidth: 160 }}
+          control={control}
+          label="License Number"
+          disabled={!complianceEditable[row._index]}
+          required
+          errorMessage={
+            errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+              ?.licenseNumber?.message
+          }
+        />
+      ),
+    },
+    {
+      id: "validFrom",
+      label: "Valid From",
+      render: (row: ComplianceRow) => (
+        <MyDatePicker
+          name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
+          size="small"
+          label="Valid From"
+          disabled={!complianceEditable[row._index]}
+          disablePast={false}
+        />
+      ),
+    },
+    {
+      id: "validTill",
+      label: "Valid Till",
+      render: (row: ComplianceRow) => (
+        <MyDatePicker
+          name={`branches.${branchIndex}.complianceDetails.${row._index}.validTill`}
+          size="small"
+          label="Valid Till"
+          disabled={!complianceEditable[row._index]}
+          disableFuture={false}
+        />
+      ),
+    },
+    {
+      id: "actions",
+      label: "Actions",
+      sortable: false,
+      render: (row: ComplianceRow) => (
+        <Box display="flex" gap={1}>
+          {complianceEditable[row._index] ? (
+            <Tooltip title="Save">
+              <IconButton
+                color="success"
+                onClick={() => handleSaveCompliance(row._index)}
+              >
+                <CheckIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Edit">
+              <IconButton
+                color="primary"
+                onClick={() => handleEditCompliance(row._index)}
+              >
+                <EditNoteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          <IconButton
+            color="error"
+            disabled={complianceArray.fields.length === 1}
+            onClick={() => {
+              complianceArray.remove(row._index);
+              setComplianceEditable((prev) =>
+                prev.filter((_, i) => i !== row._index),
+              );
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
 
   return (
     <MyAccordion
       expanded={expanded}
-      onChange={onToggle}
+      onChange={() => onToggle()}
       sx={{ mb: 2 }}
       summary={
         <Box
@@ -113,7 +262,10 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           {branchIndex === branchArray.fields.length - 1 && (
             <MyButton
               variant="outlined"
-              onClick={addBranch}
+              onClick={(e) => {
+                e.stopPropagation();
+                addBranch();
+              }}
               disabled={branchArray.fields.length >= 3}
             >
               <AddIcon sx={{ mr: 0.5 }} />
@@ -126,7 +278,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       <Box>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <MyInput<FormValues>
+            <MyInput<RestaurantInfoValues>
               name={`branches.${branchIndex}.branchName`}
               control={control}
               label="Branch Name"
@@ -135,7 +287,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <MyInput<FormValues>
+            <MyInput<RestaurantInfoValues>
               name={`branches.${branchIndex}.branchCode`}
               control={control}
               required
@@ -164,85 +316,17 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </MyButton>
           </Box>
 
-          {complianceArray.fields.map((item, cIndex) => (
-            <Paper
-              key={item.id}
-              elevation={3}
-              sx={{
-                p: 3,
-                mb: 3,
-                borderRadius: 3,
-                backgroundColor: "grey.50",
-              }}
-            >
-              {/* CARD HEADER */}
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
-              >
-                <Typography fontWeight={600}>License {cIndex + 1}</Typography>
-
-                <IconButton
-                  color="error"
-                  disabled={complianceArray.fields.length === 1}
-                  onClick={() => complianceArray.remove(cIndex)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-
-              {/* FIELDS */}
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <MyInput<FormValues>
-                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.licenseType`}
-                    control={control}
-                    label="License Type"
-                    required
-                    errorMessage={
-                      errors.branches?.[branchIndex]?.complianceDetails?.[
-                        cIndex
-                      ]?.licenseType?.message
-                    }
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <MyInput<FormValues>
-                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.licenseNumber`}
-                    control={control}
-                    label="License Number"
-                    required
-                    errorMessage={
-                      errors.branches?.[branchIndex]?.complianceDetails?.[
-                        cIndex
-                      ]?.licenseNumber?.message
-                    }
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <MyDatePicker
-                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.validFrom`}
-                    label="Valid From"
-                    disablePast={false}
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <MyDatePicker
-                    name={`branches.${branchIndex}.complianceDetails.${cIndex}.validTill`}
-                    label="Valid Till"
-                    disableFuture={false}
-                  />
-                </Grid>
-              </Grid>
-            </Paper>
-          ))}
+          <Box>
+            <MyTable
+              variant="editable"
+              columns={complianceColumns}
+              rows={complianceRows}
+              pagination={false}
+              dense={false}
+              scrollable={true}
+            />
+          </Box>
         </Box>
-
         {branchArray.fields.length > 1 && (
           <Box mt={2} display="flex" justifyContent="flex-start">
             <MyButton
@@ -260,34 +344,16 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
 
 //  Main Component
 const RestaurantInfo = () => {
-  const methods = useForm<FormValues>({
-    defaultValues: {
-      restaurantName: "",
-      ownerName: "",
-      menuItems: [{ itemName: "", category: "", price: 0, file: null }],
-      branches: [
-        {
-          branchName: "",
-          branchCode: "",
-          complianceDetails: [
-            {
-              licenseType: "",
-              licenseNumber: "",
-              validFrom: "",
-              validTill: "",
-            },
-          ],
-        },
-      ],
-    },
+  const methods = useForm<RestaurantInfoValues>({
+    defaultValues: defaultRestaurantValues,
     resolver: yupResolver(restaurantInfoSchema),
     mode: "onChange",
   });
-
   const {
     control,
     handleSubmit,
     trigger,
+    reset,
     formState: { errors },
   } = methods;
 
@@ -301,7 +367,7 @@ const RestaurantInfo = () => {
     name: "branches",
   });
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = (data: RestaurantInfoValues) => {
     console.log("FINAL SUBMIT DATA:", data);
   };
 
@@ -320,6 +386,7 @@ const RestaurantInfo = () => {
         price: 0,
         file: null,
       });
+      setMenuEditable((prev) => [...prev, true]);
     }
   };
 
@@ -332,6 +399,33 @@ const RestaurantInfo = () => {
       setExpandedBranches([]);
     }
   }, [expandAll, branchArray.fields.length]);
+
+  const [resetSnackbarOpen, setResetSnackbarOpen] = React.useState(false);
+
+  const handleReset = () => {
+    reset(defaultRestaurantValues);
+    setResetSnackbarOpen(true);
+  };
+
+  const [menuEditable, setMenuEditable] = React.useState<boolean[]>(
+    menuItemsArray.fields.map(() => true),
+  );
+
+  const handleSaveMenuItem = async (index: number) => {
+    const valid = await trigger([
+      `menuItems.${index}.itemName`,
+      `menuItems.${index}.category`,
+      `menuItems.${index}.price`,
+    ]);
+
+    if (valid) {
+      setMenuEditable((prev) => prev.map((v, i) => (i === index ? false : v)));
+    }
+  };
+
+  const handleEditMenuItem = (index: number) => {
+    setMenuEditable((prev) => prev.map((v, i) => (i === index ? true : v)));
+  };
 
   return (
     <FormProvider {...methods}>
@@ -389,7 +483,7 @@ const RestaurantInfo = () => {
                 <Box>
                   <Grid container spacing={2}>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                      <MyInput<FormValues>
+                      <MyInput<RestaurantInfoValues>
                         name="restaurantName"
                         control={control}
                         label="Restaurant Name"
@@ -398,7 +492,7 @@ const RestaurantInfo = () => {
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                      <MyInput<FormValues>
+                      <MyInput<RestaurantInfoValues>
                         name="ownerName"
                         control={control}
                         required
@@ -449,23 +543,47 @@ const RestaurantInfo = () => {
                             Item {index + 1}
                           </Typography>
 
-                          <IconButton
-                            onClick={() => menuItemsArray.remove(index)}
-                            disabled={menuItemsArray.fields.length === 1}
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
+                          {/* ACTION BUTTONS- Save/Edit + Delete */}
+                          <Box display="flex" alignItems="center" gap={1}>
+                            {menuEditable[index] ? (
+                              <Tooltip title="Save">
+                                <IconButton
+                                  color="success"
+                                  onClick={() => handleSaveMenuItem(index)}
+                                >
+                                  <CheckIcon />
+                                </IconButton>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Edit">
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => handleEditMenuItem(index)}
+                                >
+                                  <EditNoteIcon />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+
+                            <IconButton
+                              onClick={() => menuItemsArray.remove(index)}
+                              disabled={menuItemsArray.fields.length === 1}
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
                         </Box>
 
                         {/* FIELDS */}
                         <Grid container spacing={2}>
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <MyInput<FormValues>
+                            <MyInput<RestaurantInfoValues>
                               name={`menuItems.${index}.itemName`}
                               control={control}
                               label="Item Name"
                               required
+                              disabled={!menuEditable[index]}
                               errorMessage={
                                 errors.menuItems?.[index]?.itemName?.message
                               }
@@ -473,11 +591,12 @@ const RestaurantInfo = () => {
                           </Grid>
 
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <MyInput<FormValues>
+                            <MyInput<RestaurantInfoValues>
                               name={`menuItems.${index}.category`}
                               control={control}
                               label="Category"
                               required
+                              disabled={!menuEditable[index]}
                               errorMessage={
                                 errors.menuItems?.[index]?.category?.message
                               }
@@ -485,12 +604,13 @@ const RestaurantInfo = () => {
                           </Grid>
 
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <MyInput<FormValues>
+                            <MyInput<RestaurantInfoValues>
                               name={`menuItems.${index}.price`}
                               control={control}
                               label="Price"
                               required
                               type="number"
+                              disabled={!menuEditable[index]}
                               errorMessage={
                                 errors.menuItems?.[index]?.price?.message
                               }
@@ -514,6 +634,10 @@ const RestaurantInfo = () => {
                                         ?.click()
                                     }
                                   >
+                                    <CloudUploadIcon
+                                      fontSize="small"
+                                      sx={{ mr: 1 }}
+                                    />{" "}
                                     {field.value?.name ?? "Upload Item Image"}
                                   </MyButton>
 
@@ -558,13 +682,35 @@ const RestaurantInfo = () => {
                     )
                   }
                   onBranchAdded={(newIndex: number) =>
-                    setExpandedBranches((prev) => [...prev, newIndex])
+                    setExpandedBranches((prev) => {
+                      // include all current expanded + the clicked one + new
+                      const lastBranch = branchArray.fields.length - 1;
+                      const updated = Array.from(
+                        new Set([...prev, lastBranch, newIndex]),
+                      );
+                      return updated;
+                    })
                   }
                 />
               ))}
 
               {/* SUBMIT BUTTON */}
-              <Box display="flex" justifyContent="center" mt={4}>
+              <Box display="flex" justifyContent="center" gap={2} mt={4}>
+                <MyButton
+                  type="button"
+                  variant="contained"
+                  onClick={handleReset}
+                  sx={{
+                    px: 3,
+                    py: 1,
+                    borderRadius: 2,
+                    backgroundColor: "grey.600",
+                    color: "white",
+                  }}
+                >
+                  Reset
+                </MyButton>
+
                 <MyButton
                   type="submit"
                   variant="primary"
@@ -575,6 +721,13 @@ const RestaurantInfo = () => {
               </Box>
             </form>
           </Paper>
+          <MySnackbar
+            open={resetSnackbarOpen}
+            message="Form reset successfully"
+            severity="success"
+            onClose={() => setResetSnackbarOpen(false)}
+            position={{ vertical: "top", horizontal: "center" }}
+          />
         </Container>
       </LocalizationProvider>
     </FormProvider>

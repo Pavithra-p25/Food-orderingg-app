@@ -51,8 +51,13 @@ interface MyTableProps<T> {
   expandedContent?: (row: T) => React.ReactNode;
   enableExpand?: boolean;
   pagination?: boolean;
+  dense?: boolean;
   enableGroupScroll?: boolean;
   activeTab?: string;
+  scrollable?: boolean;
+
+  variant?: "display" | "editable";
+  minWidth?: number;
 }
 
 interface TablePaginationActionsProps {
@@ -119,8 +124,12 @@ function MyTable<T>({
   expandedContent,
   enableExpand,
   pagination = true,
+  dense: denseProp,
   enableGroupScroll = false,
+  scrollable = false,
   activeTab,
+  variant = "display",
+  minWidth,
 }: MyTableProps<T>) {
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
@@ -129,7 +138,10 @@ function MyTable<T>({
   const [selected, setSelected] = useState<string[]>([]);
   const [expandAll, setExpandAll] = useState(false);
   const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
-  const [dense, setDense] = useState(false);
+
+  const [internalDense, setInternalDense] = useState(false);
+
+  const dense = typeof denseProp === "boolean" ? denseProp : internalDense;
 
   const handleSelectAll = (checked: boolean) => {
     const newSelected = checked
@@ -396,9 +408,16 @@ function MyTable<T>({
         sx={{
           maxHeight: 450,
           overflowY: "auto",
+          overflowX: scrollable ? "auto" : "hidden",
         }}
       >
-        <Table size={dense ? "small" : "medium"}>
+        <Table
+          size={dense ? "small" : "medium"}
+          sx={{
+            tableLayout: variant === "editable" ? "fixed" : "auto",
+            minWidth: variant === "editable" ? (minWidth ?? 900) : undefined,
+          }}
+        >
           <TableHead>
             {/* GROUP HEADER ROW */}
             {columnGroups && columnGroups.length > 0 && (
@@ -481,6 +500,7 @@ function MyTable<T>({
                               columnGroups.length - 1
                               ? "2px solid #bdbdbd"
                               : "none",
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {group.label}
@@ -544,118 +564,122 @@ function MyTable<T>({
             </TableRow>
           </TableHead>
 
+          <TableBody>
+            {visibleRows.map((row: any, rowIndex) => {
+              if (!shouldRenderRow(row, rowIndex)) return null;
 
-<TableBody>
-  {visibleRows.map((row: any, rowIndex) => {
-    if (!shouldRenderRow(row, rowIndex)) return null;
+              const id = rowId(row);
+              const open = openRows[id];
 
-    const id = rowId(row);
-    const open = openRows[id];
-
-    return (
-      <React.Fragment key={id}>
-        <TableRow>
-          {finalColumns.map((col, colIndex) => {
-            // GROUP ROW LOGIC
-            if (row.isGroup) {
-              if (colIndex === 0) {
-                return (
-                  <TableCell
-                    key={colIndex}
-                    colSpan={finalColumns.length}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          setOpenRows((prev) => ({
-                            ...prev,
-                            [id]: !prev[id],
-                          }))
+              return (
+                <React.Fragment key={id}>
+                  <TableRow>
+                    {finalColumns.map((col, colIndex) => {
+                      // GROUP ROW LOGIC
+                      if (row.isGroup) {
+                        if (colIndex === 0) {
+                          return (
+                            <TableCell
+                              key={colIndex}
+                              colSpan={finalColumns.length}
+                            >
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    setOpenRows((prev) => ({
+                                      ...prev,
+                                      [id]: !prev[id],
+                                    }))
+                                  }
+                                >
+                                  {isGroupRowOpen(id) ? (
+                                    <KeyboardArrowUpIcon />
+                                  ) : (
+                                    <KeyboardArrowDownIcon />
+                                  )}
+                                </IconButton>
+                                <strong>
+                                  {row.label} ({row.count})
+                                </strong>
+                              </Box>
+                            </TableCell>
+                          );
                         }
+                        return null;
+                      }
+
+                      // DATA ROW LOGIC FOR GROUPBY TAB
+                      if (activeTab === "Groupby") {
+                        if (colIndex === 0) return null;
+                      }
+
+                      const effectiveColSpan =
+                        activeTab === "Groupby" && colIndex === 1 ? 2 : 1;
+
+                      const alignment = col.cellAlign
+                        ? col.cellAlign(row)
+                        : col.align || "center";
+
+                      return (
+                        <TableCell
+                          key={colIndex}
+                          align={alignment}
+                          colSpan={effectiveColSpan}
+                          sx={{
+                            // ✅ FIX: LOCK ACTIONS COLUMN WIDTH
+                            width: col.id === "actions" ? 90 : undefined,
+                            whiteSpace:
+                              col.id === "actions" ? "nowrap" : undefined,
+
+                            borderRight:
+                              enableGroupScroll &&
+                              typeof col.id === "string" &&
+                              isGroupEndColumn(col.id) &&
+                              !(row as any).isGroup
+                                ? "2px solid #eeeeee"
+                                : "none",
+                          }}
+                        >
+                          {effectiveColSpan === 2 ? (
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <Box sx={{ minWidth: 48, mr: 1 }} />
+                              {col.render
+                                ? col.render(row)
+                                : (row as any)[col.id]}
+                            </Box>
+                          ) : col.render ? (
+                            col.render(row)
+                          ) : (
+                            (row as any)[col.id]
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+
+                  {enableExpand && expandedContent && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={finalColumns.length}
+                        sx={{ paddingBottom: 0, paddingTop: 0 }}
                       >
-                        {isGroupRowOpen(id) ? (
-                          <KeyboardArrowUpIcon />
-                        ) : (
-                          <KeyboardArrowDownIcon />
-                        )}
-                      </IconButton>
-                      <strong>
-                        {row.label} ({row.count})
-                      </strong>
-                    </Box>
-                  </TableCell>
-                );
-              }
-              return null;
-            }
-
-            // DATA ROW LOGIC FOR GROUPBY TAB
-            if (activeTab === "Groupby") {
-              if (colIndex === 0) return null;
-            }
-
-            const effectiveColSpan =
-              activeTab === "Groupby" && colIndex === 1 ? 2 : 1;
-
-            const alignment = col.cellAlign
-              ? col.cellAlign(row)
-              : col.align || "center";
-
-            return (
-              <TableCell
-                key={colIndex}
-                align={alignment}
-                colSpan={effectiveColSpan}
-                sx={{
-                  // ✅ FIX: LOCK ACTIONS COLUMN WIDTH
-                  width: col.id === "actions" ? 90 : undefined,
-                  whiteSpace:
-                    col.id === "actions" ? "nowrap" : undefined,
-
-                  borderRight:
-                    enableGroupScroll &&
-                    typeof col.id === "string" &&
-                    isGroupEndColumn(col.id) &&
-                    !(row as any).isGroup
-                      ? "2px solid #eeeeee"
-                      : "none",
-                }}
-              >
-                {effectiveColSpan === 2 ? (
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Box sx={{ minWidth: 48, mr: 1 }} />
-                    {col.render
-                      ? col.render(row)
-                      : (row as any)[col.id]}
-                  </Box>
-                ) : col.render ? (
-                  col.render(row)
-                ) : (
-                  (row as any)[col.id]
-                )}
-              </TableCell>
-            );
-          })}
-        </TableRow>
-
-        {enableExpand && expandedContent && (
-          <TableRow>
-            <TableCell
-              colSpan={finalColumns.length}
-              sx={{ paddingBottom: 0, paddingTop: 0 }}
-            >
-              <Collapse in={open} timeout="auto" unmountOnExit>
-                <Box sx={{ m: 2 }}>{expandedContent(row)}</Box>
-              </Collapse>
-            </TableCell>
-          </TableRow>
-        )}
-      </React.Fragment>
-    );
-  })}
-</TableBody>
-
+                        <Collapse in={open} timeout="auto" unmountOnExit>
+                          <Box sx={{ m: 2 }}>{expandedContent(row)}</Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </TableBody>
         </Table>
       </TableContainer>
 
@@ -669,15 +693,17 @@ function MyTable<T>({
             px: 2,
           }}
         >
-          <FormControlLabel
-            control={
-              <Switch
-                checked={dense}
-                onChange={(e) => setDense(e.target.checked)}
-              />
-            }
-            label="Dense padding"
-          />
+          {denseProp === undefined && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={internalDense}
+                  onChange={(e) => setInternalDense(e.target.checked)}
+                />
+              }
+              label="Dense padding"
+            />
+          )}
 
           <TablePagination
             component="div"

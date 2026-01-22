@@ -20,7 +20,7 @@ export type Branch = {
   complianceDetails: ComplianceDetail[];
 };
 
-export type FormValues = {
+export type RestaurantInfoValues = {
   restaurantName: string;
   ownerName: string;
   menuItems: MenuItem[];

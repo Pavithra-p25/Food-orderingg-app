@@ -1,28 +1,25 @@
 import * as yup from "yup";
-import { ERROR_MESSAGES } from "../config/constants/ErrorMessages";
-
-// common required error
-const REQUIRED_ERROR = "is required";
+import { REQUIRED_ERROR } from "../config/constants/ErrorMessages";
 
 export const restaurantInfoSchema = yup.object({
-   restaurantName: yup
+  restaurantName: yup
     .string()
-    .required(ERROR_MESSAGES.contact.ownerNameRequired.replace("Owner", "Restaurant")) 
+    .required(`Restaurant name ${REQUIRED_ERROR}`)
     .min(3, "Restaurant name must be at least 3 characters")
-    .max(20, "Restaurant name cannot exceed 50 characters"),
+    .max(20, "Restaurant name cannot exceed 20 characters"),
 
   ownerName: yup
     .string()
-    .required(ERROR_MESSAGES.contact.ownerNameRequired)
+    .required(`Owner name ${REQUIRED_ERROR}`)
     .min(3, "Owner name must be at least 3 characters")
-    .max(20, "Owner name cannot exceed 30 characters"),
+    .max(20, "Owner name cannot exceed 20 characters"),
 
   menuItems: yup
     .array()
     .of(
       yup.object({
-       itemName: yup.string().required(`Item name ${REQUIRED_ERROR}`),
-       category: yup.string().required(`Category ${REQUIRED_ERROR}`),
+        itemName: yup.string().required(`Item name ${REQUIRED_ERROR}`),
+        category: yup.string().required(`Category ${REQUIRED_ERROR}`),
         price: yup
           .number()
           .typeError("Price must be a number")
@@ -38,24 +35,43 @@ export const restaurantInfoSchema = yup.object({
     .required()
     .of(
       yup.object({
-       branchName: yup.string().required(`Branch name ${REQUIRED_ERROR}`),
+        branchName: yup
+          .string()
+          .required(`Branch name ${REQUIRED_ERROR}`)
+          .min(3, "Restaurant name must be at least 3 characters")
+          .max(20, "Restaurant name cannot exceed 20 characters"),
         branchCode: yup.string().required(`Branch code ${REQUIRED_ERROR}`),
         complianceDetails: yup
           .array()
           .of(
             yup.object({
-              licenseType: yup.string().required(`License type ${REQUIRED_ERROR}`),
+              licenseType: yup
+                .string()
+                .required(`License type ${REQUIRED_ERROR}`),
               licenseNumber: yup
                 .string()
                 .required(`License number ${REQUIRED_ERROR}`),
-              validFrom: yup.string().required(`Valid from date ${REQUIRED_ERROR}`),
-              validTill: yup.string().required(`Valid till date ${REQUIRED_ERROR}`),
+              validFrom: yup
+                .string()
+                .required(`Valid from date ${REQUIRED_ERROR}`),
+              validTill: yup
+                .string()
+                .required(`Valid till ${REQUIRED_ERROR}`)
+                .test(
+                  "is-after-validFrom",
+                  "Valid till must be after valid from",
+                  function (value) {
+                    const { validFrom } = this.parent;
+
+                    if (!validFrom || !value) return true; // let required handle empty
+
+                    return new Date(value) > new Date(validFrom);
+                  },
+                ),
             }),
           )
           .required(`At least one license ${REQUIRED_ERROR}`)
           .min(1, "At least one license is required"),
       }),
-    )
-    .required(`At least one branch ${REQUIRED_ERROR}`)
-    .min(1, "At least one branch is required"),
+    ),
 });
