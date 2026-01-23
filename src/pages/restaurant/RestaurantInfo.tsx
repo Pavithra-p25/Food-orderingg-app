@@ -13,7 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
+import MyAccordion from "../../components/newcomponents/accordian/MyAccordion"; 
 import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -88,6 +88,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
   // Add License
   const addLicense = async () => {
     // Validate only this branch's complianceDetails
+    if (complianceArray.fields.length >= 3) return;
     const valid = await trigger(`branches.${branchIndex}.complianceDetails`);
     if (valid) {
       complianceArray.append({
@@ -140,7 +141,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           size="small"
           sx={{ minWidth: 160 }}
           control={control}
-          label="License Type"
+
           required
           disabled={!complianceEditable[row._index]}
           errorMessage={
@@ -159,7 +160,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           size="small"
           sx={{ minWidth: 160 }}
           control={control}
-          label="License Number"
           disabled={!complianceEditable[row._index]}
           required
           errorMessage={
@@ -176,7 +176,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         <MyDatePicker
           name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
           size="small"
-          label="Valid From"
           disabled={!complianceEditable[row._index]}
           disablePast={false}
         />
@@ -189,7 +188,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         <MyDatePicker
           name={`branches.${branchIndex}.complianceDetails.${row._index}.validTill`}
           size="small"
-          label="Valid Till"
           disabled={!complianceEditable[row._index]}
           disableFuture={false}
         />
@@ -200,7 +198,16 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       label: "Actions",
       sortable: false,
       render: (row: ComplianceRow) => (
-        <Box display="flex" gap={1}>
+        <Box
+          gap={1}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+           
+            height:"100%"
+          }}
+        >
           {complianceEditable[row._index] ? (
             <Tooltip title="Save">
               <IconButton
@@ -310,7 +317,11 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               <Typography fontWeight={700}>Compliance Details</Typography>
             </Box>
 
-            <MyButton variant="outlined" onClick={addLicense}>
+            <MyButton
+              variant="outlined"
+              onClick={addLicense}
+              disabled={complianceArray.fields.length >= 3}
+            >
               <AddIcon sx={{ mr: 0.5 }} />
               Add License
             </MyButton>
@@ -323,7 +334,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               rows={complianceRows}
               pagination={false}
               dense={false}
-              scrollable={true}
             />
           </Box>
         </Box>
@@ -378,6 +388,7 @@ const RestaurantInfo = () => {
 
   // Add Menu Item
   const addMenuItem = async () => {
+    if (menuItemsArray.fields.length >= 3) return;
     const valid = await trigger("menuItems"); // validate current form
     if (valid) {
       menuItemsArray.append({
@@ -430,7 +441,7 @@ const RestaurantInfo = () => {
   return (
     <FormProvider {...methods}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <Paper elevation={8} sx={{ p: 4, mt: 4, borderRadius: 4 }}>
             <Box
               display="flex"
@@ -514,7 +525,11 @@ const RestaurantInfo = () => {
                         <Typography fontWeight={700}>Menu Items</Typography>
                       </Box>
 
-                      <MyButton variant="outlined" onClick={addMenuItem}>
+                      <MyButton
+                        variant="outlined"
+                        onClick={addMenuItem}
+                        disabled={menuItemsArray.fields.length >= 3}
+                      >
                         <AddIcon sx={{ mr: 0.5 }} />
                         Add Menu Item
                       </MyButton>

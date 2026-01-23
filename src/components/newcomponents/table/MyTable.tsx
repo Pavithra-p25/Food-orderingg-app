@@ -448,6 +448,7 @@ function MyTable<T>({
                           fontWeight: "bold",
                           backgroundColor: "#9e9e9e",
                           borderBottom: "1px solid #dcdcdc",
+
                           position: "sticky",
                           top: 0,
                           zIndex: 4,
@@ -573,7 +574,7 @@ function MyTable<T>({
 
               return (
                 <React.Fragment key={id}>
-                  <TableRow>
+                  <TableRow >
                     {finalColumns.map((col, colIndex) => {
                       // GROUP ROW LOGIC
                       if (row.isGroup) {
@@ -633,11 +634,15 @@ function MyTable<T>({
                           align={alignment}
                           colSpan={effectiveColSpan}
                           sx={{
-                            // ✅ FIX: LOCK ACTIONS COLUMN WIDTH
+                            alignItems: "center",
+                            height: "150%",
+                            py: 1.5,
+                            //  LOCK ACTIONS COLUMN WIDTH
                             width: col.id === "actions" ? 90 : undefined,
+                            maxWidth: col.id === "actions" ? 90 : undefined,
+                            padding: col.id === "actions" ? "4px" : undefined,
                             whiteSpace:
                               col.id === "actions" ? "nowrap" : undefined,
-
                             borderRight:
                               enableGroupScroll &&
                               typeof col.id === "string" &&

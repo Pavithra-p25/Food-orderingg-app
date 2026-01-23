@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import RestaurantForm from "../restaurant/RestaurantForm";
-import { restaurantDefaultValues } from "./restaurantDefaultValues";
+import { restaurantDefaultValues } from "./data/restaurantDefaultValues";
 import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import MyTab from "../../components/newcomponents/tabs/MyTab";

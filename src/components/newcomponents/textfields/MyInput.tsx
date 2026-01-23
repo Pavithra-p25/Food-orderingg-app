@@ -4,7 +4,7 @@ import { TextField , type TextFieldProps} from "@mui/material";
 type MyInputProps<T extends FieldValues> = {
   name: Path<T>;
   control?: Control<T>;
-  label: string;
+  label?: string;
   placeholder?: string;
   type?: string;
   required?: boolean;

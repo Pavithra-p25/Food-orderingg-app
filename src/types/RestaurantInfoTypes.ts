@@ -3,7 +3,7 @@
  export type MenuItem = {
   itemName: string;
   category: string;
-  price: number;
+  price: number ;
   file: File | null;
 };
 

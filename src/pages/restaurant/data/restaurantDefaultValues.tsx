@@ -1,4 +1,4 @@
-import type { Restaurant } from "../../types/RestaurantTypes";
+import type { Restaurant } from "../../../types/RestaurantTypes";
 
 export const restaurantDefaultValues: Restaurant = {
   /* SYSTEM FIELDS */

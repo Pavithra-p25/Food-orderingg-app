@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 interface MyDatePickerProps {
   name: string;
-  label: string;
+  label?: string;
   disableFuture?: boolean;
   disablePast?: boolean;
   size?:"small"|"medium";
