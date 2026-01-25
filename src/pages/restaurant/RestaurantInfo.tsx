@@ -8,12 +8,17 @@ import StoreIcon from "@mui/icons-material/Store";
 import AddIcon from "@mui/icons-material/Add";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { FormProvider, useForm, useFieldArray } from "react-hook-form";
+import {
+  FormProvider,
+  useForm,
+  useFieldArray,
+  useFormContext,
+} from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import MyAccordion from "../../components/newcomponents/accordian/MyAccordion"; 
+import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
 import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -26,6 +31,9 @@ import MyTable from "../../components/newcomponents/table/MyTable";
 import CheckIcon from "@mui/icons-material/Check";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
+import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
+import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
+import { formatDate } from "../../utils/DateUtils";
 
 import type {
   Control,
@@ -85,6 +93,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
     }
   };
 
+  const { watch } = useFormContext<RestaurantInfoValues>();
+
   // Add License
   const addLicense = async () => {
     // Validate only this branch's complianceDetails
@@ -135,63 +145,88 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
     {
       id: "licenseType",
       label: "License Type",
-      render: (row: ComplianceRow) => (
-        <MyInput<RestaurantInfoValues>
-          name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseType`}
-          size="small"
-          sx={{ minWidth: 160 }}
-          control={control}
-
-          required
-          disabled={!complianceEditable[row._index]}
-          errorMessage={
-            errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-              ?.licenseType?.message
-          }
-        />
-      ),
+      render: (row: ComplianceRow) =>
+        complianceEditable[row._index] ? (
+          <MyInput<RestaurantInfoValues>
+            name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseType`}
+            size="small"
+            sx={{ minWidth: 160 }}
+            control={control}
+            required
+            errorMessage={
+              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+                ?.licenseType?.message
+            }
+          />
+        ) : (
+          <Typography fontWeight={600}>
+            {watch(
+              `branches.${branchIndex}.complianceDetails.${row._index}.licenseType`,
+            ) || "-"}
+          </Typography>
+        ),
     },
     {
       id: "licenseNumber",
       label: "License Number",
-      render: (row: ComplianceRow) => (
-        <MyInput<RestaurantInfoValues>
-          name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`}
-          size="small"
-          sx={{ minWidth: 160 }}
-          control={control}
-          disabled={!complianceEditable[row._index]}
-          required
-          errorMessage={
-            errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-              ?.licenseNumber?.message
-          }
-        />
-      ),
+      render: (row: ComplianceRow) =>
+        complianceEditable[row._index] ? (
+          <MyInput<RestaurantInfoValues>
+            name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`}
+            size="small"
+            sx={{ minWidth: 160 }}
+            control={control}
+            required
+            errorMessage={
+              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+                ?.licenseNumber?.message
+            }
+          />
+        ) : (
+          <Typography fontWeight={600}>
+            {watch(
+              `branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`,
+            ) || "-"}
+          </Typography>
+        ),
     },
     {
       id: "validFrom",
       label: "Valid From",
-      render: (row: ComplianceRow) => (
-        <MyDatePicker
-          name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
-          size="small"
-          disabled={!complianceEditable[row._index]}
-          disablePast={false}
-        />
-      ),
+      render: (row: ComplianceRow) =>
+        complianceEditable[row._index] ? (
+          <MyDatePicker
+            name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
+            size="small"
+          />
+        ) : (
+          <Typography fontWeight={600}>
+            {formatDate(
+              watch(
+                `branches.${branchIndex}.complianceDetails.${row._index}.validFrom`,
+              ),
+            )}
+          </Typography>
+        ),
     },
     {
       id: "validTill",
       label: "Valid Till",
-      render: (row: ComplianceRow) => (
-        <MyDatePicker
-          name={`branches.${branchIndex}.complianceDetails.${row._index}.validTill`}
-          size="small"
-          disabled={!complianceEditable[row._index]}
-          disableFuture={false}
-        />
-      ),
+      render: (row: ComplianceRow) =>
+        complianceEditable[row._index] ? (
+          <MyDatePicker
+            name={`branches.${branchIndex}.complianceDetails.${row._index}.validTill`}
+            size="small"
+          />
+        ) : (
+          <Typography fontWeight={600}>
+            {formatDate(
+              watch(
+                `branches.${branchIndex}.complianceDetails.${row._index}.validTill`,
+              ),
+            )}
+          </Typography>
+        ),
     },
     {
       id: "actions",
@@ -204,8 +239,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-           
-            height:"100%"
+
+            height: "100%",
           }}
         >
           {complianceEditable[row._index] ? (
@@ -438,6 +473,21 @@ const RestaurantInfo = () => {
     setMenuEditable((prev) => prev.map((v, i) => (i === index ? true : v)));
   };
 
+  const FieldLabel = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value?: React.ReactNode;
+  }) => (
+    <Box>
+      <Typography fontWeight={600} variant="caption" color="text.secondary">
+        {label}
+      </Typography>
+      <Typography fontWeight={200}>{value || "-"}</Typography>
+    </Box>
+  );
+
   return (
     <FormProvider {...methods}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -593,83 +643,110 @@ const RestaurantInfo = () => {
                         {/* FIELDS */}
                         <Grid container spacing={2}>
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <MyInput<RestaurantInfoValues>
-                              name={`menuItems.${index}.itemName`}
-                              control={control}
-                              label="Item Name"
-                              required
-                              disabled={!menuEditable[index]}
-                              errorMessage={
-                                errors.menuItems?.[index]?.itemName?.message
-                              }
-                            />
+                            {menuEditable[index] ? (
+                              <MyInput<RestaurantInfoValues>
+                                name={`menuItems.${index}.itemName`}
+                                control={control}
+                                label="Item Name"
+                                required
+                                errorMessage={
+                                  errors.menuItems?.[index]?.itemName?.message
+                                }
+                              />
+                            ) : (
+                              <FieldLabel
+                                label="Item Name"
+                                value={methods.watch(
+                                  `menuItems.${index}.itemName`,
+                                )}
+                              />
+                            )}
                           </Grid>
 
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <MyInput<RestaurantInfoValues>
-                              name={`menuItems.${index}.category`}
-                              control={control}
-                              label="Category"
-                              required
-                              disabled={!menuEditable[index]}
-                              errorMessage={
-                                errors.menuItems?.[index]?.category?.message
-                              }
-                            />
+                            {menuEditable[index] ? (
+                              <MyDropdown
+                                name={`menuItems.${index}.category`}
+                                control={control}
+                                label="Category"
+                                options={RESTAURANT_CATEGORIES}
+                                required
+                                errors={errors}
+                              />
+                            ) : (
+                              <FieldLabel
+                                label="Category"
+                                value={methods.watch(
+                                  `menuItems.${index}.category`,
+                                )}
+                              />
+                            )}
                           </Grid>
 
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <MyInput<RestaurantInfoValues>
-                              name={`menuItems.${index}.price`}
-                              control={control}
-                              label="Price"
-                              required
-                              type="number"
-                              disabled={!menuEditable[index]}
-                              errorMessage={
-                                errors.menuItems?.[index]?.price?.message
-                              }
-                            />
+                            {menuEditable[index] ? (
+                              <MyInput<RestaurantInfoValues>
+                                name={`menuItems.${index}.price`}
+                                control={control}
+                                label="Price"
+                                type="number"
+                                required
+                                errorMessage={
+                                  errors.menuItems?.[index]?.price?.message
+                                }
+                              />
+                            ) : (
+                              <FieldLabel
+                                label="Price"
+                                value={`₹ ${methods.watch(`menuItems.${index}.price`)}`}
+                              />
+                            )}
                           </Grid>
 
                           {/* FILE UPLOAD */}
                           <Grid size={{ xs: 12, sm: 6 }}>
-                            <Controller
-                              name={`menuItems.${index}.file`}
-                              control={control}
-                              render={({ field }) => (
-                                <>
-                                  <MyButton
-                                    variant="outlined"
-                                    fullWidth
-                                    sx={{ height: 56 }}
-                                    onClick={() =>
-                                      document
-                                        .getElementById(`menu-file-${index}`)
-                                        ?.click()
-                                    }
-                                  >
-                                    <CloudUploadIcon
-                                      fontSize="small"
-                                      sx={{ mr: 1 }}
-                                    />{" "}
-                                    {field.value?.name ?? "Upload Item Image"}
-                                  </MyButton>
+                            {menuEditable[index] ? (
+                              <Controller
+                                name={`menuItems.${index}.file`}
+                                control={control}
+                                render={({ field }) => (
+                                  <>
+                                    <MyButton
+                                      variant="outlined"
+                                      fullWidth
+                                      sx={{ height: 56 }}
+                                      onClick={() =>
+                                        document
+                                          .getElementById(`menu-file-${index}`)
+                                          ?.click()
+                                      }
+                                    >
+                                      <CloudUploadIcon sx={{ mr: 1 }} />
+                                      {field.value?.name ?? "Upload Item Image"}
+                                    </MyButton>
 
-                                  <input
-                                    type="file"
-                                    hidden
-                                    id={`menu-file-${index}`}
-                                    accept="image/*"
-                                    onChange={(e) =>
-                                      field.onChange(
-                                        e.target.files?.[0] || null,
-                                      )
-                                    }
-                                  />
-                                </>
-                              )}
-                            />
+                                    <input
+                                      type="file"
+                                      hidden
+                                      id={`menu-file-${index}`}
+                                      accept="image/*"
+                                      onChange={(e) =>
+                                        field.onChange(
+                                          e.target.files?.[0] || null,
+                                        )
+                                      }
+                                    />
+                                  </>
+                                )}
+                              />
+                            ) : (
+                              <FieldLabel
+                                label="Item Image"
+                                value={
+                                  methods.watch(`menuItems.${index}.file`)?.name
+                                }
+                              />
+                            )}
                           </Grid>
                         </Grid>
                       </Paper>

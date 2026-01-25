@@ -1,121 +1,154 @@
+import type {
+  UseFieldArrayReturn,
+  UseFormTrigger,
+  Control,
+} from "react-hook-form";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
-import type { UseFormTrigger, UseFieldArrayReturn } from "react-hook-form";
-import React from "react";
+import { defaultRestaurantValues } from "../../pages/restaurant/data/RestaurantInfoDefault";
 
-/*  MENU HANDLERS  */
-export const useMenuActions = (
-  trigger: UseFormTrigger<RestaurantInfoValues>,
-  menuItemsArray: UseFieldArrayReturn<RestaurantInfoValues, "menuItems">,
-) => {
-  const [menuEditable, setMenuEditable] = React.useState<boolean[]>(
-    menuItemsArray.fields.map(() => true),
-  );
+type HandlersParams = {
+  control: Control<RestaurantInfoValues>;
+  trigger: UseFormTrigger<RestaurantInfoValues>;
+  reset: (values?: RestaurantInfoValues) => void;
+};
 
-  const addMenuItem = async () => {
+export const useFormHandlers = ({
+
+  trigger,
+  reset,
+}: HandlersParams) => {
+  /** MENU ITEMS **/
+  const addMenuItem = async (
+    menuItemsArray: UseFieldArrayReturn<RestaurantInfoValues, "menuItems">,
+    setMenuEditable: React.Dispatch<React.SetStateAction<boolean[]>>
+  ) => {
+    if (menuItemsArray.fields.length >= 3) return;
     const valid = await trigger("menuItems");
-    if (!valid) return;
-
-    menuItemsArray.append({
-      itemName: "",
-      category: "",
-      price: 0,
-      file: null,
-    });
-
-    setMenuEditable((prev) => [...prev, true]);
+    if (valid) {
+      menuItemsArray.append({
+        itemName: "",
+        category: "",
+        price: 0,
+        file: null,
+      });
+      setMenuEditable((prev) => [...prev, true]);
+    }
   };
 
-  const saveMenuItem = async (index: number) => {
+  const handleSaveMenuItem = async (
+    index: number,
+    setMenuEditable: React.Dispatch<React.SetStateAction<boolean[]>>
+  ) => {
     const valid = await trigger([
       `menuItems.${index}.itemName`,
       `menuItems.${index}.category`,
       `menuItems.${index}.price`,
     ]);
+    if (valid) setMenuEditable((prev) => prev.map((v, i) => (i === index ? false : v)));
+  };
 
+  const handleEditMenuItem = (
+    index: number,
+    setMenuEditable: React.Dispatch<React.SetStateAction<boolean[]>>
+  ) => {
+    setMenuEditable((prev) => prev.map((v, i) => (i === index ? true : v)));
+  };
+
+  /** BRANCHES **/
+  const addBranch = async (
+    branchArray: UseFieldArrayReturn<RestaurantInfoValues, "branches">,
+    setExpandedBranches: React.Dispatch<React.SetStateAction<number[]>>,
+    onBranchAdded: (newIndex: number) => void
+  ) => {
+    if (branchArray.fields.length >= 3) return;
+    const valid = await trigger("branches");
     if (valid) {
-      setMenuEditable((prev) =>
-        prev.map((v, i) => (i === index ? false : v)),
-      );
+      const newIndex = branchArray.fields.length;
+      branchArray.append({
+        branchName: "",
+        branchCode: "",
+        complianceDetails: [{ licenseType: "", licenseNumber: "", validFrom: "", validTill: "" }],
+      });
+      onBranchAdded(newIndex);
+      setExpandedBranches((prev) => [...prev, newIndex]);
     }
   };
 
-  const editMenuItem = (index: number) => {
-    setMenuEditable((prev) =>
-      prev.map((v, i) => (i === index ? true : v)),
-    );
+  /** COMPLIANCE DETAILS **/
+  const addLicense = async (
+    branchIndex: number,
+    complianceArray: UseFieldArrayReturn<RestaurantInfoValues, `branches.${number}.complianceDetails`>,
+    setComplianceEditable: React.Dispatch<React.SetStateAction<boolean[]>>
+  ) => {
+    if (complianceArray.fields.length >= 3) return;
+    const valid = await trigger(`branches.${branchIndex}.complianceDetails`);
+    if (valid) {
+      complianceArray.append({ licenseType: "", licenseNumber: "", validFrom: "", validTill: "" });
+      setComplianceEditable((prev) => [...prev, true]);
+    }
   };
 
-  const removeMenuItem = (index: number) => {
-    menuItemsArray.remove(index);
-    setMenuEditable((prev) => prev.filter((_, i) => i !== index));
+  const handleSaveCompliance = async (
+    branchIndex: number,
+    index: number,
+    setComplianceEditable: React.Dispatch<React.SetStateAction<boolean[]>>,
+  ) => {
+    const valid = await trigger([
+      `branches.${branchIndex}.complianceDetails.${index}.licenseType`,
+      `branches.${branchIndex}.complianceDetails.${index}.licenseNumber`,
+      `branches.${branchIndex}.complianceDetails.${index}.validFrom`,
+      `branches.${branchIndex}.complianceDetails.${index}.validTill`,
+    ]);
+    if (valid) setComplianceEditable((prev) => prev.map((v, i) => (i === index ? false : v)));
+  };
+
+  const handleEditCompliance = (
+    index: number,
+    setComplianceEditable: React.Dispatch<React.SetStateAction<boolean[]>>
+  ) => {
+    setComplianceEditable((prev) => prev.map((v, i) => (i === index ? true : v)));
+  };
+
+  /** RESET FORM **/
+  const handleReset = (
+    setMenuEditable: React.Dispatch<React.SetStateAction<boolean[]>>,
+    setExpandedRestaurant: React.Dispatch<React.SetStateAction<boolean>>,
+    setExpandedBranches: React.Dispatch<React.SetStateAction<number[]>>
+  ) => {
+    reset(defaultRestaurantValues);
+    // reset states
+    setMenuEditable(defaultRestaurantValues.menuItems.map(() => true));
+    setExpandedRestaurant(false);
+    setExpandedBranches([]);
+  };
+
+  /** EXPAND / COLLAPSE ALL **/
+  const handleExpandAll = (
+    expandAll: boolean,
+    setExpandAll: React.Dispatch<React.SetStateAction<boolean>>,
+    setExpandedRestaurant: React.Dispatch<React.SetStateAction<boolean>>,
+    setExpandedBranches: React.Dispatch<React.SetStateAction<number[]>>,
+    branchArray: UseFieldArrayReturn<RestaurantInfoValues, "branches">
+  ) => {
+    setExpandAll(!expandAll);
+    if (!expandAll) {
+      setExpandedRestaurant(true);
+      setExpandedBranches(branchArray.fields.map((_, i) => i));
+    } else {
+      setExpandedRestaurant(false);
+      setExpandedBranches([]);
+    }
   };
 
   return {
-    menuEditable,
     addMenuItem,
-    saveMenuItem,
-    editMenuItem,
-    removeMenuItem,
-  };
-};
-
-/*  BRANCH HANDLERS  */
-export const useBranchActions = (
-  trigger: UseFormTrigger<RestaurantInfoValues>,
-  branchArray: UseFieldArrayReturn<RestaurantInfoValues, "branches">,
-) => {
-  const [expandedBranches, setExpandedBranches] = React.useState<number[]>([]);
-
-  const addBranch = async () => {
-    if (branchArray.fields.length >= 3) return;
-
-    const valid = await trigger("branches");
-    if (!valid) return;
-
-    branchArray.append({
-      branchName: "",
-      branchCode: "",
-      complianceDetails: [
-        { licenseType: "", licenseNumber: "", validFrom: "", validTill: "" },
-      ],
-    });
-
-    setExpandedBranches((prev) => [...prev, branchArray.fields.length]);
-  };
-
-  const removeBranch = (index: number) => {
-    branchArray.remove(index);
-    setExpandedBranches((prev) => prev.filter((i) => i !== index));
-  };
-
-  return {
-    expandedBranches,
-    setExpandedBranches,
+    handleSaveMenuItem,
+    handleEditMenuItem,
     addBranch,
-    removeBranch,
-  };
-};
-
-/* FORM ACTIONS  */
-export const useFormActions = (
-  reset: (values?: RestaurantInfoValues) => void,
-  defaultValues: RestaurantInfoValues,
-) => {
-  const [resetSnackbarOpen, setResetSnackbarOpen] = React.useState(false);
-
-  const handleReset = () => {
-    reset(defaultValues);
-    setResetSnackbarOpen(true);
-  };
-
-  const onSubmit = (data: RestaurantInfoValues) => {
-    console.log("FINAL SUBMIT DATA:", data);
-  };
-
-  return {
+    addLicense,
+    handleSaveCompliance,
+    handleEditCompliance,
     handleReset,
-    resetSnackbarOpen,
-    setResetSnackbarOpen,
-    onSubmit,
+    handleExpandAll,
   };
 };
