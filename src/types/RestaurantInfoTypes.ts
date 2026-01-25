@@ -2,7 +2,7 @@
 //  Types
  export type MenuItem = {
   itemName: string;
-  category: string;
+  category: string ;
   price: number ;
   file: File | null;
 };

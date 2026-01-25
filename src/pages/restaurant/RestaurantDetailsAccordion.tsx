@@ -7,13 +7,16 @@ import CheckIcon from "@mui/icons-material/Check";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { useFormContext, Controller } from "react-hook-form";
+
 import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyButton from "../../components/newcomponents/button/MyButton";
+
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
+import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantAccordionHandlers";
 
 type RestaurantDetailsAccordionProps = {
   expanded: boolean;
@@ -24,46 +27,29 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
   expanded,
   onToggle,
 }) => {
-  const { control, trigger, formState: { errors }, watch } = useFormContext<RestaurantInfoValues>();
-  const menuItemsArray = useFieldArray({
+  const {
     control,
-    name: "menuItems",
-  });
+    trigger,
+    formState: { errors },
+    watch,
+  } = useFormContext<RestaurantInfoValues>();
 
-  const [menuEditable, setMenuEditable] = React.useState<boolean[]>(
-    menuItemsArray.fields.map(() => true),
-  );
+  const {
+    menuItemsArray,
+    menuEditable,
+    addMenuItem,
+    saveMenuItem,
+    editMenuItem,
+    removeMenuItem,
+  } = useRestaurantAccordionHandlers(control, trigger);
 
-  const addMenuItem = async () => {
-    if (menuItemsArray.fields.length >= 3) return;
-    const valid = await trigger("menuItems");
-    if (valid) {
-      menuItemsArray.append({
-        itemName: "",
-        category: "",
-        price: 0,
-        file: null,
-      });
-      setMenuEditable((prev) => [...prev, true]);
-    }
-  };
-
-  const handleSaveMenuItem = async (index: number) => {
-    const valid = await trigger([
-      `menuItems.${index}.itemName`,
-      `menuItems.${index}.category`,
-      `menuItems.${index}.price`,
-    ]);
-    if (valid) {
-      setMenuEditable((prev) => prev.map((v, i) => (i === index ? false : v)));
-    }
-  };
-
-  const handleEditMenuItem = (index: number) => {
-    setMenuEditable((prev) => prev.map((v, i) => (i === index ? true : v)));
-  };
-
-  const FieldLabel = ({ label, value }: { label: string; value?: React.ReactNode }) => (
+  const FieldLabel = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value?: React.ReactNode;
+  }) => (
     <Box>
       <Typography fontWeight={600} variant="caption" color="text.secondary">
         {label}
@@ -85,6 +71,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
       }
     >
       <Box>
+        {/* Basic Info */}
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <MyInput<RestaurantInfoValues>
@@ -95,6 +82,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
               errorMessage={errors.restaurantName?.message}
             />
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6 }}>
             <MyInput<RestaurantInfoValues>
               name="ownerName"
@@ -108,12 +96,22 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
 
         {/* Menu Items */}
         <Box mt={3}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
             <Box display="flex" alignItems="center" gap={1}>
               <RestaurantMenuIcon color="primary" />
               <Typography fontWeight={700}>Menu Items</Typography>
             </Box>
-            <MyButton variant="outlined" onClick={addMenuItem} disabled={menuItemsArray.fields.length >= 3}>
+
+            <MyButton
+              variant="outlined"
+              onClick={addMenuItem}
+              disabled={menuItemsArray.fields.length >= 3}
+            >
               <AddIcon sx={{ mr: 0.5 }} /> Add Menu Item
             </MyButton>
           </Box>
@@ -122,28 +120,48 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
             <Paper
               key={item.id}
               elevation={4}
-              sx={{ p: 3, mb: 3, borderRadius: 3, backgroundColor: "grey.50", position: "relative" }}
+              sx={{
+                p: 3,
+                mb: 3,
+                borderRadius: 3,
+                backgroundColor: "grey.50",
+              }}
             >
               {/* Header */}
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography fontWeight={600}>Item {index + 1}</Typography>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Typography fontWeight={600}>
+                  Item {index + 1}
+                </Typography>
+
                 <Box display="flex" gap={1}>
                   {menuEditable[index] ? (
                     <Tooltip title="Save">
-                      <IconButton color="success" onClick={() => handleSaveMenuItem(index)}>
+                      <IconButton
+                        color="success"
+                        onClick={() => saveMenuItem(index)}
+                      >
                         <CheckIcon />
                       </IconButton>
                     </Tooltip>
                   ) : (
                     <Tooltip title="Edit">
-                      <IconButton color="primary" onClick={() => handleEditMenuItem(index)}>
+                      <IconButton
+                        color="primary"
+                        onClick={() => editMenuItem(index)}
+                      >
                         <EditNoteIcon />
                       </IconButton>
                     </Tooltip>
                   )}
+
                   <IconButton
                     color="error"
-                    onClick={() => menuItemsArray.remove(index)}
+                    onClick={() => removeMenuItem(index)}
                     disabled={menuItemsArray.fields.length === 1}
                   >
                     <DeleteIcon />
@@ -160,10 +178,15 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                       control={control}
                       label="Item Name"
                       required
-                      errorMessage={errors.menuItems?.[index]?.itemName?.message}
+                      errorMessage={
+                        errors.menuItems?.[index]?.itemName?.message
+                      }
                     />
                   ) : (
-                    <FieldLabel label="Item Name" value={watch(`menuItems.${index}.itemName`)} />
+                    <FieldLabel
+                      label="Item Name"
+                      value={watch(`menuItems.${index}.itemName`)}
+                    />
                   )}
                 </Grid>
 
@@ -178,7 +201,10 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                       errors={errors}
                     />
                   ) : (
-                    <FieldLabel label="Category" value={watch(`menuItems.${index}.category`)} />
+                    <FieldLabel
+                      label="Category"
+                      value={watch(`menuItems.${index}.category`)}
+                    />
                   )}
                 </Grid>
 
@@ -190,10 +216,15 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                       label="Price"
                       type="number"
                       required
-                      errorMessage={errors.menuItems?.[index]?.price?.message}
+                      errorMessage={
+                        errors.menuItems?.[index]?.price?.message
+                      }
                     />
                   ) : (
-                    <FieldLabel label="Price" value={`₹ ${watch(`menuItems.${index}.price`)}`} />
+                    <FieldLabel
+                      label="Price"
+                      value={`₹ ${watch(`menuItems.${index}.price`)}`}
+                    />
                   )}
                 </Grid>
 
@@ -208,23 +239,36 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                             variant="outlined"
                             fullWidth
                             sx={{ height: 56 }}
-                            onClick={() => document.getElementById(`menu-file-${index}`)?.click()}
+                            onClick={() =>
+                              document
+                                .getElementById(`menu-file-${index}`)
+                                ?.click()
+                            }
                           >
                             <CloudUploadIcon sx={{ mr: 1 }} />
-                            {field.value?.name ?? "Upload Item Image"}
+                            {field.value?.name ??
+                              "Upload Item Image"}
                           </MyButton>
+
                           <input
                             type="file"
                             hidden
                             id={`menu-file-${index}`}
                             accept="image/*"
-                            onChange={(e) => field.onChange(e.target.files?.[0] || null)}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.files?.[0] || null,
+                              )
+                            }
                           />
                         </>
                       )}
                     />
                   ) : (
-                    <FieldLabel label="Item Image" value={watch(`menuItems.${index}.file`)?.name} />
+                    <FieldLabel
+                      label="Item Image"
+                      value={watch(`menuItems.${index}.file`)?.name}
+                    />
                   )}
                 </Grid>
               </Grid>
