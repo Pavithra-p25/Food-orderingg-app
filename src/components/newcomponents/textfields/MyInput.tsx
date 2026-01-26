@@ -36,7 +36,7 @@ const MyInput = <T extends FieldValues>({
           type={type}
           required={required}
           error={Boolean(errorMessage)}
-          helperText={errorMessage || " "}
+          helperText={errorMessage }
           {...rest}
         />
       )}
