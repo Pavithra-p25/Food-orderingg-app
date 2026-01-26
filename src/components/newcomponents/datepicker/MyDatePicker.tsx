@@ -9,6 +9,7 @@ interface MyDatePickerProps {
   disablePast?: boolean;
   size?:"small"|"medium";
   disabled?: boolean;
+  error?: boolean;
 }
 
 const MyDatePicker: React.FC<MyDatePickerProps> = ({
@@ -40,7 +41,6 @@ const MyDatePicker: React.FC<MyDatePickerProps> = ({
               fullWidth: true,
               size,
               error: !!fieldState.error,
-              helperText: fieldState.error?.message || " ",
             },
           }}
         />

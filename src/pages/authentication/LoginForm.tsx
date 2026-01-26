@@ -10,10 +10,10 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
-import { validateRequired } from "../../utils/validators/GeneralValidators";
 import useUser from "../../hooks/useUser";
-import { useForm } from "react-hook-form";
-
+import { useForm, FormProvider } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { loginSchema } from "../../schemas/LoginSchema";
 
 interface LoginFormProps {
   show: boolean;
@@ -22,84 +22,51 @@ interface LoginFormProps {
   onLoginSuccess: (user: any) => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ show, onClose, onSignupClick, onLoginSuccess }) => {
-  const { control} = useForm({
+const LoginForm: React.FC<LoginFormProps> = ({
+  show,
+  onClose,
+  onSignupClick,
+  onLoginSuccess,
+}) => {
+  // Single useForm instance
+  const methods = useForm({
     defaultValues: {
       emailOrUsername: "",
       password: "",
     },
+    resolver: yupResolver(loginSchema),
   });
 
-  const [showPassword, setShowPassword] = useState(false); 
-
-  const [formData, setFormData] = useState({
-    emailOrUsername: "",
-    password: "",
-    error: "",
-    emailError: "",
-    passwordError: "",
-  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const { fetchUsers } = useUser();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      emailError: name === "emailOrUsername" ? "" : prev.emailError,
-      passwordError: name === "password" ? "" : prev.passwordError,
-    }));
-  };
-
-  const handleLogin = async () => {
-    const emailError = validateRequired(
-      formData.emailOrUsername,
-      "Email or Username",
-    );
-    const passwordError = validateRequired(formData.password, "Password");
-
-    setFormData((prev) => ({
-      ...prev,
-      emailError: emailError || "",
-      passwordError: passwordError || "",
-      error: "",
-    }));
-
-    if (emailError || passwordError) return;
-
+  const onSubmit = async (data: {
+    emailOrUsername: string;
+    password: string;
+  }) => {
+    setError(""); // reset API error
     try {
       const users = await fetchUsers();
       const foundUser = users.find(
         (u) =>
-          (u.emailOrUsername === formData.emailOrUsername ||
-            u.fullName === formData.emailOrUsername) &&
-          u.password === formData.password,
+          (u.emailOrUsername === data.emailOrUsername ||
+            u.fullName === data.emailOrUsername) &&
+          u.password === data.password,
       );
 
       if (foundUser) {
         localStorage.setItem("user", JSON.stringify(foundUser));
         onLoginSuccess(foundUser);
         onClose();
-        setFormData({
-          emailOrUsername: "",
-          password: "",
-          error: "",
-          emailError: "",
-          passwordError: "",
-        });
+        methods.reset();
       } else {
-        setFormData((prev) => ({
-          ...prev,
-          error: "Invalid username/email or password",
-        }));
+        setError("Invalid username/email or password");
       }
     } catch (err) {
       console.error(err);
-      setFormData((prev) => ({
-        ...prev,
-        error: "Something went wrong. Try again!",
-      }));
+      setError("Something went wrong. Try again!");
     }
   };
 
@@ -122,7 +89,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ show, onClose, onSignupClick, onL
           justifyContent: "center",
         }}
       >
-        {/* Header */}
         <Typography
           variant="h6"
           component="h2"
@@ -133,7 +99,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ show, onClose, onSignupClick, onL
           Login
         </Typography>
 
-        {/* Signup link */}
         <Typography align="center" color="text.secondary" mb={3}>
           Don’t have an account?{" "}
           <span
@@ -144,64 +109,58 @@ const LoginForm: React.FC<LoginFormProps> = ({ show, onClose, onSignupClick, onL
           </span>
         </Typography>
 
-        {/* API Error */}
-        {formData.error && (
+        {error && (
           <Typography color="error" align="center" mb={2}>
-            {formData.error}
+            {error}
           </Typography>
         )}
 
-        {/* Email or Username */}
-        <MyInput
-          label="Email or Username"
-          placeholder="Enter email or username"
-          name="emailOrUsername"
-          control={control}
-          value={formData.emailOrUsername}
-          onChange={handleChange}
-          errorMessage={formData.emailError}
-          required
-          sx={{ mb: 2 }}
-        />
+        {/* Wrap inputs inside FormProvider */}
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+            <MyInput
+              name="emailOrUsername"
+              label="Email or Username"
+              placeholder="Enter email or username"
+              errorMessage={methods.formState.errors.emailOrUsername?.message}
+              required
+              sx={{ mb: 2 }}
+            />
 
-        {/* Password */}
-        <MyInput
-          label="Password"
-          placeholder="Enter password"
-          name="password"
-          control={control}
-          type={showPassword ? "text" : "password"}
-          value={formData.password}
-          onChange={handleChange}
-          errorMessage={formData.passwordError}
-          required
-          sx={{ mb: 2 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+            <MyInput
+              name="password"
+              label="Password"
+              placeholder="Enter password"
+              type={showPassword ? "text" : "password"}
+              errorMessage={methods.formState.errors.password?.message}
+              required
+              sx={{ mb: 2 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-        {/* Login button */}
-        <Button
-          variant="contained"
-          color="error"
-          fullWidth
-          sx={{ mt: 2, mb: 2 }}
-          onClick={handleLogin}
-        >
-          Login
-        </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              fullWidth
+              sx={{ mt: 2, mb: 2 }}
+            >
+              Login
+            </Button>
+          </form>
+        </FormProvider>
 
-        {/* Forgot password */}
         <Typography
           align="center"
           color="error"

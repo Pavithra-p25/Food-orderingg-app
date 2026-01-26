@@ -16,7 +16,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
-import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantAccordionHandlers";
+import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantHandlers";
 
 type RestaurantDetailsAccordionProps = {
   expanded: boolean;

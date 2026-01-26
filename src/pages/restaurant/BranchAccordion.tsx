@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Typography, IconButton, Tooltip } from "@mui/material";
+import { Box, Grid, Typography, IconButton, Tooltip, FormHelperText } from "@mui/material";
 import StoreIcon from "@mui/icons-material/Store";
 import AddIcon from "@mui/icons-material/Add";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -15,7 +15,7 @@ import MyTable from "../../components/newcomponents/table/MyTable";
 import { formatDate } from "../../utils/DateUtils";
 import type { Control, FieldErrors, UseFieldArrayReturn, UseFormTrigger,} from "react-hook-form";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
-import {useBranchAccordionHandlers,useComplianceAccordionHandlers,} from "../../hooks/useBranchAccordionHandlers";
+import {useBranchAccordionHandlers,useComplianceAccordionHandlers,} from "../../hooks/useBranchHandlers";
 
 type BranchAccordionProps = {
   branchIndex: number;
@@ -80,10 +80,10 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             size="small"
             control={control}
             required
-            errorMessage={
-              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-                ?.licenseType?.message
-            }
+             error={Boolean(
+    errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+      ?.licenseType
+  )}
           />
         ) : (
           <Typography fontWeight={600}>
@@ -103,10 +103,10 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             size="small"
             control={control}
             required
-            errorMessage={
-              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-                ?.licenseNumber?.message
-            }
+           error={Boolean(
+    errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+      ?.licenseNumber
+  )}
           />
         ) : (
           <Typography fontWeight={600}>
@@ -124,6 +124,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           <MyDatePicker
             name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
             size="small"
+            
           />
         ) : (
           <Typography fontWeight={600}>
@@ -167,6 +168,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
                 onClick={() => saveLicense(row._index)}
               >
                 <CheckIcon />
+                
               </IconButton>
             </Tooltip>
           ) : (
