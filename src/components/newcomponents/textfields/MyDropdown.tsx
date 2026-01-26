@@ -1,14 +1,13 @@
 import React from "react";
 import { TextField, MenuItem } from "@mui/material";
 import { Controller } from "react-hook-form";
-import type { Control, FieldErrors } from "react-hook-form";
+import type { Control } from "react-hook-form";
 
 type MyDropdownProps = {
   name: string;
   control: Control<any>;
   label: string;
   options: string[];
-  errors?: FieldErrors<any>;
   required?: boolean;
   size?: "small" | "medium";
 };
@@ -18,7 +17,6 @@ const MyDropdown: React.FC<MyDropdownProps> = ({
   control,
   label,
   options,
-  errors,
   required = false,
   size = "medium",
 }) => {
@@ -26,7 +24,7 @@ const MyDropdown: React.FC<MyDropdownProps> = ({
     <Controller
       name={name}
       control={control}
-      render={({ field }) => (
+      render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
           select
@@ -34,13 +32,12 @@ const MyDropdown: React.FC<MyDropdownProps> = ({
           label={label}
           required={required}
           size={size}
-          error={Boolean(errors?.[name]?.message)}
-          helperText={errors?.[name]?.message as string}
+          error={!!error}
+          helperText={error?.message || ""}
         >
           <MenuItem value="">
             Select {label}
           </MenuItem>
-
           {options.map((opt) => (
             <MenuItem key={opt} value={opt}>
               {opt}

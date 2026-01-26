@@ -15,12 +15,10 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useFormContext, Controller } from "react-hook-form";
-
 import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyButton from "../../components/newcomponents/button/MyButton";
-
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
 import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantHandlers";
@@ -183,9 +181,9 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
 
               {/* Fields */}
 
-              <Grid container spacing={2} alignItems="center">
-                {/* Item Name */}
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid container spacing={2}>
+                {/* Row 1: Item Name | Category */}
+                <Grid size={{ xs: 12, sm: 6 }}>
                   {menuEditable[index] ? (
                     <MyInput<RestaurantInfoValues>
                       name={`menuItems.${index}.itemName`}
@@ -205,8 +203,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   )}
                 </Grid>
 
-                {/* Category */}
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   {menuEditable[index] ? (
                     <MyDropdown
                       name={`menuItems.${index}.category`}
@@ -215,7 +212,6 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                       size="small"
                       options={RESTAURANT_CATEGORIES}
                       required
-                      errors={errors}
                     />
                   ) : (
                     <FieldLabel
@@ -225,8 +221,8 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   )}
                 </Grid>
 
-                {/* Price */}
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                {/* Row 2: Price | File Upload */}
+                <Grid size={{ xs: 12, sm: 6 }}>
                   {menuEditable[index] ? (
                     <MyInput<RestaurantInfoValues>
                       name={`menuItems.${index}.price`}
@@ -245,8 +241,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   )}
                 </Grid>
 
-                {/* File Upload */}
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   {menuEditable[index] ? (
                     <Controller
                       name={`menuItems.${index}.file`}
@@ -266,7 +261,6 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                             <CloudUploadIcon sx={{ mr: 1, fontSize: 18 }} />
                             {field.value?.name ?? "Upload Item Image"}
                           </MyButton>
-
                           <input
                             type="file"
                             hidden
