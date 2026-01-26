@@ -739,5 +739,52 @@
       "createdAt": "2026-01-07T07:00:00.000Z",
       "updatedAt": "2026-01-13T05:06:16.468Z"
     }
+  ],
+  "restaurantinfo": [
+    {
+      "id": "6f14",
+      "branches": [
+        {
+          "branchName": "branch 1",
+          "branchCode": "DHGJ89",
+          "complianceDetails": [
+            {
+              "licenseType": "gst",
+              "licenseNumber": "87e94",
+              "validFrom": "2026-01-03T18:30:00.000Z",
+              "validTill": "2026-01-15T18:30:00.000Z"
+            }
+          ]
+        },
+        {
+          "branchName": "branch2",
+          "branchCode": "HVJV89",
+          "complianceDetails": [
+            {
+              "licenseType": "FSSAI",
+              "licenseNumber": "36848",
+              "validFrom": "2026-01-05T18:30:00.000Z",
+              "validTill": "2026-02-10T18:30:00.000Z"
+            }
+          ]
+        }
+      ],
+      "menuItems": [
+        {
+          "file": {},
+          "price": 15,
+          "category": "South Indian",
+          "itemName": "idly"
+        },
+        {
+          "file": {},
+          "price": 20,
+          "category": "South Indian",
+          "itemName": "dhosa"
+        }
+      ],
+      "ownerName": "some",
+      "restaurantName": "some"
+    }
   ]
 }

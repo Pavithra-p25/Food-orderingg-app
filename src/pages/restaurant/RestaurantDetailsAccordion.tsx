@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Grid, Typography, Paper, IconButton, Tooltip } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  Paper,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import AddIcon from "@mui/icons-material/Add";
@@ -77,6 +84,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
             <MyInput<RestaurantInfoValues>
               name="restaurantName"
               control={control}
+              size="small"
               label="Restaurant Name"
               required
               errorMessage={errors.restaurantName?.message}
@@ -87,6 +95,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
             <MyInput<RestaurantInfoValues>
               name="ownerName"
               control={control}
+              size="small"
               label="Owner Name"
               required
               errorMessage={errors.ownerName?.message}
@@ -106,13 +115,18 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
               <RestaurantMenuIcon color="primary" />
               <Typography fontWeight={700}>Menu Items</Typography>
             </Box>
-
             <MyButton
               variant="outlined"
               onClick={addMenuItem}
               disabled={menuItemsArray.fields.length >= 3}
+              sx={{
+                width: { xs: "70%", sm: "auto" }, // 70% width on mobile, auto on larger screens
+                fontSize: { xs: "0.75rem", sm: "0.875rem", md: "0.9rem" },
+                px: { xs: 1, sm: 2 },
+              }}
             >
-              <AddIcon sx={{ mr: 0.5 }} /> Add Menu Item
+              <AddIcon sx={{ mr: 0.5, fontSize: { xs: 16, sm: 20 } }} /> Menu
+              Item
             </MyButton>
           </Box>
 
@@ -134,9 +148,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                 alignItems="center"
                 mb={2}
               >
-                <Typography fontWeight={600}>
-                  Item {index + 1}
-                </Typography>
+                <Typography fontWeight={600}>Item {index + 1}</Typography>
 
                 <Box display="flex" gap={1}>
                   {menuEditable[index] ? (
@@ -170,13 +182,16 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
               </Box>
 
               {/* Fields */}
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
+
+              <Grid container spacing={2} alignItems="center">
+                {/* Item Name */}
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   {menuEditable[index] ? (
                     <MyInput<RestaurantInfoValues>
                       name={`menuItems.${index}.itemName`}
                       control={control}
                       label="Item Name"
+                      size="small"
                       required
                       errorMessage={
                         errors.menuItems?.[index]?.itemName?.message
@@ -190,12 +205,14 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   )}
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6 }}>
+                {/* Category */}
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   {menuEditable[index] ? (
                     <MyDropdown
                       name={`menuItems.${index}.category`}
                       control={control}
                       label="Category"
+                      size="small"
                       options={RESTAURANT_CATEGORIES}
                       required
                       errors={errors}
@@ -208,17 +225,17 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   )}
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6 }}>
+                {/* Price */}
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   {menuEditable[index] ? (
                     <MyInput<RestaurantInfoValues>
                       name={`menuItems.${index}.price`}
                       control={control}
                       label="Price"
+                      size="small"
                       type="number"
                       required
-                      errorMessage={
-                        errors.menuItems?.[index]?.price?.message
-                      }
+                      errorMessage={errors.menuItems?.[index]?.price?.message}
                     />
                   ) : (
                     <FieldLabel
@@ -228,7 +245,8 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   )}
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6 }}>
+                {/* File Upload */}
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   {menuEditable[index] ? (
                     <Controller
                       name={`menuItems.${index}.file`}
@@ -238,16 +256,15 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                           <MyButton
                             variant="outlined"
                             fullWidth
-                            sx={{ height: 56 }}
+                            sx={{ height: 40, px: 1.5 }}
                             onClick={() =>
                               document
                                 .getElementById(`menu-file-${index}`)
                                 ?.click()
                             }
                           >
-                            <CloudUploadIcon sx={{ mr: 1 }} />
-                            {field.value?.name ??
-                              "Upload Item Image"}
+                            <CloudUploadIcon sx={{ mr: 1, fontSize: 18 }} />
+                            {field.value?.name ?? "Upload Item Image"}
                           </MyButton>
 
                           <input
@@ -256,9 +273,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                             id={`menu-file-${index}`}
                             accept="image/*"
                             onChange={(e) =>
-                              field.onChange(
-                                e.target.files?.[0] || null,
-                              )
+                              field.onChange(e.target.files?.[0] || null)
                             }
                           />
                         </>

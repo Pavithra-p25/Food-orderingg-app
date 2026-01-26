@@ -526,10 +526,7 @@ function MyTable<T>({
               }}
             >
               {finalColumns.map((col, index) => {
-                if (
-                  enableGroupScroll &&
-                  (col.id === "status" || col.id === "actions")
-                ) {
+                if (enableGroupScroll && col.id === "status") {
                   return null;
                 }
 
@@ -574,7 +571,7 @@ function MyTable<T>({
 
               return (
                 <React.Fragment key={id}>
-                  <TableRow >
+                  <TableRow>
                     {finalColumns.map((col, colIndex) => {
                       // GROUP ROW LOGIC
                       if (row.isGroup) {

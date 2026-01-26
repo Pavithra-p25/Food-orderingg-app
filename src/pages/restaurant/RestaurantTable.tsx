@@ -91,6 +91,7 @@ const RestaurantTable: React.FC<Props> = ({
       selectable={isActiveTab || isInactiveTab}
       rowId={(r: any) => r.id.toString()}
       activeTab={activeTab}
+      scrollable
       columnGroups={activeTab === "Groupby" ? columnGroups : undefined}
       pagination={activeTab !== "Groupby"}
       enableGroupScroll={activeTab === "Groupby"}

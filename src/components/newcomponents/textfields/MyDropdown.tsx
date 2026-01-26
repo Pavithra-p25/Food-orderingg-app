@@ -10,6 +10,7 @@ type MyDropdownProps = {
   options: string[];
   errors?: FieldErrors<any>;
   required?: boolean;
+  size?: "small" | "medium";
 };
 
 const MyDropdown: React.FC<MyDropdownProps> = ({
@@ -19,6 +20,7 @@ const MyDropdown: React.FC<MyDropdownProps> = ({
   options,
   errors,
   required = false,
+  size = "medium",
 }) => {
   return (
     <Controller
@@ -31,6 +33,7 @@ const MyDropdown: React.FC<MyDropdownProps> = ({
           fullWidth
           label={label}
           required={required}
+          size={size}
           error={Boolean(errors?.[name]?.message)}
           helperText={errors?.[name]?.message as string}
         >

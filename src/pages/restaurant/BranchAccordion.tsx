@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Grid, Typography, IconButton, Tooltip, FormHelperText } from "@mui/material";
+import { Box, Grid, Typography, IconButton, Tooltip } from "@mui/material";
 import StoreIcon from "@mui/icons-material/Store";
 import AddIcon from "@mui/icons-material/Add";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -13,9 +13,17 @@ import MyAccordion from "../../components/newcomponents/accordian/MyAccordion";
 import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 import MyTable from "../../components/newcomponents/table/MyTable";
 import { formatDate } from "../../utils/DateUtils";
-import type { Control, FieldErrors, UseFieldArrayReturn, UseFormTrigger,} from "react-hook-form";
+import type {
+  Control,
+  FieldErrors,
+  UseFieldArrayReturn,
+  UseFormTrigger,
+} from "react-hook-form";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
-import {useBranchAccordionHandlers,useComplianceAccordionHandlers,} from "../../hooks/useBranchHandlers";
+import {
+  useBranchAccordionHandlers,
+  useComplianceAccordionHandlers,
+} from "../../hooks/useBranchHandlers";
 
 type BranchAccordionProps = {
   branchIndex: number;
@@ -80,10 +88,10 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             size="small"
             control={control}
             required
-             error={Boolean(
-    errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-      ?.licenseType
-  )}
+            error={Boolean(
+              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+                ?.licenseType,
+            )}
           />
         ) : (
           <Typography fontWeight={600}>
@@ -103,10 +111,10 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             size="small"
             control={control}
             required
-           error={Boolean(
-    errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-      ?.licenseNumber
-  )}
+            error={Boolean(
+              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+                ?.licenseNumber,
+            )}
           />
         ) : (
           <Typography fontWeight={600}>
@@ -124,7 +132,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           <MyDatePicker
             name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
             size="small"
-            
           />
         ) : (
           <Typography fontWeight={600}>
@@ -159,6 +166,13 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       id: "actions",
       label: "Actions",
       sortable: false,
+      sx: {
+        position: "sticky",
+        right: 0,
+        backgroundColor: "white",
+        zIndex: 2,
+        minWidth: 120,
+      },
       render: (row: ComplianceRow) => (
         <Box display="flex" gap={1} justifyContent="center">
           {complianceEditable[row._index] ? (
@@ -168,7 +182,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
                 onClick={() => saveLicense(row._index)}
               >
                 <CheckIcon />
-                
               </IconButton>
             </Tooltip>
           ) : (
@@ -202,9 +215,12 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       summary={
         <Box
           display="flex"
+          flexWrap="wrap"
+          flexDirection={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems={{ xs: "flex-start", sm: "center" }}
           width="100%"
+          gap={1}
         >
           <Box display="flex" alignItems="center" gap={1}>
             <StoreIcon color="secondary" />
@@ -222,7 +238,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               }}
               disabled={branchArray.fields.length >= 3}
             >
-              <AddIcon sx={{ mr: 0.5 }} /> Add Branch
+              <AddIcon sx={{ mr: 0.5 }} /> Branch
             </MyButton>
           )}
         </Box>
@@ -234,6 +250,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             <MyInput<RestaurantInfoValues>
               name={`branches.${branchIndex}.branchName`}
               control={control}
+              size="small"
               label="Branch Name"
               required
               errorMessage={errors.branches?.[branchIndex]?.branchName?.message}
@@ -244,6 +261,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             <MyInput<RestaurantInfoValues>
               name={`branches.${branchIndex}.branchCode`}
               control={control}
+              size="small"
               label="Branch Code"
               required
               errorMessage={errors.branches?.[branchIndex]?.branchCode?.message}
@@ -255,9 +273,11 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         <Box mt={3}>
           <Box
             display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
-            alignItems="center"
+            alignItems={{ xs: "flex-start", sm: "center" }}
             mb={2}
+            gap={1}
           >
             <Box display="flex" gap={1} alignItems="center">
               <DescriptionIcon color="secondary" />
@@ -269,17 +289,28 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               onClick={addLicense}
               disabled={complianceArray.fields.length >= 3}
             >
-              <AddIcon sx={{ mr: 0.5 }} /> Add License
+              <AddIcon sx={{ mr: 0.5 }} /> License
             </MyButton>
           </Box>
 
-          <MyTable
-            variant="editable"
-            columns={complianceColumns}
-            rows={complianceRows}
-            pagination={false}
-            dense={false}
-          />
+          <Box
+            sx={{
+              width: "100%",
+              overflowX: "auto",
+              WebkitOverflowScrolling: "touch", // smooth scroll on mobile
+            }}
+          >
+            <Box sx={{ minWidth: 800 }}>
+              <MyTable
+                variant="editable"
+                columns={complianceColumns}
+                rows={complianceRows}
+                pagination={false}
+                dense={false}
+                scrollable
+              />
+            </Box>
+          </Box>
         </Box>
 
         {branchArray.fields.length > 1 && (
