@@ -17,12 +17,15 @@ export const useRestaurantAccordionHandlers = (
     name: "menuItems",
   });
 
+  //menu item limit const
+  const canAddMenuItem = (count: number, max = 3) => count < max;
+
   const [menuEditable, setMenuEditable] = React.useState<boolean[]>(
     menuItemsArray.fields.map(() => true),
   );
 
   const addMenuItem = async () => {
-    if (menuItemsArray.fields.length >= 3) return;
+   if (!canAddMenuItem(menuItemsArray.fields.length)) return;
 
     const valid = await trigger("menuItems");
     if (valid) {

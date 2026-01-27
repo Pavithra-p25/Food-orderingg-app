@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { EMAIL_REGEX, PASSWORD_REGEX } from "../config/constants/regex";
+import { EMAIL_REGEX, PASSWORD_REGEX } from "../config/constants/ValidationRegex";
 
 export const loginSchema = yup.object({
   emailOrUsername: yup

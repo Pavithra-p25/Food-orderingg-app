@@ -7,6 +7,10 @@ import type {
 } from "react-hook-form";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 
+const MAX_ITEMS = 3;
+
+const canAddItem = (count: number) => count < MAX_ITEMS;
+
 /*   BRANCH HANDLERS */
 export const useBranchAccordionHandlers = (
   
@@ -15,7 +19,8 @@ export const useBranchAccordionHandlers = (
   onBranchAdded: (index: number) => void,
 ) => {
   const addBranch = async () => {
-    if (branchArray.fields.length >= 3) return;
+  if (!canAddItem(branchArray.fields.length)) return;
+
 
     const valid = await trigger("branches");
     if (valid) {
@@ -63,7 +68,7 @@ export const useComplianceAccordionHandlers = (
   );
 
   const addLicense = async () => {
-    if (complianceArray.fields.length >= 3) return;
+     if (!canAddItem(complianceArray.fields.length)) return;
 
     const valid = await trigger(
       `branches.${branchIndex}.complianceDetails`,

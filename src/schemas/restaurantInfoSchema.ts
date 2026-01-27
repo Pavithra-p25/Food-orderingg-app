@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { REQUIRED_ERROR } from "../config/constants/ErrorMessages";
-import { NAME_REGEX } from "../config/constants/regex";
+import { NAME_REGEX } from "../config/constants/ValidationRegex";
 
 export const restaurantInfoSchema = yup.object({
   restaurantName: yup
