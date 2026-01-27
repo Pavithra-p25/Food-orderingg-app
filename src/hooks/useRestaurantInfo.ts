@@ -3,7 +3,7 @@ import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import {
   createRestaurantInfo,
   getRestaurantInfoList,
-  updateRestaurantInfo
+  updateRestaurantInfo,
 } from "../services/restaurantInfoService";
 
 export const useRestaurantInfo = () => {
@@ -18,9 +18,8 @@ export const useRestaurantInfo = () => {
     try {
       setLoading(true);
       const data = await getRestaurantInfoList();
-      console.log("Fetched restaurant list:", data); 
       setRestaurantInfoList(data);
-    } catch (err) {
+    } catch {
       setError("Failed to fetch restaurant info");
     } finally {
       setLoading(false);
@@ -40,19 +39,24 @@ export const useRestaurantInfo = () => {
     }
   };
 
-   /* UPDATE */
- const editRestaurantInfo = async (id: string | number, data: RestaurantInfoValues) => {
-  try {
-    setLoading(true);
-    await updateRestaurantInfo(id, data);
-    await fetchRestaurantInfo(); // refresh list
-  } catch (err) {
-    setError("Failed to update restaurant info");
-  } finally {
-    setLoading(false);
-  }
-};
+  /* UPDATE */
+  const editRestaurantInfo = async (
+    id: string | number,
+    data: RestaurantInfoValues,
+  ) => {
+    try {
+      setLoading(true);
+      const updated = await updateRestaurantInfo(id, data);
 
+      setRestaurantInfoList((prev) =>
+        prev.map((r) => (r.id === id ? updated : r)),
+      );
+    } catch {
+      setError("Failed to update restaurant info");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     restaurantInfoList,

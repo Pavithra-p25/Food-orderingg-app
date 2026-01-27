@@ -7,7 +7,7 @@ export const defaultRestaurantValues: RestaurantInfoValues = {
     {
       itemName: "",
       category: "",
-      price: NaN ,
+      price: 0 ,
       file: null,
     },
   ],

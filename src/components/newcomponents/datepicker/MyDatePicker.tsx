@@ -7,9 +7,8 @@ interface MyDatePickerProps {
   label?: string;
   disableFuture?: boolean;
   disablePast?: boolean;
-  size?:"small"|"medium";
+  size?: "small" | "medium";
   disabled?: boolean;
-  error?: boolean;
 }
 
 const MyDatePicker: React.FC<MyDatePickerProps> = ({
@@ -17,7 +16,7 @@ const MyDatePicker: React.FC<MyDatePickerProps> = ({
   label,
   disableFuture = false,
   disablePast = false,
-  size="medium",
+  size = "medium",
   disabled,
 }) => {
   const { control } = useFormContext();
@@ -26,25 +25,32 @@ const MyDatePicker: React.FC<MyDatePickerProps> = ({
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState }) => (
-        <DatePicker
-          label={label}
-          disabled={disabled}
-          value={field.value ? dayjs(field.value) : null}
-          onChange={(newValue) =>
-            field.onChange(newValue ? newValue.toISOString() : null)
-          }
-          disableFuture={disableFuture}
-          disablePast={disablePast}
-          slotProps={{
-            textField: {
-              fullWidth: true,
-              size,
-              error: !!fieldState.error,
-            },
-          }}
-        />
-      )}
+      render={({ field, fieldState }) => {
+        const safeValue =
+          field.value && dayjs(field.value).isValid()
+            ? dayjs(field.value)
+            : null;
+
+        return (
+          <DatePicker
+            label={label}
+            disabled={disabled}
+            value={safeValue}
+            onChange={(newValue) =>
+              field.onChange(newValue ? newValue.toISOString() : null)
+            }
+            disableFuture={disableFuture}
+            disablePast={disablePast}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                size,
+                error: !!fieldState.error,
+              },
+            }}
+          />
+        );
+      }}
     />
   );
 };

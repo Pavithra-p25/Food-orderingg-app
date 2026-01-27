@@ -69,18 +69,22 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     handleReset,
     handleSubmitForm,
   } = useRestaurantInfoHandlers(reset);
-
+  
 const handleUpdate = async (data: RestaurantInfoValues) => {
-    if (!restaurantData?.id) return;
+  if (!data.id) return; // use the id from form data, not from restaurantData prop
 
-    try {
-      await editRestaurantInfo(restaurantData.id, data);
-      if (onUpdateSuccess) onUpdateSuccess();
-      navigate(-1); // Go back after update
-    } catch (error) {
-      console.error("Update failed:", error);
-    }
-  };
+  try {
+    await editRestaurantInfo(data.id, data); // send the updated form values
+    if (onUpdateSuccess) onUpdateSuccess();
+    console.log("UPDATE CLICKED", data);
+
+    navigate(-1); // Go back after update
+  } catch (error) {
+    console.error("Update failed:", error);
+  }
+};
+
+
 
   return (
     <FormProvider {...methods}>

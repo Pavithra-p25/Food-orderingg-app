@@ -234,18 +234,32 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </Typography>
           </Box>
 
-          {branchIndex === branchArray.fields.length - 1 && (
-            <MyButton
-              variant="outlined"
-              onClick={(e) => {
-                e.stopPropagation();
-                addBranch();
-              }}
-              disabled={branchArray.fields.length >= 3}
-            >
-              <AddIcon sx={{ mr: 0.5 }} /> Branch
-            </MyButton>
-          )}
+         {branchIndex === branchArray.fields.length - 1 && (
+  <Box
+    display="flex"
+    alignItems="center"
+    gap={0.5}
+    sx={{
+      px: 1.5,
+      py: 0.5,
+      border: "1px solid",
+      borderColor: "grey.400",
+      borderRadius: 1,
+      cursor: branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
+      opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
+      userSelect: "none",
+    }}
+    onClick={(e) => {
+      e.stopPropagation();
+      if (branchArray.fields.length < 3) {
+        addBranch();
+      }
+    }}
+  >
+    <AddIcon fontSize="small" />
+    <Typography fontSize={14}>Branch</Typography>
+  </Box>
+)}
         </Box>
       }
     >

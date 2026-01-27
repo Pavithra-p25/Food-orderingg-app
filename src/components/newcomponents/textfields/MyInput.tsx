@@ -28,24 +28,35 @@ const MyInput = <T extends FieldValues>({
   const { control } = useFormContext<T>(); 
 
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <TextField
-          {...field}
-          fullWidth
-          label={label}
-          placeholder={placeholder}
-          type={type}
-          required={required}
-          error={Boolean(errorMessage)}
-          helperText={errorMessage}
-          inputRef={field.ref}
-          {...rest}
-        />
-      )}
-    />
+   <Controller
+  name={name}
+  control={control}
+  render={({ field }) => {
+    const safeValue =
+      type === "number"
+        ? Number.isNaN(field.value)
+          ? ""
+          : field.value ?? ""
+        : field.value ?? "";
+
+    return (
+      <TextField
+        {...field}
+        value={safeValue}
+        fullWidth
+        label={label}
+        placeholder={placeholder}
+        type={type}
+        required={required}
+        error={Boolean(errorMessage)}
+        helperText={errorMessage}
+        inputRef={field.ref}
+        {...rest}
+      />
+    );
+  }}
+/>
+
   );
 };
 
