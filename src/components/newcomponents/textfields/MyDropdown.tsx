@@ -1,25 +1,28 @@
-import React from "react";
 import { TextField, MenuItem } from "@mui/material";
-import { Controller } from "react-hook-form";
-import type { Control } from "react-hook-form";
+import {
+  Controller,
+  useFormContext,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
 
-type MyDropdownProps = {
-  name: string;
-  control: Control<any>;
+type MyDropdownProps<T extends FieldValues> = {
+  name: Path<T>;
   label: string;
   options: string[];
   required?: boolean;
   size?: "small" | "medium";
 };
 
-const MyDropdown: React.FC<MyDropdownProps> = ({
+const MyDropdown = <T extends FieldValues>({
   name,
-  control,
   label,
   options,
   required = false,
   size = "medium",
-}) => {
+}: MyDropdownProps<T>) => {
+  const { control } = useFormContext<T>(); 
+
   return (
     <Controller
       name={name}
@@ -38,6 +41,7 @@ const MyDropdown: React.FC<MyDropdownProps> = ({
           <MenuItem value="">
             Select {label}
           </MenuItem>
+
           {options.map((opt) => (
             <MenuItem key={opt} value={opt}>
               {opt}

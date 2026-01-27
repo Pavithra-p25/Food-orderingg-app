@@ -15,7 +15,6 @@ import { RESTAURANT_TYPES ,RESTAURANT_CATEGORIES } from "../../config/constants/
 
 type Props = {
   methods: any;
-  control: any;
   handleSubmit: any;
   onSubmit: any;
   handleReset: () => void;
@@ -24,7 +23,6 @@ type Props = {
 
 const RestaurantSearchForm: React.FC<Props> = ({
   methods,
-  control,
   handleSubmit,
   onSubmit,
   handleReset,
@@ -54,7 +52,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="restaurantName"
-                control={control}
                 label="Restaurant Name"
                 placeholder="Enter name"
               />
@@ -63,7 +60,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyDropdown
                 name="category"
-                control={control}
                 label="Category"
                 options={RESTAURANT_CATEGORIES}
               />
@@ -72,7 +68,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyDropdown
                 name="restaurantType"
-                control={control}
                 label="Restaurant Type"
                 options={RESTAURANT_TYPES}
               />
@@ -81,7 +76,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="city"
-                control={control}
                 label="City"
                 placeholder="Enter city"
               />
@@ -90,7 +84,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="state"
-                control={control}
                 label="State"
                 placeholder="Enter state"
               />
@@ -99,7 +92,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="email"
-                control={control}
                 label="Email"
                 placeholder="Enter email"
               />
@@ -108,7 +100,6 @@ const RestaurantSearchForm: React.FC<Props> = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <MyInput
                 name="phone"
-                control={control}
                 label="Phone Number"
                 placeholder="Enter phone number"
               />

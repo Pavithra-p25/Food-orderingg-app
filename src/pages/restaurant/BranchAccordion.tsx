@@ -83,10 +83,9 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       label: "License Type",
       render: (row: ComplianceRow) =>
         complianceEditable[row._index] ? (
-          <MyInput<RestaurantInfoValues>
+          <MyInput
             name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseType`}
             size="small"
-            control={control}
             required
             error={Boolean(
               errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
@@ -106,10 +105,9 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       label: "License Number",
       render: (row: ComplianceRow) =>
         complianceEditable[row._index] ? (
-          <MyInput<RestaurantInfoValues>
+          <MyInput
             name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`}
             size="small"
-            control={control}
             required
             error={Boolean(
               errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
@@ -247,9 +245,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       <Box>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <MyInput<RestaurantInfoValues>
+            <MyInput
               name={`branches.${branchIndex}.branchName`}
-              control={control}
               size="small"
               label="Branch Name"
               required
@@ -258,9 +255,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <MyInput<RestaurantInfoValues>
+            <MyInput
               name={`branches.${branchIndex}.branchCode`}
-              control={control}
               size="small"
               label="Branch Code"
               required

@@ -79,9 +79,8 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
         {/* Basic Info */}
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <MyInput<RestaurantInfoValues>
+            <MyInput
               name="restaurantName"
-              control={control}
               size="small"
               label="Restaurant Name"
               required
@@ -90,9 +89,8 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <MyInput<RestaurantInfoValues>
+            <MyInput
               name="ownerName"
-              control={control}
               size="small"
               label="Owner Name"
               required
@@ -185,9 +183,8 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                 {/* Row 1: Item Name | Category */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   {menuEditable[index] ? (
-                    <MyInput<RestaurantInfoValues>
+                    <MyInput
                       name={`menuItems.${index}.itemName`}
-                      control={control}
                       label="Item Name"
                       size="small"
                       required
@@ -207,7 +204,6 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                   {menuEditable[index] ? (
                     <MyDropdown
                       name={`menuItems.${index}.category`}
-                      control={control}
                       label="Category"
                       size="small"
                       options={RESTAURANT_CATEGORIES}
@@ -224,9 +220,8 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                 {/* Row 2: Price | File Upload */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                   {menuEditable[index] ? (
-                    <MyInput<RestaurantInfoValues>
+                    <MyInput
                       name={`menuItems.${index}.price`}
-                      control={control}
                       label="Price"
                       size="small"
                       type="number"

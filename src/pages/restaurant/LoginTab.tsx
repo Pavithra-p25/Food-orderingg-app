@@ -4,7 +4,7 @@ import MyInput from "../../components/newcomponents/textfields/MyInput";
 import { useFormContext } from "react-hook-form";
 
 const LoginTab: React.FC = () => {
-  const { control, formState: { errors } } = useFormContext();
+  const { formState: { errors } } = useFormContext();
 
   return (
     <Grid container spacing={2}>
@@ -12,7 +12,6 @@ const LoginTab: React.FC = () => {
       <Grid size={12}>
         <MyInput
           name="email"
-          control={control}
           label="Email"
           placeholder="Enter email"
           required
@@ -25,7 +24,6 @@ const LoginTab: React.FC = () => {
         <MyInput
           name="password"
           type="password"
-          control={control}
           label="Password"
           placeholder="Enter password"
           required
@@ -38,7 +36,6 @@ const LoginTab: React.FC = () => {
         <MyInput
           name="confirmPassword"
           type="password"
-          control={control}
           label="Confirm Password"
           placeholder="Re-enter password"
           required

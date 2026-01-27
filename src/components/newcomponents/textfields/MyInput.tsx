@@ -1,28 +1,32 @@
-import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
-import { TextField , type TextFieldProps} from "@mui/material";
+import {
+  Controller,
+  type FieldValues,
+  type Path,
+  useFormContext,
+} from "react-hook-form";
+import { TextField, type TextFieldProps } from "@mui/material";
 
 type MyInputProps<T extends FieldValues> = {
   name: Path<T>;
-  control?: Control<T>;
   label?: string;
   placeholder?: string;
   type?: string;
   required?: boolean;
-  value?: string;
   errorMessage?: string;
   onClick?: () => void;
-}& Partial<TextFieldProps>;
+} & Partial<TextFieldProps>;
 
 const MyInput = <T extends FieldValues>({
   name,
-  control,
   label,
   placeholder,
   type = "text",
   required = false,
   errorMessage,
-  ...rest 
+  ...rest
 }: MyInputProps<T>) => {
+  const { control } = useFormContext<T>(); 
+
   return (
     <Controller
       name={name}
@@ -36,8 +40,8 @@ const MyInput = <T extends FieldValues>({
           type={type}
           required={required}
           error={Boolean(errorMessage)}
-          helperText={errorMessage }
-           inputRef={field.ref}
+          helperText={errorMessage}
+          inputRef={field.ref}
           {...rest}
         />
       )}

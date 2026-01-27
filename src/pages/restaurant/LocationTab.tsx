@@ -32,7 +32,6 @@ const LocationTab: React.FC = () => {
       <Grid size={6}>
         <MyInput
           name="city"
-          control={control}
           label="City"
           placeholder="Enter city"
           required
@@ -44,7 +43,6 @@ const LocationTab: React.FC = () => {
       <Grid size={6}>
         <MyInput
           name="state"
-          control={control}
           label="State"
           placeholder="Enter state"
           required
@@ -56,7 +54,6 @@ const LocationTab: React.FC = () => {
       <Grid size={6}>
         <MyInput
           name="country"
-          control={control}
           label="Country"
           placeholder="Enter country"
           required
@@ -68,7 +65,6 @@ const LocationTab: React.FC = () => {
       <Grid size={6}>
         <MyInput
           name="pincode"
-          control={control}
           label="Pincode"
           placeholder="Enter pincode"
           required
