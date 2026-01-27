@@ -21,8 +21,10 @@ export type Branch = {
 };
 
 export type RestaurantInfoValues = {
+  id?: string;
   restaurantName: string;
   ownerName: string;
   menuItems: MenuItem[];
   branches: Branch[];
+  
 };

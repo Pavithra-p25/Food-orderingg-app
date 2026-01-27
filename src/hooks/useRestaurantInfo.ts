@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import {
   createRestaurantInfo,
   getRestaurantInfoList,
+  updateRestaurantInfo
 } from "../services/restaurantInfoService";
 
 export const useRestaurantInfo = () => {
@@ -17,6 +18,7 @@ export const useRestaurantInfo = () => {
     try {
       setLoading(true);
       const data = await getRestaurantInfoList();
+      console.log("Fetched restaurant list:", data); 
       setRestaurantInfoList(data);
     } catch (err) {
       setError("Failed to fetch restaurant info");
@@ -38,10 +40,19 @@ export const useRestaurantInfo = () => {
     }
   };
 
-  /* AUTO FETCH ON LOAD */
-  useEffect(() => {
-    fetchRestaurantInfo();
-  }, []);
+   /* UPDATE */
+ const editRestaurantInfo = async (id: string | number, data: RestaurantInfoValues) => {
+  try {
+    setLoading(true);
+    await updateRestaurantInfo(id, data);
+    await fetchRestaurantInfo(); // refresh list
+  } catch (err) {
+    setError("Failed to update restaurant info");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return {
     restaurantInfoList,
@@ -49,5 +60,6 @@ export const useRestaurantInfo = () => {
     error,
     addRestaurantInfo,
     fetchRestaurantInfo,
+    editRestaurantInfo,
   };
 };

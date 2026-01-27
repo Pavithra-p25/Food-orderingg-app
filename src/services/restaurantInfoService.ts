@@ -19,3 +19,9 @@ export const getRestaurantInfoList = () => {
     RESTAURANT_INFO_URL
   );
 };
+
+/* UPDATE restaurant info by ID */
+export const updateRestaurantInfo = (id: string | number, data: RestaurantInfoValues) => {
+  console.log("PUT:", `${RESTAURANT_INFO_URL}/${id}`, data);
+  return apiService.put<RestaurantInfoValues>(`${RESTAURANT_INFO_URL}/${id}`, data);
+};

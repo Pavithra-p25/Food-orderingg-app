@@ -15,6 +15,7 @@ import MyTable from "../../components/newcomponents/table/MyTable";
 import { formatDate } from "../../utils/DateUtils";
 import type {
   Control,
+  FieldError,
   FieldErrors,
   UseFieldArrayReturn,
   UseFormTrigger,
@@ -52,6 +53,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
   onBranchAdded,
 }) => {
   const { watch } = useFormContext<RestaurantInfoValues>();
+
+  const [openErrorRow, setOpenErrorRow] = React.useState<number | null>(null);
 
   /*  HANDLERS */
   const { addBranch, removeBranch } = useBranchAccordionHandlers(
@@ -171,37 +174,41 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         zIndex: 2,
         minWidth: 120,
       },
-      render: (row: ComplianceRow) => (
-        <Box display="flex" gap={1} justifyContent="center">
-          {complianceEditable[row._index] ? (
-            <Tooltip title="Save">
-              <IconButton
-                color="success"
-                onClick={() => saveLicense(row._index)}
-              >
-                <CheckIcon />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Edit">
-              <IconButton
-                color="primary"
-                onClick={() => editLicense(row._index)}
-              >
-                <EditNoteIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+      render: (row: ComplianceRow) => {
+       
 
-          <IconButton
-            color="error"
-            disabled={complianceArray.fields.length === 1}
-            onClick={() => removeLicense(row._index)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      ),
+        return (
+          <Box display="flex" gap={1} justifyContent="center">
+            {complianceEditable[row._index] ? (
+              <Tooltip title="Save">
+                <IconButton
+                  color="success"
+                  onClick={() => saveLicense(row._index)}
+                >
+                  <CheckIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Edit">
+                <IconButton
+                  color="primary"
+                  onClick={() => editLicense(row._index)}
+                >
+                  <EditNoteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            <IconButton
+              color="error"
+              disabled={complianceArray.fields.length === 1}
+              onClick={() => removeLicense(row._index)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        );
+      },
     },
   ];
 
@@ -308,6 +315,64 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </Box>
           </Box>
         </Box>
+        {complianceRows.map((row) => {
+          const rowErrors =
+            errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+
+          const messages: string[] = rowErrors
+            ? Object.values(rowErrors)
+                .filter(
+                  (e): e is FieldError =>
+                    typeof e === "object" && "message" in e,
+                )
+                .map((e) => e.message)
+                .filter((msg): msg is string => Boolean(msg))
+            : [];
+
+          const isOpen = openErrorRow === row._index;
+
+          if (messages.length === 0) return null;
+
+          return (
+            <Box key={`error-row-${row._index}`}>
+              <Box
+                onClick={() => setOpenErrorRow(isOpen ? null : row._index)}
+                sx={{
+                  px: 2,
+                  py: 1,
+                  cursor: "pointer",
+                  color: "red",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  borderBottom: "1px solid #f2caca",
+                }}
+              >
+                ❌ {messages.length} error{messages.length > 1 && "s"} found{" "}
+                {isOpen ? "▴" : "▾"}
+              </Box>
+
+              {isOpen && (
+                <Box
+                  sx={{
+                    px: 3,
+                    py: 1,
+                    backgroundColor: "#fff5f5",
+                    borderBottom: "1px solid red",
+                  }}
+                >
+                  {messages.map((msg, i) => (
+                    <Typography
+                      key={i}
+                      sx={{ color: "red", fontSize: 13, mb: 0.5 }}
+                    >
+                      • {msg}
+                    </Typography>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          );
+        })}
 
         {branchArray.fields.length > 1 && (
           <Box mt={2}>

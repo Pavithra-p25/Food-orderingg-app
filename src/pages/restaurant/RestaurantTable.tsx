@@ -24,6 +24,7 @@ type TableRow =
 // Type guard to check if row is a Restaurant
 const isRestaurant = (row: TableRow): row is Restaurant => !("isGroup" in row);
 
+
 const RestaurantTable: React.FC<Props> = ({
   results,
   onEdit,

@@ -26,12 +26,13 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import DescriptionIcon from "@mui/icons-material/Description";
 import { ThemeContext } from "../context/ThemeContext";
 import LoginForm from "../pages/authentication/LoginForm";
 import SignupForm from "../pages/authentication/SignupForm";
 import MyToast from "../components/toast/MyToast";
 import { ListItemButton } from "@mui/material";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -239,6 +240,16 @@ const Header: React.FC = () => {
                 text: "Search Restaurant",
                 icon: <SearchIcon />,
                 to: "/RestaurantSearch",
+              },
+              {
+                text: "Restaurant Info",
+                icon: <DescriptionIcon />,
+                to: "/RestaurantInfo",
+              },
+              {
+                text: "Restaurant Info List",
+                icon: <FormatListBulletedIcon/>,
+                to: "RestaurantInfoList",
               },
             ].map((item) => (
               <ListItem

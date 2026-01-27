@@ -14,6 +14,7 @@ import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui 
 import RestaurantSearch from "./pages/restaurant/RestaurantSearch";
 import RestaurantListing from "./pages/restaurant/RestaurantList";
 import RestaurantInfo from "./pages/restaurant/RestaurantInfo";
+import RestaurantInfoList from "./pages/restaurant/RestaurantInfoList";
 
 const AddRestaurantModal = () => {
   const navigate = useNavigate();
@@ -52,7 +53,24 @@ const App: React.FC = () => {
                     element={<AddRestaurantModal />}
                   />
 
-                  <Route path="/restaurantinfo" element ={<RestaurantInfo/>}/>
+                  <Route
+                    path="/restaurantinfo"
+                    element={
+                      <RestaurantInfo
+                        editRestaurantInfo={async (id, data) => {
+                          console.log("Editing restaurant:", id, data);
+                        }}
+                        onUpdateSuccess={() => {
+                          console.log("Restaurant updated successfully!");
+                        }}
+                      />
+                    }
+                  />
+
+                  <Route
+                    path="/RestaurantInfoList"
+                    element={<RestaurantInfoList />}
+                  />
                 </Routes>
               </main>
 

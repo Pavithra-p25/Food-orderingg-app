@@ -19,7 +19,7 @@ const RestaurantSearch: React.FC = () => {
     defaultValues: { ...restaurantDefaultValues },
   });
 
-  const { control, handleSubmit, reset } = methods;
+  const {  handleSubmit, reset } = methods;
 
   const [results, setResults] = useState<Restaurant[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
@@ -230,7 +230,6 @@ const RestaurantSearch: React.FC = () => {
         <Grid size={12}>
           <RestaurantSearchForm
             methods={methods}
-            control={control}
             handleSubmit={handleSubmit}
             onSubmit={onSubmit}
             handleReset={handleReset}
