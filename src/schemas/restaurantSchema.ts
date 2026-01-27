@@ -1,8 +1,7 @@
-import * as yup from "yup";//schema validation library 
+import * as yup from "yup";
 import type { Restaurant, RestaurantType} from "../types/RestaurantTypes";
 import { ERROR_MESSAGES } from "../config/constants/ErrorMessages";
 
-// Define schema
 export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
   // Login tab
   email: yup
