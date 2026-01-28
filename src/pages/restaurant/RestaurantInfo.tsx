@@ -16,10 +16,12 @@ import BranchAccordion from "./BranchAccordion";
 import { useRestaurantInfoHandlers } from "../../hooks/useRestaurantInfoHandlers";
 import { useNavigate } from "react-router-dom";
 
-
 type RestaurantInfoProps = {
   restaurantData?: RestaurantInfoValues;
-  editRestaurantInfo: (id: string | number, data: RestaurantInfoValues) => Promise<void>;
+  editRestaurantInfo: (
+    id: string | number,
+    data: RestaurantInfoValues,
+  ) => Promise<void>;
   onUpdateSuccess?: () => void;
 };
 
@@ -51,7 +53,18 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
   // Pre-fill form if restaurantData prop exists
   useEffect(() => {
     if (restaurantData) {
-      reset(restaurantData);
+      const sanitizedData = {
+        ...restaurantData,
+        menuItems:
+          restaurantData.menuItems?.map((item: any) => ({
+            ...item,
+            // If file is a string (URL) or not a File object, set to null to pass validation
+            // (Schema expects File | null, but matches checks for File properties)
+            file: item.file instanceof File ? item.file : null,
+          })) || [],
+      };
+      console.log("Resetting form with sanitized data:", sanitizedData);
+      reset(sanitizedData);
     }
   }, [restaurantData, reset]);
 
@@ -69,22 +82,41 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     handleReset,
     handleSubmitForm,
   } = useRestaurantInfoHandlers(reset);
-  
-const handleUpdate = async (data: RestaurantInfoValues) => {
-  if (!data.id) return; // use the id from form data, not from restaurantData prop
 
-  try {
-    await editRestaurantInfo(data.id, data); // send the updated form values
-    if (onUpdateSuccess) onUpdateSuccess();
-    console.log("UPDATE CLICKED", data);
+  const handleUpdate = async (data: RestaurantInfoValues) => {
+    const id = data.id || restaurantData?.id;
 
-    navigate(-1); // Go back after update
-  } catch (error) {
-    console.error("Update failed:", error);
-  }
-};
+    if (id === undefined || id === null || id === "") {
+      console.error("Update aborted: Missing ID");
+      return;
+    }
 
+    try {
+      await editRestaurantInfo(id, data);
 
+      // SHOW SUCCESS SNACKBAR
+      setSnackbar({
+        open: true,
+        message: "Restaurant updated successfully",
+        severity: "success",
+      });
+
+      // DELAY NAVIGATION
+      setTimeout(() => {
+        if (onUpdateSuccess) {
+          onUpdateSuccess();
+        } else {
+          navigate("/restaurant"); //  table route
+        }
+      }, 1500);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Update failed. Please try again",
+        severity: "error",
+      });
+    }
+  };
 
   return (
     <FormProvider {...methods}>
@@ -132,6 +164,7 @@ const handleUpdate = async (data: RestaurantInfoValues) => {
             <form
               onSubmit={handleSubmit(
                 restaurantData ? handleUpdate : handleSubmitForm,
+                (errors) => console.error("Form Validation Failed:", errors),
               )}
               noValidate
             >

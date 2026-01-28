@@ -745,8 +745,8 @@
       "id": "6f14",
       "branches": [
         {
-          "branchName": "branch 1",
-          "branchCode": "DHGJ89",
+          "branchName": "branch editedd",
+          "branchCode": "D2GJ89",
           "complianceDetails": [
             {
               "licenseType": "gst",
@@ -757,7 +757,7 @@
           ]
         },
         {
-          "branchName": "branch2",
+          "branchName": "branch 2",
           "branchCode": "HVJV89",
           "complianceDetails": [
             {
@@ -771,20 +771,188 @@
       ],
       "menuItems": [
         {
-          "file": {},
+          "file": null,
           "price": 15,
           "category": "South Indian",
           "itemName": "idly"
         },
         {
-          "file": {},
+          "file": null,
           "price": 20,
           "category": "South Indian",
           "itemName": "dhosa"
         }
       ],
-      "ownerName": "some",
-      "restaurantName": "some"
+      "ownerName": "first owner",
+      "restaurantName": "first restaurant"
+    },
+    {
+      "id": "7g25",
+      "branches": [
+        {
+          "branchName": "main branch",
+          "branchCode": "MB123",
+          "complianceDetails": [
+            {
+              "licenseType": "gst",
+              "licenseNumber": "12345",
+              "validFrom": "2026-01-10T18:30:00.000Z",
+              "validTill": "2027-01-10T18:30:00.000Z"
+            }
+          ]
+        },
+        {
+          "branchName": "second branch",
+          "branchCode": "SB456",
+          "complianceDetails": [
+            {
+              "licenseType": "FSSAI",
+              "licenseNumber": "67890",
+              "validFrom": "2026-02-01T18:30:00.000Z",
+              "validTill": "2027-02-01T18:30:00.000Z"
+            }
+          ]
+        }
+      ],
+      "menuItems": [
+        {
+          "file": null,
+          "price": 50,
+          "category": "Fast Food",
+          "itemName": "Burger"
+        },
+        {
+          "file": null,
+          "price": 100,
+          "category": "Fast Food",
+          "itemName": "Pizza"
+        }
+      ],
+      "ownerName": "second owner",
+      "restaurantName": "second restaurant"
+    },
+    {
+      "id": "8h36",
+      "branches": [
+        {
+          "branchName": "central branch",
+          "branchCode": "CB789",
+          "complianceDetails": [
+            {
+              "licenseType": "gst",
+              "licenseNumber": "54321",
+              "validFrom": "2026-03-01T18:30:00.000Z",
+              "validTill": "2027-03-01T18:30:00.000Z"
+            }
+          ]
+        },
+        {
+          "branchName": "branch no2",
+          "branchCode": "HVJV89",
+          "complianceDetails": [
+            {
+              "licenseType": "FSSAI",
+              "licenseNumber": "36848",
+              "validFrom": "2026-01-10T18:30:00.000Z",
+              "validTill": "2026-01-30T18:30:00.000Z"
+            }
+          ]
+        }
+      ],
+      "menuItems": [
+        {
+          "file": null,
+          "price": 30,
+          "category": "North Indian",
+          "itemName": "Paneer Butter Masala"
+        },
+        {
+          "file": null,
+          "price": 25,
+          "category": "North Indian",
+          "itemName": "Naan"
+        }
+      ],
+      "ownerName": "third owner",
+      "restaurantName": "third restaurant"
+    },
+    {
+      "id": "9i47",
+      "branches": [
+        {
+          "branchName": "uptown branch",
+          "branchCode": "UB101",
+          "complianceDetails": [
+            {
+              "licenseType": "FSSAI",
+              "licenseNumber": "11223",
+              "validFrom": "2026-04-01T18:30:00.000Z",
+              "validTill": "2027-04-01T18:30:00.000Z"
+            }
+          ]
+        }
+      ],
+      "menuItems": [
+        {
+          "file": null,
+          "price": 10,
+          "category": "Beverages",
+          "itemName": "Coffee"
+        },
+        {
+          "file": null,
+          "price": 15,
+          "category": "Beverages",
+          "itemName": "Tea"
+        }
+      ],
+      "ownerName": "fourth owner",
+      "restaurantName": "fourth restaurant"
+    },
+    {
+      "id": "10j58",
+      "branches": [
+        {
+          "branchName": "downtown branch",
+          "branchCode": "DB202",
+          "complianceDetails": [
+            {
+              "licenseType": "gst",
+              "licenseNumber": "99887",
+              "validFrom": "2026-05-01T18:30:00.000Z",
+              "validTill": "2027-05-01T18:30:00.000Z"
+            }
+          ]
+        },
+        {
+          "branchName": "east branch",
+          "branchCode": "EB303",
+          "complianceDetails": [
+            {
+              "licenseType": "FSSAI",
+              "licenseNumber": "77665",
+              "validFrom": "2026-06-01T18:30:00.000Z",
+              "validTill": "2027-06-01T18:30:00.000Z"
+            }
+          ]
+        }
+      ],
+      "menuItems": [
+        {
+          "file": null,
+          "price": 40,
+          "category": "Chinese",
+          "itemName": "Noodles"
+        },
+        {
+          "file": null,
+          "price": 60,
+          "category": "Chinese",
+          "itemName": "Manchurian"
+        }
+      ],
+      "ownerName": "fifth owner",
+      "restaurantName": "fifth restaurant"
     }
   ]
 }

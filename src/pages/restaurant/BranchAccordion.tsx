@@ -175,8 +175,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         minWidth: 120,
       },
       render: (row: ComplianceRow) => {
-       
-
         return (
           <Box display="flex" gap={1} justifyContent="center">
             {complianceEditable[row._index] ? (
@@ -234,32 +232,40 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </Typography>
           </Box>
 
-         {branchIndex === branchArray.fields.length - 1 && (
-  <Box
-    display="flex"
-    alignItems="center"
-    gap={0.5}
-    sx={{
-      px: 1.5,
-      py: 0.5,
-      border: "1px solid",
-      borderColor: "grey.400",
-      borderRadius: 1,
-      cursor: branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
-      opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
-      userSelect: "none",
-    }}
-    onClick={(e) => {
-      e.stopPropagation();
-      if (branchArray.fields.length < 3) {
-        addBranch();
-      }
-    }}
-  >
-    <AddIcon fontSize="small" />
-    <Typography fontSize={14}>Branch</Typography>
-  </Box>
-)}
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              px: 2,
+              py: 0.5,
+              border: "1px solid",
+              borderColor: "primary.main",
+              borderRadius: 1,
+              color: "primary.main",
+              fontSize: 14,
+              fontWeight: 500,
+              bgcolor: "transparent",
+              cursor:
+                branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
+              opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
+              userSelect: "none",
+              transition: "all 0.2s",
+              "&:hover": {
+                bgcolor:
+                  branchArray.fields.length < 3
+                    ? "action.hover"
+                    : "transparent",
+              },
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (branchArray.fields.length < 3) addBranch();
+            }}
+          >
+            <AddIcon />
+            BRANCH
+          </Box>
         </Box>
       }
     >

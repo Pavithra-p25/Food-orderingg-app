@@ -27,18 +27,18 @@ const RestaurantInfoList = () => {
       id: "restaurantName",
       label: "Restaurant Name",
       sortable: true,
-      align: "center" as const,
+      align: "left" as const,
     },
-    { id: "ownerName", label: "Owner Name", align: "center" as const },
+    { id: "ownerName", label: "Owner Name", align: "left" as const },
     {
       id: "branches",
       label: "Branches",
-      render: (row: any) => row.branches?.length ?? 0,
+      render: (row: any) => row.branches?.length ?? 0 , align:"center" as const,
     },
     {
       id: "menuItems",
       label: "Menu Items",
-      render: (row: any) => row.menuItems?.length ?? 0,
+      render: (row: any) => row.menuItems?.length ?? 0, align:"center" as const,
     },
     {
       id: "actions",
