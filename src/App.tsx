@@ -5,7 +5,7 @@ import "./styles/theme.css";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import { FilterProvider } from "./context/FilterContext";
-//import RestaurantDetails from "./pages/restaurant/RestaurantDetails";
+import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormTheme from "./config/theme/Theme";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +42,7 @@ const App: React.FC = () => {
               <main className="flex-grow-1 pt-5">
                 <Routes>
                   <Route path="/restaurants" element={<RestaurantListing />} />
-                  {/*}   <Route path="/restaurants/:id" element={<RestaurantDetails />} /> {/* Dynamic route for restaurant details */}
+                 <Route path="/restaurants/:id" element={<RestaurantMenu />} /> {/* Dynamic route for restaurant details */}
                   <Route
                     path="/RestaurantSearch"
                     element={<RestaurantSearch />}

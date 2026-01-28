@@ -14,7 +14,7 @@ type CustomCardProps = {
   sx?: SxProps<Theme>;
 };
 
-const CustomCard: React.FC<CustomCardProps> = ({
+const MyCard: React.FC<CustomCardProps> = ({
   title,
   description,
   image,
@@ -47,4 +47,4 @@ const CustomCard: React.FC<CustomCardProps> = ({
   );
 };
 
-export default CustomCard;
+export default MyCard;

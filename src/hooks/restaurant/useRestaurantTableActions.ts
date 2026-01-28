@@ -3,7 +3,7 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 
 type PendingAction = "delete" | "restore" | null;
 
-export const useRestaurantActions = (
+export const useRestaurantTableActions = (
   softDeleteRestaurant: (id: string) => Promise<any>, //api call to deactivate restuarant 
   activateRestaurant: (id: string) => Promise<any> ,// to activate 
   deleteRestaurant: (id: string) => Promise<any>,

@@ -12,7 +12,7 @@ import MyTab from "../../components/newcomponents/tabs/MyTab";
 import RestaurantSearchForm from "./RestaurantSearchForm";
 import RestaurantTable from "./RestaurantTable";
 // HOOK
-import { useRestaurantActions } from "../../hooks/restaurant/useRestaurantActions";
+import { useRestaurantTableActions } from "../../hooks/restaurant/useRestaurantTableActions";
 
 const RestaurantSearch: React.FC = () => {
   const methods = useForm<Restaurant>({
@@ -52,7 +52,7 @@ const RestaurantSearch: React.FC = () => {
     handleConfirmYes,
     handleConfirmNo,
     setSnackbarOpen,
-  } = useRestaurantActions(
+  } = useRestaurantTableActions(
     softDeleteRestaurant,
     activateRestaurant,
     deleteRestaurant,

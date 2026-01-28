@@ -1,6 +1,6 @@
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import type { Dispatch, SetStateAction } from "react";
-import { useRestaurantInfo } from "../../hooks/useRestaurantInfo";
+import { useRestaurantInfo } from "../useRestaurantInfo";
 
 interface HandlersProps {
   setEditingRestaurant: Dispatch<SetStateAction<RestaurantInfoValues | null>>;
