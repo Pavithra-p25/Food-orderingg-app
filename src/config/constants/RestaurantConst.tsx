@@ -20,3 +20,9 @@ export const RESTAURANT_CATEGORIES = [
   "Pizza",
   "Italian",
 ];
+
+export const MAX_MENU_ITEMS = 3;
+export const MAX_BRANCHES = 3;
+export const MAX_COMPLIANCE = 3;
+
+export const canAddItem = (count: number, max: number = 3) => count < max;

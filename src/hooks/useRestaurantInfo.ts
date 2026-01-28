@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import {
   createRestaurantInfo,
+  deleteRestaurantInfo,
   getRestaurantInfoList,
   updateRestaurantInfo,
 } from "../services/restaurantInfoService";
@@ -58,6 +59,27 @@ export const useRestaurantInfo = () => {
     }
   };
 
+  /* DELETE */
+const removeRestaurantInfo = async (id: string | number) => {
+  try {
+    setLoading(true);
+    await deleteRestaurantInfo(id);
+
+    // update UI
+    setRestaurantInfoList((prev) =>
+      prev.filter((r) => String(r.id) !== String(id))
+    );
+
+    // optional but safe
+    await fetchRestaurantInfo();
+  } catch {
+    setError("Failed to delete restaurant info");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   return {
     restaurantInfoList,
     loading,
@@ -65,5 +87,6 @@ export const useRestaurantInfo = () => {
     addRestaurantInfo,
     fetchRestaurantInfo,
     editRestaurantInfo,
+    removeRestaurantInfo
   };
 };

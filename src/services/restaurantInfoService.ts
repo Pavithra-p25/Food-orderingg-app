@@ -25,3 +25,10 @@ export const updateRestaurantInfo = (id: string | number, data: RestaurantInfoVa
   console.log("PUT:", `${RESTAURANT_INFO_URL}/${id}`, data);
   return apiService.put<RestaurantInfoValues>(`${RESTAURANT_INFO_URL}/${id}`, data);
 };
+
+
+/* DELETE restaurant info by ID */
+
+export const deleteRestaurantInfo = (id: number | string) => {
+  return apiService.delete(`${RESTAURANT_INFO_URL}/${id}`);
+};

@@ -11,13 +11,22 @@ import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+import Stack from "@mui/material/Stack";
+import MyButton from "../../components/newcomponents/button/MyButton";
+
 const RestaurantInfoList = () => {
-  const { restaurantInfoList, fetchRestaurantInfo, editRestaurantInfo } =
-    useRestaurantInfo();
+  const {
+    restaurantInfoList,
+    fetchRestaurantInfo,
+    editRestaurantInfo,
+    removeRestaurantInfo,
+  } = useRestaurantInfo();
 
   const [editingRestaurant, setEditingRestaurant] = useState<any>(null);
   const [previewRestaurant, setPreviewRestaurant] =
     React.useState<RestaurantInfoValues | null>(null);
+  const [deleteRestaurant, setDeleteRestaurant] =
+    useState<RestaurantInfoValues | null>(null);
 
   useEffect(() => {
     fetchRestaurantInfo();
@@ -34,12 +43,14 @@ const RestaurantInfoList = () => {
     {
       id: "branches",
       label: "Branches",
-      render: (row: any) => row.branches?.length ?? 0 , align:"center" as const,
+      render: (row: any) => row.branches?.length ?? 0,
+      align: "center" as const,
     },
     {
       id: "menuItems",
       label: "Menu Items",
-      render: (row: any) => row.menuItems?.length ?? 0, align:"center" as const,
+      render: (row: any) => row.menuItems?.length ?? 0,
+      align: "center" as const,
     },
     {
       id: "actions",
@@ -53,7 +64,7 @@ const RestaurantInfoList = () => {
               color="primary"
               onClick={() => setEditingRestaurant(row)}
             >
-              <EditNoteIcon fontSize="small"/>
+              <EditNoteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
 
@@ -66,15 +77,12 @@ const RestaurantInfoList = () => {
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-            {/* Delete Button */}
-      <Tooltip title="Delete">
-        <IconButton
-          color="error"
-        
-        >
-          <DeleteIcon fontSize="small"/>
-        </IconButton>
-      </Tooltip>
+          {/* Delete Button */}
+          <Tooltip title="Delete">
+            <IconButton color="error" onClick={() => setDeleteRestaurant(row)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
       ),
     },
@@ -94,6 +102,8 @@ const RestaurantInfoList = () => {
       />
     );
   }
+
+ 
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -181,7 +191,6 @@ const RestaurantInfoList = () => {
                 pb: 2,
               }}
             >
-              
               <Typography variant="subtitle1" color="text.primary" align="left">
                 Owner: {previewRestaurant.ownerName}
               </Typography>
@@ -288,6 +297,45 @@ const RestaurantInfoList = () => {
           </Box>
         )}
       </MyDialog>
+      
+    <MyDialog
+  open={!!deleteRestaurant}
+  onClose={() => setDeleteRestaurant(null)}
+  maxWidth="xs"
+>
+  <Typography textAlign="center">
+    Are you sure you want to delete this restaurant?
+  </Typography>
+
+  <Stack
+    direction="row"
+    spacing={2}
+    justifyContent="center"
+    sx={{ mt: 3 }}
+  >
+    <MyButton
+      variant="outlined"
+      onClick={() => setDeleteRestaurant(null)}
+    >
+      No
+    </MyButton>
+
+    <MyButton
+      variant="cancel"
+     
+      onClick={async () => {
+        if (!deleteRestaurant?.id) return;
+
+        await removeRestaurantInfo(deleteRestaurant.id);
+        setDeleteRestaurant(null);
+      }}
+    >
+      Yes
+    </MyButton>
+  </Stack>
+</MyDialog>
+
+
     </Container>
   );
 };
