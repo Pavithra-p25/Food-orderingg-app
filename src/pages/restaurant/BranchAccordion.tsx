@@ -25,6 +25,7 @@ import {
   useBranchAccordionHandlers,
   useComplianceAccordionHandlers,
 } from "../../hooks/useBranchHandlers";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 type BranchAccordionProps = {
   branchIndex: number;
@@ -54,8 +55,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
 }) => {
   const { watch } = useFormContext<RestaurantInfoValues>();
 
-  const [openErrorRow, setOpenErrorRow] = React.useState<number | null>(null);
-
   /*  HANDLERS */
   const { addBranch, removeBranch } = useBranchAccordionHandlers(
     branchArray,
@@ -79,6 +78,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       _index: index,
     }),
   );
+
+  const isLastBranch = branchIndex === branchArray.fields.length - 1;
 
   const complianceColumns = [
     {
@@ -232,40 +233,43 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </Typography>
           </Box>
 
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.5,
-              px: 2,
-              py: 0.5,
-              border: "1px solid",
-              borderColor: "primary.main",
-              borderRadius: 1,
-              color: "primary.main",
-              fontSize: 14,
-              fontWeight: 500,
-              bgcolor: "transparent",
-              cursor:
-                branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
-              opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
-              userSelect: "none",
-              transition: "all 0.2s",
-              "&:hover": {
-                bgcolor:
-                  branchArray.fields.length < 3
-                    ? "action.hover"
-                    : "transparent",
-              },
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (branchArray.fields.length < 3) addBranch();
-            }}
-          >
-            <AddIcon />
-            BRANCH
-          </Box>
+          {isLastBranch && (
+  <Box
+    sx={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 0.5,
+      px: 2,
+      py: 0.5,
+      border: "1px solid",
+      borderColor: "primary.main",
+      borderRadius: 1,
+      color: "primary.main",
+      fontSize: 14,
+      fontWeight: 500,
+      bgcolor: "transparent",
+      cursor:
+        branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
+      opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
+      userSelect: "none",
+      transition: "all 0.2s",
+      "&:hover": {
+        bgcolor:
+          branchArray.fields.length < 3
+            ? "action.hover"
+            : "transparent",
+      },
+    }}
+    onClick={(e) => {
+      e.stopPropagation();
+      if (branchArray.fields.length < 3) addBranch();
+    }}
+  >
+    <AddIcon />
+    BRANCH
+  </Box>
+)}
+
         </Box>
       }
     >
@@ -335,64 +339,60 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </Box>
           </Box>
         </Box>
-        {complianceRows.map((row) => {
-          const rowErrors =
-            errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
 
-          const messages: string[] = rowErrors
-            ? Object.values(rowErrors)
-                .filter(
-                  (e): e is FieldError =>
-                    typeof e === "object" && "message" in e,
-                )
-                .map((e) => e.message)
-                .filter((msg): msg is string => Boolean(msg))
-            : [];
+      {complianceRows.map((row) => {
+  const rowErrors =
+    errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
 
-          const isOpen = openErrorRow === row._index;
+  if (!rowErrors) return null;
 
-          if (messages.length === 0) return null;
+ const messages: string[] = Object.values(rowErrors)
+  .filter(
+    (e): e is FieldError => typeof e === "object" && "message" in e
+  )
+  .map((e) => e.message)
+  .filter((msg): msg is string => !!msg); // ←type guard ensures string[]
 
-          return (
-            <Box key={`error-row-${row._index}`}>
-              <Box
-                onClick={() => setOpenErrorRow(isOpen ? null : row._index)}
-                sx={{
-                  px: 2,
-                  py: 1,
-                  cursor: "pointer",
-                  color: "red",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  borderBottom: "1px solid #f2caca",
-                }}
+
+  if (messages.length === 0) return null;
+
+  return (
+    <Box
+      key={`error-tooltip-${row._index}`}
+      sx={{ display: "inline-block", ml: 1 }}
+    >
+      <Tooltip
+        title={
+          <Box>
+            {messages.map((msg, i) => (
+              <Typography
+                key={i}
+                sx={{ color: "white", fontSize: 12 }}
               >
-                ❌ {messages.length} error{messages.length > 1 && "s"} found{" "}
-                {isOpen ? "▴" : "▾"}
-              </Box>
+                • {msg}
+              </Typography>
+            ))}
+          </Box>
+        }
+        arrow
+        placement="top"
+      >
+        <Typography
+          sx={{
+            display: "inline-flex",
+            cursor: "pointer",
+            color: "red",
+            fontSize: 16,
+            fontWeight: 700,
+          }}
+        >
+          <ErrorOutlineIcon sx={{ mt: 0.5 , ml:1}} />
+        </Typography>
+      </Tooltip>
+    </Box>
+  );
+})}
 
-              {isOpen && (
-                <Box
-                  sx={{
-                    px: 3,
-                    py: 1,
-                    backgroundColor: "#fff5f5",
-                    borderBottom: "1px solid red",
-                  }}
-                >
-                  {messages.map((msg, i) => (
-                    <Typography
-                      key={i}
-                      sx={{ color: "red", fontSize: 13, mb: 0.5 }}
-                    >
-                      • {msg}
-                    </Typography>
-                  ))}
-                </Box>
-              )}
-            </Box>
-          );
-        })}
 
         {branchArray.fields.length > 1 && (
           <Box mt={2}>

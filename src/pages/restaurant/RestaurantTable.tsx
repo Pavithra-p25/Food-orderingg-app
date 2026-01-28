@@ -2,11 +2,11 @@ import React from "react";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
-import MyButton from "../../components/newcomponents/button/MyButton";
 import MyTable from "../../components/newcomponents/table/MyTable";
 import { Chip } from "@mui/material";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import { Box } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 
 type Props = {
   results: Restaurant[];
@@ -23,7 +23,6 @@ type TableRow =
 
 // Type guard to check if row is a Restaurant
 const isRestaurant = (row: TableRow): row is Restaurant => !("isGroup" in row);
-
 
 const RestaurantTable: React.FC<Props> = ({
   results,
@@ -84,6 +83,7 @@ const RestaurantTable: React.FC<Props> = ({
       label: "Contact",
       columns: ["phone", "email"],
     },
+    
   ];
 
   return (
@@ -99,8 +99,7 @@ const RestaurantTable: React.FC<Props> = ({
       onSelectionChange={(selectedRows) => {
         console.log("Selected rows:", selectedRows);
       }}
-     enableExpand={activeTab === "all" || activeTab === "Groupby"}
-
+      enableExpand={activeTab === "all" || activeTab === "Groupby"}
       expandedContent={
         activeTab === "all"
           ? (row) =>
@@ -179,7 +178,6 @@ const RestaurantTable: React.FC<Props> = ({
           id: "category",
           label: "Category",
           align: "left",
-          
         },
         {
           id: "restaurantType",
@@ -257,23 +255,19 @@ const RestaurantTable: React.FC<Props> = ({
 
             if (activeTab === "active") {
               return row.isActive || isDraft ? (
-               
                 <Box sx={{ display: "flex", flexWrap: "nowrap", gap: 1 }}>
                   <EditNoteIcon
                     color="primary"
                     sx={{ cursor: "pointer", mr: 1 }}
                     onClick={() => onEdit(row)}
                   />
-                  <MyButton
-                    variant="outline-secondary"
-                    style={{ minWidth: 0, padding: 0 }}
-                    onClick={() => onDelete([row.id.toString()])}
-                  >
-                    <DeleteIcon color="error" />
-                  </MyButton>
-                  </Box>
-              
-                
+                  <IconButton
+                  size="small"
+                  onClick={() => onDelete([row.id.toString()])}
+                >
+                  <DeleteIcon color="error" />
+                </IconButton>
+                </Box>
               ) : null;
             }
 
@@ -300,20 +294,18 @@ const RestaurantTable: React.FC<Props> = ({
 
             // Draft or active
             return (
-              <>
-                <EditNoteIcon
-                  color="primary"
-                  sx={{ cursor: "pointer", mr: 1 }}
-                  onClick={() => onEdit(row)}
-                />
-                <MyButton
-                  variant="outline-secondary"
-                  style={{ minWidth: 0, padding: 0 }}
+              <Box sx={{ display: "flex" }}>
+                <IconButton size="small" onClick={() => onEdit(row)}>
+                  <EditNoteIcon color="primary" />
+                </IconButton>
+
+                <IconButton
+                  size="small"
                   onClick={() => onDelete([row.id.toString()])}
                 >
                   <DeleteIcon color="error" />
-                </MyButton>
-              </>
+                </IconButton>
+              </Box>
             );
           },
         },

@@ -9,6 +9,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import RestaurantInfo from "./RestaurantInfo";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const RestaurantInfoList = () => {
   const { restaurantInfoList, fetchRestaurantInfo, editRestaurantInfo } =
@@ -45,14 +46,14 @@ const RestaurantInfoList = () => {
       label: "Actions",
       sortable: false,
       render: (row: any) => (
-        <Box display="flex" gap={1} justifyContent="center">
+        <Box display="flex" gap={1} justifyContent="center" width="50px">
           {/* Edit Button */}
           <Tooltip title="Edit">
             <IconButton
               color="primary"
               onClick={() => setEditingRestaurant(row)}
             >
-              <EditNoteIcon />
+              <EditNoteIcon fontSize="small"/>
             </IconButton>
           </Tooltip>
 
@@ -62,9 +63,18 @@ const RestaurantInfoList = () => {
               color="secondary"
               onClick={() => setPreviewRestaurant(row)}
             >
-              <VisibilityIcon />
+              <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+            {/* Delete Button */}
+      <Tooltip title="Delete">
+        <IconButton
+          color="error"
+        
+        >
+          <DeleteIcon fontSize="small"/>
+        </IconButton>
+      </Tooltip>
         </Box>
       ),
     },
