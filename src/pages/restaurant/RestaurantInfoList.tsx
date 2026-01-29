@@ -71,7 +71,7 @@ const RestaurantInfoList = () => {
           {/* Preview Button */}
           <Tooltip title="Preview">
             <IconButton
-              color="secondary"
+              color="success"
               onClick={() => setPreviewRestaurant(row)}
             >
               <VisibilityIcon fontSize="small" />

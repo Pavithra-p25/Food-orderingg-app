@@ -13,7 +13,7 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
-import CustomCard from "../../components/newcomponents/card/MyCard";
+import MyCard from "../../components/newcomponents/card/MyCard";
 import db from "../../../server/db.json";
 
 // Types
@@ -95,7 +95,7 @@ const RestaurantMenu: React.FC = () => {
     );
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container maxWidth="lg" disableGutters sx={{ mt: 4 }}>
       {/* Hero Section */}
       <Box
         sx={{
@@ -144,11 +144,23 @@ const RestaurantMenu: React.FC = () => {
               const isFavorite = favorites.includes(index);
               return (
                 <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
-                  <CustomCard
-                    title={item.itemName}
-                    description={`₹${item.price}`}
-                    image={item.file || "/placeholder.jpg"}
-                  >
+                  <MyCard image={item.file || "/placeholder.jpg"}>
+                    {/* Title + Price Row */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography fontWeight="bold">{item.itemName}</Typography>
+
+                      <Typography fontWeight="bold" color="success.main">
+                        ₹{item.price}
+                      </Typography>
+                    </Box>
+
                     <Box
                       sx={{
                         display: "flex",
@@ -189,7 +201,7 @@ const RestaurantMenu: React.FC = () => {
                         </IconButton>
                       </Tooltip>
                     </Box>
-                  </CustomCard>
+                  </MyCard>
                 </Grid>
               );
             })

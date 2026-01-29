@@ -18,7 +18,8 @@ export const useBranchAccordionHandlers = (
 ) => {
   const addBranch = async () => {
    if (!canAddItem(branchArray.fields.length, MAX_BRANCHES)) return;
-  const valid = await trigger("branches");
+ const valid = await trigger(`branches.${branchArray.fields.length - 1}`);
+
     if (valid) {
       const newIndex = branchArray.fields.length;
       branchArray.append({
