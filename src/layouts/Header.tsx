@@ -32,7 +32,8 @@ import LoginForm from "../pages/authentication/LoginForm";
 import SignupForm from "../pages/authentication/SignupForm";
 import MyToast from "../components/toast/MyToast";
 import { ListItemButton } from "@mui/material";
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import { useLocation } from "react-router-dom";
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -48,6 +49,7 @@ interface HeaderState {
 
 const Header: React.FC = () => {
   const { darkMode, setDarkMode } = useContext(ThemeContext);
+  const location = useLocation();
 
   const [state, setState] = useState<HeaderState>({
     showLoginForm: false,
@@ -248,7 +250,7 @@ const Header: React.FC = () => {
               },
               {
                 text: "Restaurant Info List",
-                icon: <FormatListBulletedIcon/>,
+                icon: <FormatListBulletedIcon />,
                 to: "RestaurantInfoList",
               },
             ].map((item) => (
@@ -268,6 +270,15 @@ const Header: React.FC = () => {
                     minHeight: 48,
                     justifyContent: state.collapsed ? "center" : "flex-start",
                     px: 2.5,
+                    //  ACTIVE STYLE
+                    backgroundColor:
+                      location.pathname === item.to
+                        ? "rgba(226, 55, 68, 0.12)"
+                        : "transparent",
+
+                    "&:hover": {
+                      backgroundColor: "rgba(226, 55, 68, 0.18)",
+                    },
                   }}
                 >
                   <ListItemIcon
@@ -281,7 +292,16 @@ const Header: React.FC = () => {
                     {item.icon}
                   </ListItemIcon>
 
-                  {!state.collapsed && <ListItemText primary={item.text} />}
+                  {!state.collapsed && (
+                    <ListItemText
+                      primary={item.text}
+                      sx={{
+                        color:
+                          location.pathname === item.to ? "#e23744" : "inherit",
+                        fontWeight: location.pathname === item.to ? 600 : 400,
+                      }}
+                    />
+                  )}
                 </ListItemButton>
               </ListItem>
             ))}

@@ -57,7 +57,7 @@ const RestaurantInfoList = () => {
       label: "Actions",
       sortable: false,
       render: (row: any) => (
-        <Box display="flex" gap={1} justifyContent="center" width="50px">
+        <Box display="flex" gap={1} justifyContent="center" width="20px">
           {/* Edit Button */}
           <Tooltip title="Edit">
             <IconButton

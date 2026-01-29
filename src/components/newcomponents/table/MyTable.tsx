@@ -32,6 +32,12 @@ interface Column<T> {
   sortable?: boolean;
   align?: "left" | "center" | "right";
   cellAlign?: (row: any) => "left" | "center" | "right";
+
+  // NEW
+  width?: number;
+  minWidth?: number;
+  headerSx?: object;
+  cellSx?: object;
 }
 
 type ColumnGroup = {
@@ -497,7 +503,7 @@ function MyTable<T>({
                           borderBottom: "1px solid #dcdcdc",
                           borderRight:
                             enableGroupScroll &&
-                              columnGroups.indexOf(group) !==
+                            columnGroups.indexOf(group) !==
                               columnGroups.length - 1
                               ? "2px solid #bdbdbd"
                               : "none",
@@ -526,7 +532,10 @@ function MyTable<T>({
               }}
             >
               {finalColumns.map((col, index) => {
-                if (enableGroupScroll && (col.id === "status" || col.id === "actions")) {
+                if (
+                  enableGroupScroll &&
+                  (col.id === "status" || col.id === "actions")
+                ) {
                   return null;
                 }
 
@@ -536,11 +545,12 @@ function MyTable<T>({
                     align="center"
                     sx={{
                       width: col.id === "actions" ? 90 : undefined,
+                      minWidth: col.id === "actions" ? 90 : undefined,
                       whiteSpace: col.id === "actions" ? "nowrap" : undefined,
                       borderRight:
                         enableGroupScroll &&
-                          typeof col.id === "string" &&
-                          isGroupEndColumn(col.id)
+                        typeof col.id === "string" &&
+                        isGroupEndColumn(col.id)
                           ? "2px solid #bdbdbd"
                           : "none",
                     }}
@@ -642,9 +652,9 @@ function MyTable<T>({
                               col.id === "actions" ? "nowrap" : undefined,
                             borderRight:
                               enableGroupScroll &&
-                                typeof col.id === "string" &&
-                                isGroupEndColumn(col.id) &&
-                                !(row as any).isGroup
+                              typeof col.id === "string" &&
+                              isGroupEndColumn(col.id) &&
+                              !(row as any).isGroup
                                 ? "2px solid #eeeeee"
                                 : "none",
                           }}

@@ -164,118 +164,124 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           </Typography>
         ),
     },
-    {
-      id: "actions",
-      label: "Actions",
-      sortable: false,
-      sx: {
+  {
+  id: "actions",
+  label: "Actions",
+  sortable: false,
+
+  // BODY CELL
+  sx: {
     position: "sticky",
     right: 0,
     backgroundColor: "white",
-    zIndex: 3,          
-    minWidth: 300,     
-    width: 300,        
+    zIndex: 3,
+    minWidth: 300,
+    width: 300,
     textAlign: "center",
-    whiteSpace: "nowrap" 
+    whiteSpace: "nowrap",
   },
- headCellSx: {
-  minWidth: 180,
-  width: 180,
-  textAlign: "center",
-  whiteSpace: "nowrap",
-},
 
-    render: (row: ComplianceRow) => {
-  const rowErrors =
-    errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+  // HEADER CELL 
+  headCellSx: {
+    position: "sticky",
+    right: 0,
+    backgroundColor: "white",
+    zIndex: 4,
+    minWidth: 300,
+    width: 10,
+    textAlign: "center",
+    whiteSpace: "nowrap",
+  },
 
-  const messages: string[] = rowErrors
-    ? Object.values(rowErrors)
-        .filter(
-          (e): e is FieldError => typeof e === "object" && "message" in e
-        )
-        .map((e) => e.message)
-        .filter((msg): msg is string => !!msg)
-    : [];
+  render: (row: ComplianceRow) => {
+    const rowErrors =
+      errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
 
-  const hasError = messages.length > 0;
-
-  return (
-  <Box
-  display="flex"
-  gap={1}
-  justifyContent="center"
-  alignItems="center"
-  width={120}        
->
-      <Tooltip
-        title={
-          hasError ? (
-            <Box>
-              {messages.map((msg, i) => (
-                <Typography
-                  key={i}
-                  sx={{ color: "white", fontSize: 12 }}
-                >
-                  • {msg}
-                </Typography>
-              ))}
-            </Box>
-          ) : (
-            ""
+    const messages: string[] = rowErrors
+      ? Object.values(rowErrors)
+          .filter(
+            (e): e is FieldError => typeof e === "object" && "message" in e
           )
-        }
-        arrow
-        disableHoverListener={!hasError}
+          .map((e) => e.message)
+          .filter((msg): msg is string => !!msg)
+      : [];
+
+    const hasError = messages.length > 0;
+
+    return (
+      <Box
+        display="flex"
+        gap={1}
+        justifyContent="center"
+        alignItems="center"
+        width={120}
       >
-        <span>
-          <IconButton
-            size="small"
-            disabled={!hasError}
-            sx={{
-              color: hasError ? "error.main" : "grey.400",
-              cursor: hasError ? "pointer" : "not-allowed",
-            }}
-          >
-            <ErrorOutlineIcon />
-          </IconButton>
-        </span>
-      </Tooltip>
-
-      {/* EDIT / SAVE */}
-      {complianceEditable[row._index] ? (
-        <Tooltip title="Save">
-          <IconButton
-            color="success"
-            onClick={() => saveLicense(row._index)}
-          >
-            <CheckIcon />
-          </IconButton>
+        {/* ERROR */}
+        <Tooltip
+          title={
+            hasError ? (
+              <Box>
+                {messages.map((msg, i) => (
+                  <Typography key={i} sx={{ color: "white", fontSize: 12 }}>
+                    • {msg}
+                  </Typography>
+                ))}
+              </Box>
+            ) : (
+              ""
+            )
+          }
+          arrow
+          disableHoverListener={!hasError}
+        >
+          <span>
+            <IconButton
+              size="small"
+              disabled={!hasError}
+              sx={{
+                color: hasError ? "error.main" : "grey.400",
+                cursor: hasError ? "pointer" : "not-allowed",
+              }}
+            >
+              <ErrorOutlineIcon />
+            </IconButton>
+          </span>
         </Tooltip>
-      ) : (
-        <Tooltip title="Edit">
-          <IconButton
-            color="primary"
-            onClick={() => editLicense(row._index)}
-          >
-            <EditNoteIcon />
-          </IconButton>
-        </Tooltip>
-      )}
 
-      {/* DELETE */}
-      <IconButton
-        color="error"
-        disabled={complianceArray.fields.length === 1}
-        onClick={() => removeLicense(row._index)}
-      >
-        <DeleteIcon />
-      </IconButton>
-    </Box>
-  );
-},
+        {/* EDIT / SAVE */}
+        {complianceEditable[row._index] ? (
+          <Tooltip title="Save">
+            <IconButton
+              color="success"
+              onClick={() => saveLicense(row._index)}
+            >
+              <CheckIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Edit">
+            <IconButton
+              color="primary"
+              onClick={() => editLicense(row._index)}
+            >
+              <EditNoteIcon />
+            </IconButton>
+          </Tooltip>
+        )}
 
-    },
+        {/* DELETE */}
+        <IconButton
+          color="error"
+          disabled={complianceArray.fields.length === 1}
+          onClick={() => removeLicense(row._index)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </Box>
+    );
+  },
+}
+,
   ];
 
   return (
