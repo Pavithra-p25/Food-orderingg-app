@@ -81,7 +81,69 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
 
   const isLastBranch = branchIndex === branchArray.fields.length - 1;
 
+  const hasErrorColumn = complianceRows.some((row) => {
+  const rowErrors = errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+  return rowErrors && Object.keys(rowErrors).length > 0;
+});
+
+
   const complianceColumns = [
+ ...(hasErrorColumn
+    ? [{
+        id: "error",
+        label: "",
+        sortable: false,
+        sx: {
+          width: "1%",
+          maxWidth: 20,
+          padding: 0,
+          textAlign: "center",
+          whiteSpace: "nowrap",
+        },
+        headCellSx: {
+          width: "1%",
+          maxWidth: 20,
+          padding: 0,
+          textAlign: "center",
+        },
+        render: (row: ComplianceRow) => {
+          const rowErrors = errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+
+          if (!rowErrors) return null;
+
+          const messages: string[] = Object.values(rowErrors)
+            .filter(
+              (e): e is FieldError => typeof e === "object" && "message" in e
+            )
+            .map((e) => e.message)
+            .filter((msg): msg is string => !!msg);
+
+          if (messages.length === 0) return null;
+
+          return (
+            <Tooltip
+              title={
+                <Box>
+                  {messages.map((msg, i) => (
+                    <Typography key={i} sx={{ color: "white", fontSize: 12 }}>
+                      • {msg}
+                    </Typography>
+                  ))}
+                </Box>
+              }
+              arrow
+            >
+              <IconButton
+                size="small"
+                sx={{ p: 0, minWidth: 0, width: 24, height: 24, color: "error.main" }}
+              >
+                <ErrorOutlineIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          );
+        },
+      }]
+    : []),
     {
       id: "licenseType",
       label: "License Type",
@@ -206,47 +268,14 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           .filter((msg): msg is string => !!msg)
       : [];
 
-    const hasError = messages.length > 0;
-
     return (
       <Box
         display="flex"
         gap={1}
         justifyContent="center"
         alignItems="center"
-        width={120}
+       
       >
-        {/* ERROR */}
-        <Tooltip
-          title={
-            hasError ? (
-              <Box>
-                {messages.map((msg, i) => (
-                  <Typography key={i} sx={{ color: "white", fontSize: 12 }}>
-                    • {msg}
-                  </Typography>
-                ))}
-              </Box>
-            ) : (
-              ""
-            )
-          }
-          arrow
-          disableHoverListener={!hasError}
-        >
-          <span>
-            <IconButton
-              size="small"
-              disabled={!hasError}
-              sx={{
-                color: hasError ? "error.main" : "grey.400",
-                cursor: hasError ? "pointer" : "not-allowed",
-              }}
-            >
-              <ErrorOutlineIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
 
         {/* EDIT / SAVE */}
         {complianceEditable[row._index] ? (
