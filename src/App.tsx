@@ -15,6 +15,7 @@ import RestaurantSearch from "./pages/restaurant/RestaurantSearch";
 import RestaurantListing from "./pages/restaurant/RestaurantList";
 import RestaurantInfo from "./pages/restaurant/RestaurantInfo";
 import RestaurantInfoList from "./pages/restaurant/RestaurantInfoList";
+import HomePage from "./pages/HomePage";
 
 const AddRestaurantModal = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const AddRestaurantModal = () => {
   return (
     <RestaurantForm
       show={true}
-      onClose={() => navigate(-1)} // close popup → go back
+      onClose={() => navigate(-1)} // close popup - go back
     />
   );
 };
@@ -41,18 +42,21 @@ const App: React.FC = () => {
               {/* MAIN CONTENT  */}
               <main className="flex-grow-1 pt-5">
                 <Routes>
+                  <Route path="/HomePage" element={<HomePage />} />
                   <Route path="/restaurants" element={<RestaurantListing />} />
-                 <Route path="/restaurants/:id" element={<RestaurantMenu />} /> {/* Dynamic route for restaurant details */}
+                  <Route
+                    path="/restaurants/:id"
+                    element={<RestaurantMenu />}
+                  />{" "}
+                  {/* Dynamic route for restaurant details */}
                   <Route
                     path="/RestaurantSearch"
                     element={<RestaurantSearch />}
                   />
-
                   <Route
                     path="/add-restaurant"
                     element={<AddRestaurantModal />}
                   />
-
                   <Route
                     path="/restaurantinfo"
                     element={
@@ -60,13 +64,9 @@ const App: React.FC = () => {
                         editRestaurantInfo={async (id, data) => {
                           console.log("Editing restaurant:", id, data);
                         }}
-                        onUpdateSuccess={() => {
-                          console.log("Restaurant updated successfully!");
-                        }}
                       />
                     }
                   />
-
                   <Route
                     path="/RestaurantInfoList"
                     element={<RestaurantInfoList />}

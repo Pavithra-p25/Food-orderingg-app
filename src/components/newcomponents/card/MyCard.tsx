@@ -8,6 +8,7 @@ type CustomCardProps = {
   description?: string;
   image?: string;
   buttonText?: string;
+  imageHeight?: number; 
   buttonVariant?: "primary" | "secondary" | "success" | "cancel" | "outlined";
   onButtonClick?: () => void;
   children?: React.ReactNode;
@@ -18,6 +19,7 @@ const MyCard: React.FC<CustomCardProps> = ({
   title,
   description,
   image,
+   imageHeight = 180,
   buttonText,
   buttonVariant = "primary",
   onButtonClick,
@@ -26,7 +28,7 @@ const MyCard: React.FC<CustomCardProps> = ({
 }) => {
   return (
     <Card>
-      {image && <CardMedia component="img" height="140" image={image} />}
+      {image && <CardMedia component="img" height={imageHeight} image={image} />}
       <CardContent>
         {title && <Typography variant="h6">{title}</Typography>}
         {description && (

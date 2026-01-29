@@ -1,6 +1,8 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import type { SxProps, Theme } from "@mui/material/styles";
+import type { ButtonProps } from "@mui/material/Button";
+import type { LinkProps } from "react-router-dom";
 
 type MyButtonProps = {
   children?: React.ReactNode;
@@ -21,8 +23,11 @@ type MyButtonProps = {
   height?: number | string;
   style?: React.CSSProperties;
   sx?: SxProps<Theme>;
-  
-};
+    // add these
+  component?: React.ElementType<LinkProps>;
+  to?: string;
+} & Omit<ButtonProps, "color" | "variant" | "type">;
+
 
 const MyButton: React.FC<MyButtonProps> = ({
   children,

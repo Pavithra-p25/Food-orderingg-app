@@ -95,7 +95,7 @@ const RestaurantInfoList = () => {
     return (
       <RestaurantInfo
         restaurantData={editingRestaurant}
-        editRestaurantInfo={editRestaurantInfo} // pass it here
+        editRestaurantInfo={editRestaurantInfo} 
         onUpdateSuccess={() => {
           fetchRestaurantInfo(); // refresh table
           setEditingRestaurant(null); // close form

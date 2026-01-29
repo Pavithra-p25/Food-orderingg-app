@@ -4,37 +4,51 @@
       "id": "1469",
       "fullName": "pavithra",
       "emailOrUsername": "pavi",
-      "password": "123456"
+      "password": "123456",
+        "role":"user"
     },
     {
       "id": "59e6",
       "fullName": "hari",
       "emailOrUsername": "hari@gmail.com",
-      "password": "14120H"
+      "password": "14120H",
+        "role":"user"
     },
     {
       "id": "dc20",
       "fullName": "Kavin",
       "emailOrUsername": "kavin@gmail.cmo",
-      "password": "123456"
+      "password": "123456",
+        "role":"user"
     },
     {
       "id": "32b8",
       "fullName": "Deva shree",
       "emailOrUsername": "shree@gmail.com",
-      "password": "shree"
+      "password": "shree",
+        "role":"user"
     },
     {
       "id": "0c63",
       "fullName": "balan",
       "emailOrUsername": "balan",
-      "password": "123"
+      "password": "123",
+        "role":"user"
     },
     {
       "id": "b320",
       "fullName": "dvsv",
       "emailOrUsername": "vsva",
-      "password": "bfbSS33"
+      "password": "bfbSS33",
+      "role":"user"
+
+    },
+     {
+      "id": "a001",
+      "fullName": "Admin",
+      "emailOrUsername": "admin",
+      "password": "Adm123",
+      "role": "admin"
     }
   ],
   "restaurants": [

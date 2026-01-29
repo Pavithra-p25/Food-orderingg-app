@@ -6,7 +6,7 @@ import {
   IconButton,
   Typography,
   Box,
-  Button,
+ Button,
   Drawer,
   List,
   ListItem,
@@ -15,7 +15,6 @@ import {
   Switch,
   Menu,
   MenuItem,
-  Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
@@ -34,6 +33,7 @@ import MyToast from "../components/toast/MyToast";
 import { ListItemButton } from "@mui/material";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useLocation } from "react-router-dom";
+
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -112,7 +112,59 @@ const Header: React.FC = () => {
     </Box>
   );
 
-  const PersonSection = () => {
+  const menuItems = [
+  {
+    text: "Home",
+    icon: <HomeIcon />,
+    to: "/HomePage",
+    roles: ["user", "admin"],
+  },
+  {
+    text: "Restaurants",
+    icon: <StoreIcon />,
+    to: "/restaurants",
+    roles: ["user", "admin"],
+  },
+  {
+    text: "Cart",
+    icon: <ShoppingCartIcon />,
+    to: "/cart",
+    roles: ["user", "admin"],
+  },
+  {
+    text: "Favorites",
+    icon: <FavoriteIcon />,
+    to: "/favorites",
+    roles: ["user", "admin"],
+  },
+
+  //  ADMIN ONLY
+  {
+    text: "Add Restaurant",
+    icon: <AddCircleIcon />,
+    to: "/add-restaurant",
+    roles: ["admin"],
+  },
+  {
+    text: "Search Restaurant",
+    icon: <SearchIcon />,
+    to: "/RestaurantSearch",
+    roles: ["admin"],
+  },
+  {
+    text: "Restaurant Info",
+    icon: <DescriptionIcon />,
+    to: "/RestaurantInfo",
+    roles: ["admin"],
+  },
+  {
+    text: "Restaurant Info List",
+    icon: <FormatListBulletedIcon />,
+    to: "/RestaurantInfoList",
+    roles: ["admin"],
+  },
+];
+  const renderPersonSection = () => {
     if (state.user) {
       return (
         <>
@@ -132,10 +184,10 @@ const Header: React.FC = () => {
             onClose={() => setAnchorEl(null)}
           >
             <MenuItem onClick={() => alert("Go to profile page")}>
-              <PersonIcon fontSize="small" sx={{ mr: 1 }} />
+              <PersonIcon fontSize="small"  />
               My Profile
             </MenuItem>
-            <Divider />
+           
             <MenuItem
               onClick={() => {
                 localStorage.removeItem("user");
@@ -148,13 +200,16 @@ const Header: React.FC = () => {
                 setAnchorEl(null);
               }}
             >
-              <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
+              <LogoutIcon fontSize="small"  />
               Logout
             </MenuItem>
           </Menu>
         </>
       );
     }
+
+
+    
 
     return (
       <Box
@@ -191,130 +246,93 @@ const Header: React.FC = () => {
             FoodExpress
           </Typography>
 
-          <Box display={{ xs: "none", lg: "flex" }} gap={2}>
+          <Box display={{ xs: "none", lg: "flex" }} gap={1}>
             {DarkToggle}
             {FoodToggle}
-            <PersonSection />
+            {renderPersonSection()}
           </Box>
 
           <Box display={{ xs: "flex", lg: "none" }}>
-            <PersonSection />
+            {renderPersonSection()}
           </Box>
         </Toolbar>
       </AppBar>
 
       {/* Sidebar */}
-      <Drawer
-        variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
-        open={!state.collapsed}
-        onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
-        sx={{
-          width: state.collapsed ? 72 : 260,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: state.collapsed ? 72 : 260,
-            boxSizing: "border-box",
-            top: "64px", // height of AppBar
-            transition: "width 0.3s",
-            overflowX: "hidden",
-          },
-        }}
-      >
-        <Box
-          sx={{
-            mt: "8px",
-            ml: "8px",
-            pt: 0,
-          }}
-        >
-          <List>
-            {[
-              { text: "Home", icon: <HomeIcon />, to: "/" },
-              { text: "Restaurants", icon: <StoreIcon />, to: "/restaurants" },
-              { text: "Cart", icon: <ShoppingCartIcon />, to: "/cart" },
-              { text: "Favorites", icon: <FavoriteIcon />, to: "/favorites" },
-              {
-                text: "Add Restaurant",
-                icon: <AddCircleIcon />,
-                to: "/add-restaurant",
-              },
-              {
-                text: "Search Restaurant",
-                icon: <SearchIcon />,
-                to: "/RestaurantSearch",
-              },
-              {
-                text: "Restaurant Info",
-                icon: <DescriptionIcon />,
-                to: "/RestaurantInfo",
-              },
-              {
-                text: "Restaurant Info List",
-                icon: <FormatListBulletedIcon />,
-                to: "RestaurantInfoList",
-              },
-            ].map((item) => (
-              <ListItem
-                key={item.text}
-                disablePadding
-                sx={{ display: "block" }}
+    {/* Sidebar */}
+{state.user && (  // ✅ Only show if logged in (user or admin)
+  <Drawer
+    variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
+    open={!state.collapsed}
+    onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
+    sx={{
+      width: state.collapsed ? 72 : 260,
+      flexShrink: 0,
+      "& .MuiDrawer-paper": {
+        width: state.collapsed ? 72 : 260,
+        boxSizing: "border-box",
+        top: "64px", // height of AppBar
+        transition: "width 0.3s",
+        overflowX: "hidden",
+      },
+    }}
+  >
+    <Box sx={{ mt: "8px", ml: "8px", pt: 0 }}>
+      <List>
+        {menuItems
+          .filter((item) => state.user && item.roles.includes(state.user.role))
+          .map((item) => (
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                component={Link}
+                to={item.to}
+                onClick={() =>
+                  window.innerWidth < 1200 &&
+                  setState((prev) => ({ ...prev, collapsed: true }))
+                }
+                sx={{
+                  minHeight: 48,
+                  justifyContent: state.collapsed ? "center" : "flex-start",
+                  px: 2.5,
+                  backgroundColor:
+                    location.pathname === item.to
+                      ? "rgba(226, 55, 68, 0.12)"
+                      : "transparent",
+                }}
               >
-                <ListItemButton
-                  component={Link}
-                  to={item.to}
-                  onClick={() =>
-                    window.innerWidth < 1200 &&
-                    setState((prev) => ({ ...prev, collapsed: true }))
-                  }
+                <ListItemIcon
                   sx={{
-                    minHeight: 48,
-                    justifyContent: state.collapsed ? "center" : "flex-start",
-                    px: 2.5,
-                    //  ACTIVE STYLE
-                    backgroundColor:
-                      location.pathname === item.to
-                        ? "rgba(226, 55, 68, 0.12)"
-                        : "transparent",
-
-                    "&:hover": {
-                      backgroundColor: "rgba(226, 55, 68, 0.18)",
-                    },
+                    minWidth: 0,
+                    mr: state.collapsed ? "auto" : 2,
+                    justifyContent: "center",
+                    color: "#333333",
                   }}
                 >
-                  <ListItemIcon
+                  {item.icon}
+                </ListItemIcon>
+                {!state.collapsed && (
+                  <ListItemText
+                    primary={item.text}
                     sx={{
-                      minWidth: 0,
-                      mr: state.collapsed ? "auto" : 2,
-                      justifyContent: "center",
-                      color: "#333333",
+                      color: location.pathname === item.to ? "#e23744" : "inherit",
+                      fontWeight: location.pathname === item.to ? 600 : 400,
                     }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
+                  />
+                )}
+              </ListItemButton>
+            </ListItem>
+          ))}
+      </List>
 
-                  {!state.collapsed && (
-                    <ListItemText
-                      primary={item.text}
-                      sx={{
-                        color:
-                          location.pathname === item.to ? "#e23744" : "inherit",
-                        fontWeight: location.pathname === item.to ? 600 : 400,
-                      }}
-                    />
-                  )}
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
+      {/* Mobile toggles */}
+      <Box p={2} display={{ lg: "none" }} gap={2}>
+        {FoodToggle}
+        {DarkToggle}
+      </Box>
+    </Box>
+  </Drawer>
+)}
 
-          <Divider />
-
-          <Box p={2} display={{ lg: "none" }} gap={2}>
-            {FoodToggle}
-            {DarkToggle}
-          </Box>
-        </Box>
-      </Drawer>
 
       {/* Login */}
       {state.showLoginForm && (
