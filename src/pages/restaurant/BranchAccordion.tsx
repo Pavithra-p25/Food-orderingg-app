@@ -82,14 +82,14 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
   const isLastBranch = branchIndex === branchArray.fields.length - 1;
 
   const hasErrorColumn = complianceRows.some((row) => {
-  const rowErrors = errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
-  return rowErrors && Object.keys(rowErrors).length > 0;
-});
+    const rowErrors = errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+    return rowErrors && Object.keys(rowErrors).length > 0;
+  });
 
 
   const complianceColumns = [
- ...(hasErrorColumn
-    ? [{
+    ...(hasErrorColumn
+      ? [{
         id: "error",
         label: "",
         sortable: false,
@@ -143,174 +143,175 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           );
         },
       }]
-    : []),
+      : []),
     {
       id: "licenseType",
       label: "License Type",
-      render: (row: ComplianceRow) =>
-        complianceEditable[row._index] ? (
-          <MyInput
-            name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseType`}
-            size="small"
-            required
-            error={Boolean(
-              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-                ?.licenseType,
-            )}
-          />
-        ) : (
-          <Typography fontWeight={600}>
-            {watch(
-              `branches.${branchIndex}.complianceDetails.${row._index}.licenseType`,
-            ) || "-"}
-          </Typography>
-        ),
+      render: (row: ComplianceRow) => (
+        <Box sx={{ width: 170 }}>
+          {complianceEditable[row._index] ? (
+            <MyInput
+              name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseType`}
+              size="small"
+              required
+              error={Boolean(
+                errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+                  ?.licenseType,
+              )}
+            />
+          ) : (
+            <Typography fontWeight={600}>
+              {watch(
+                `branches.${branchIndex}.complianceDetails.${row._index}.licenseType`,
+              ) || "-"}
+            </Typography>
+          )}
+        </Box>
+      ),
     },
     {
       id: "licenseNumber",
       label: "License Number",
-      render: (row: ComplianceRow) =>
-        complianceEditable[row._index] ? (
-          <MyInput
-            name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`}
-            size="small"
-            required
-            error={Boolean(
-              errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
-                ?.licenseNumber,
-            )}
-          />
-        ) : (
-          <Typography fontWeight={600}>
-            {watch(
-              `branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`,
-            ) || "-"}
-          </Typography>
-        ),
+      render: (row: ComplianceRow) => (
+        <Box sx={{ width: 170 }}>
+          {complianceEditable[row._index] ? (
+            <MyInput
+              name={`branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`}
+              size="small"
+              required
+              error={Boolean(
+                errors.branches?.[branchIndex]?.complianceDetails?.[row._index]
+                  ?.licenseNumber,
+              )}
+            />
+          ) : (
+            <Typography fontWeight={600}>
+              {watch(
+                `branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`,
+              ) || "-"}
+            </Typography>
+          )}
+        </Box>
+      ),
     },
     {
       id: "validFrom",
       label: "Valid From",
-      render: (row: ComplianceRow) =>
-        complianceEditable[row._index] ? (
-          <MyDatePicker
-            name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
-            size="small"
-          />
-        ) : (
-          <Typography fontWeight={600}>
-            {formatDate(
-              watch(
-                `branches.${branchIndex}.complianceDetails.${row._index}.validFrom`,
-              ),
-            )}
-          </Typography>
-        ),
+      render: (row: ComplianceRow) => (
+        <Box sx={{ width: 170 }}>
+          {complianceEditable[row._index] ? (
+            <MyDatePicker
+              name={`branches.${branchIndex}.complianceDetails.${row._index}.validFrom`}
+              size="small"
+            />
+          ) : (
+            <Typography fontWeight={600}>
+              {formatDate(
+                watch(
+                  `branches.${branchIndex}.complianceDetails.${row._index}.validFrom`,
+                ),
+              )}
+            </Typography>
+          )}
+        </Box>
+      ),
     },
     {
       id: "validTill",
       label: "Valid Till",
-      render: (row: ComplianceRow) =>
-        complianceEditable[row._index] ? (
-          <MyDatePicker
-            name={`branches.${branchIndex}.complianceDetails.${row._index}.validTill`}
-            size="small"
-          />
-        ) : (
-          <Typography fontWeight={600}>
-            {formatDate(
-              watch(
-                `branches.${branchIndex}.complianceDetails.${row._index}.validTill`,
-              ),
-            )}
-          </Typography>
-        ),
+      render: (row: ComplianceRow) => (
+        <Box sx={{ width: 170 }}>
+          {complianceEditable[row._index] ? (
+            <MyDatePicker
+              name={`branches.${branchIndex}.complianceDetails.${row._index}.validTill`}
+              size="small"
+            />
+          ) : (
+            <Typography fontWeight={600}>
+              {formatDate(
+                watch(
+                  `branches.${branchIndex}.complianceDetails.${row._index}.validTill`,
+                ),
+              )}
+            </Typography>
+          )}
+        </Box>
+      ),
     },
-  {
-  id: "actions",
-  label: "Actions",
-  sortable: false,
+    {
+      id: "actions",
+      label: "Actions",
+      sortable: false,
 
-  // BODY CELL
-  sx: {
-    position: "sticky",
-    right: 0,
-    backgroundColor: "white",
-    zIndex: 3,
-    minWidth: 300,
-    width: 300,
-    textAlign: "center",
-    whiteSpace: "nowrap",
-  },
+      // BODY CELL
+      sx: {
+        position: "sticky",
+        right: 0,
+        backgroundColor: "white",
+        zIndex: 3,
+        minWidth: 300,
+        width: 300,
+        textAlign: "center",
+        whiteSpace: "nowrap",
+      },
 
-  // HEADER CELL 
-  headCellSx: {
-    position: "sticky",
-    right: 0,
-    backgroundColor: "white",
-    zIndex: 4,
-    minWidth: 300,
-    width: 10,
-    textAlign: "center",
-    whiteSpace: "nowrap",
-  },
+      // HEADER CELL 
+      headCellSx: {
+        position: "sticky",
+        right: 0,
+        backgroundColor: "white",
+        zIndex: 4,
+        minWidth: 300,
+        width: 10,
+        textAlign: "center",
+        whiteSpace: "nowrap",
+      },
 
-  render: (row: ComplianceRow) => {
-    const rowErrors =
-      errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+      render: (row: ComplianceRow) => {
 
-    const messages: string[] = rowErrors
-      ? Object.values(rowErrors)
-          .filter(
-            (e): e is FieldError => typeof e === "object" && "message" in e
-          )
-          .map((e) => e.message)
-          .filter((msg): msg is string => !!msg)
-      : [];
+        return (
+          <Box
+            display="flex"
+            gap={1}
+            justifyContent="center"
+            alignItems="center"
 
-    return (
-      <Box
-        display="flex"
-        gap={1}
-        justifyContent="center"
-        alignItems="center"
-       
-      >
+          >
 
-        {/* EDIT / SAVE */}
-        {complianceEditable[row._index] ? (
-          <Tooltip title="Save">
+            {/* EDIT / SAVE */}
+            {complianceEditable[row._index] ? (
+              <Tooltip title="Save">
+                <IconButton
+                  color="success"
+                  onClick={() => saveLicense(row._index)}
+                >
+                  <CheckIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Edit">
+                <IconButton
+                  color="primary"
+                  onClick={() => editLicense(row._index)}
+                >
+                  <EditNoteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* DELETE */}
             <IconButton
-              color="success"
-              onClick={() => saveLicense(row._index)}
+              color="error"
+              disabled={complianceArray.fields.length === 1}
+              onClick={() => removeLicense(row._index)}
             >
-              <CheckIcon />
+              <DeleteIcon />
             </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Edit">
-            <IconButton
-              color="primary"
-              onClick={() => editLicense(row._index)}
-            >
-              <EditNoteIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-
-        {/* DELETE */}
-        <IconButton
-          color="error"
-          disabled={complianceArray.fields.length === 1}
-          onClick={() => removeLicense(row._index)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </Box>
-    );
-  },
-}
-,
+          </Box>
+        );
+      },
+    }
+    ,
   ];
 
   return (
@@ -336,41 +337,41 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           </Box>
 
           {isLastBranch && (
-  <Box
-    sx={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 0.5,
-      px: 2,
-      py: 0.5,
-      border: "1px solid",
-      borderColor: "primary.main",
-      borderRadius: 1,
-      color: "primary.main",
-      fontSize: 14,
-      fontWeight: 500,
-      bgcolor: "transparent",
-      cursor:
-        branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
-      opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
-      userSelect: "none",
-      transition: "all 0.2s",
-      "&:hover": {
-        bgcolor:
-          branchArray.fields.length < 3
-            ? "action.hover"
-            : "transparent",
-      },
-    }}
-    onClick={(e) => {
-      e.stopPropagation();
-      if (branchArray.fields.length < 3) addBranch();
-    }}
-  >
-    <AddIcon />
-    BRANCH
-  </Box>
-)}
+            <Box
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                px: 2,
+                py: 0.5,
+                border: "1px solid",
+                borderColor: "primary.main",
+                borderRadius: 1,
+                color: "primary.main",
+                fontSize: 14,
+                fontWeight: 500,
+                bgcolor: "transparent",
+                cursor:
+                  branchArray.fields.length >= 3 ? "not-allowed" : "pointer",
+                opacity: branchArray.fields.length >= 3 ? 0.5 : 1,
+                userSelect: "none",
+                transition: "all 0.2s",
+                "&:hover": {
+                  bgcolor:
+                    branchArray.fields.length < 3
+                      ? "action.hover"
+                      : "transparent",
+                },
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (branchArray.fields.length < 3) addBranch();
+              }}
+            >
+              <AddIcon />
+              BRANCH
+            </Box>
+          )}
 
         </Box>
       }
@@ -431,7 +432,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           >
             <Box sx={{ minWidth: 800 }}>
               <MyTable
-                variant="editable"
                 columns={complianceColumns}
                 rows={complianceRows}
                 pagination={false}

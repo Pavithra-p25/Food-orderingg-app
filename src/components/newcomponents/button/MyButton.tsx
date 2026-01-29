@@ -33,7 +33,7 @@ const MyButton: React.FC<MyButtonProps> = ({
   style,
   ...props
 }) => {
-  // Determine color
+  //  color
   let buttonColor: "primary" | "secondary" | "success" | "error" = "primary";
 
   if (variant === "secondary" || variant === "outline-secondary") {
@@ -41,10 +41,10 @@ const MyButton: React.FC<MyButtonProps> = ({
   } else if (variant === "success") {
     buttonColor = "success";
   } else if (variant === "cancel" || variant === "outlined-cancel") {
-    buttonColor = "error"; // <-- RED
+    buttonColor = "error"; // RED
   }
 
-  // Determine variant
+  // variant
   const buttonVariant =
     variant === "outlined" ||
     variant === "outline-secondary" ||
@@ -56,7 +56,7 @@ const MyButton: React.FC<MyButtonProps> = ({
     <Button
       type={type}
       variant={buttonVariant}
-      color={buttonColor} // <-- THIS WAS MISSING
+      color={buttonColor}
       style={{ height, ...style }}
       sx={sx}
       {...props}

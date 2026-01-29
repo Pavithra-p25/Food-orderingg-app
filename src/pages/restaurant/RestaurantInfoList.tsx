@@ -56,8 +56,9 @@ const RestaurantInfoList = () => {
       id: "actions",
       label: "Actions",
       sortable: false,
+      align: "center" as const,
       render: (row: any) => (
-        <Box display="flex" gap={1} justifyContent="center" width="20px">
+        <Box display="flex" gap={1} justifyContent="center" width="30px">
           {/* Edit Button */}
           <Tooltip title="Edit">
             <IconButton
@@ -109,7 +110,7 @@ const RestaurantInfoList = () => {
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Paper elevation={6} sx={{ p: 4, borderRadius: 4 }}>
         <Typography variant="h6" fontWeight="bold" mb={3} textAlign="center">
-          Submitted Restaurant Details
+        Restaurant Information List
         </Typography>
 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
@@ -176,7 +177,7 @@ const RestaurantInfoList = () => {
       </Paper>
       <MyDialog
         open={!!previewRestaurant}
-        title={previewRestaurant?.restaurantName || "Preview"}
+        title={previewRestaurant?.restaurantName?.toUpperCase() || "Preview"}
         onClose={() => setPreviewRestaurant(null)}
         maxWidth="md"
       >
@@ -192,7 +193,7 @@ const RestaurantInfoList = () => {
               }}
             >
               <Typography variant="subtitle1" color="text.primary" align="left">
-                Owner: {previewRestaurant.ownerName}
+               Owner: {previewRestaurant.ownerName.toUpperCase()}
               </Typography>
             </Box>
 
@@ -213,7 +214,7 @@ const RestaurantInfoList = () => {
                   }}
                 >
                   <Typography fontWeight="bold">
-                    {branch.branchName} ({branch.branchCode})
+                    {branch.branchName.toUpperCase()} ({branch.branchCode})
                   </Typography>
 
                   {/* Compliance Details */}
@@ -233,10 +234,10 @@ const RestaurantInfoList = () => {
                               color: isExpired ? "error.main" : "text.primary",
                             }}
                           >
-                            • {c.licenseType.toUpperCase()} – {c.licenseNumber}{" "}
+                             {c.licenseType.toUpperCase()} – {c.licenseNumber}{" "}
                             <br />
                             <small>
-                              {new Date(c.validFrom).toLocaleDateString()} →{" "}
+                               {new Date(c.validFrom).toLocaleDateString()} →{" "}
                               {new Date(c.validTill).toLocaleDateString()}
                               {isExpired ? " (Expired)" : ""}
                             </small>
