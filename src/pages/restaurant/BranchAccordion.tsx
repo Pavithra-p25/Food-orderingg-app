@@ -169,45 +169,112 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       label: "Actions",
       sortable: false,
       sx: {
-        position: "sticky",
-        right: 0,
-        backgroundColor: "white",
-        zIndex: 2,
-        minWidth: 120,
-      },
-      render: (row: ComplianceRow) => {
-        return (
-          <Box display="flex" gap={1} justifyContent="center">
-            {complianceEditable[row._index] ? (
-              <Tooltip title="Save">
-                <IconButton
-                  color="success"
-                  onClick={() => saveLicense(row._index)}
-                >
-                  <CheckIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Edit">
-                <IconButton
-                  color="primary"
-                  onClick={() => editLicense(row._index)}
-                >
-                  <EditNoteIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+    position: "sticky",
+    right: 0,
+    backgroundColor: "white",
+    zIndex: 3,          
+    minWidth: 300,     
+    width: 300,        
+    textAlign: "center",
+    whiteSpace: "nowrap" 
+  },
+ headCellSx: {
+  minWidth: 180,
+  width: 180,
+  textAlign: "center",
+  whiteSpace: "nowrap",
+},
 
-            <IconButton
-              color="error"
-              disabled={complianceArray.fields.length === 1}
-              onClick={() => removeLicense(row._index)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Box>
-        );
-      },
+    render: (row: ComplianceRow) => {
+  const rowErrors =
+    errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+
+  const messages: string[] = rowErrors
+    ? Object.values(rowErrors)
+        .filter(
+          (e): e is FieldError => typeof e === "object" && "message" in e
+        )
+        .map((e) => e.message)
+        .filter((msg): msg is string => !!msg)
+    : [];
+
+  const hasError = messages.length > 0;
+
+  return (
+  <Box
+  display="flex"
+  gap={1}
+  justifyContent="center"
+  alignItems="center"
+  width={120}        
+>
+      <Tooltip
+        title={
+          hasError ? (
+            <Box>
+              {messages.map((msg, i) => (
+                <Typography
+                  key={i}
+                  sx={{ color: "white", fontSize: 12 }}
+                >
+                  • {msg}
+                </Typography>
+              ))}
+            </Box>
+          ) : (
+            ""
+          )
+        }
+        arrow
+        disableHoverListener={!hasError}
+      >
+        <span>
+          <IconButton
+            size="small"
+            disabled={!hasError}
+            sx={{
+              color: hasError ? "error.main" : "grey.400",
+              cursor: hasError ? "pointer" : "not-allowed",
+            }}
+          >
+            <ErrorOutlineIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      {/* EDIT / SAVE */}
+      {complianceEditable[row._index] ? (
+        <Tooltip title="Save">
+          <IconButton
+            color="success"
+            onClick={() => saveLicense(row._index)}
+          >
+            <CheckIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Edit">
+          <IconButton
+            color="primary"
+            onClick={() => editLicense(row._index)}
+          >
+            <EditNoteIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {/* DELETE */}
+      <IconButton
+        color="error"
+        disabled={complianceArray.fields.length === 1}
+        onClick={() => removeLicense(row._index)}
+      >
+        <DeleteIcon />
+      </IconButton>
+    </Box>
+  );
+},
+
     },
   ];
 
@@ -339,60 +406,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
             </Box>
           </Box>
         </Box>
-
-      {complianceRows.map((row) => {
-  const rowErrors =
-    errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
-
-  if (!rowErrors) return null;
-
- const messages: string[] = Object.values(rowErrors)
-  .filter(
-    (e): e is FieldError => typeof e === "object" && "message" in e
-  )
-  .map((e) => e.message)
-  .filter((msg): msg is string => !!msg); // ←type guard ensures string[]
-
-
-  if (messages.length === 0) return null;
-
-  return (
-    <Box
-      key={`error-tooltip-${row._index}`}
-      sx={{ display: "inline-block", ml: 1 }}
-    >
-      <Tooltip
-        title={
-          <Box>
-            {messages.map((msg, i) => (
-              <Typography
-                key={i}
-                sx={{ color: "white", fontSize: 12 }}
-              >
-                • {msg}
-              </Typography>
-            ))}
-          </Box>
-        }
-        arrow
-        placement="top"
-      >
-        <Typography
-          sx={{
-            display: "inline-flex",
-            cursor: "pointer",
-            color: "red",
-            fontSize: 16,
-            fontWeight: 700,
-          }}
-        >
-          <ErrorOutlineIcon sx={{ mt: 0.5 , ml:1}} />
-        </Typography>
-      </Tooltip>
-    </Box>
-  );
-})}
-
 
         {branchArray.fields.length > 1 && (
           <Box mt={2}>

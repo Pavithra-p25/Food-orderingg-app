@@ -745,7 +745,7 @@
       "id": "f693",
       "branches": [
         {
-          "branchName": "main branch",
+          "branchName": "main branch1",
           "branchCode": "MB123",
           "complianceDetails": [
             {
@@ -771,13 +771,13 @@
       ],
       "menuItems": [
         {
-          "file": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0cFleHkr83XTp-0AALLRqiAOs7nZxme-OVQ&s",
+          "file": null,
           "price": 50,
           "category": "Fast Food",
           "itemName": "Burger"
         },
         {
-          "file": "https://images.unsplash.com/photo-1520201163981-8cc95007dd2a?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGl6emElMjBzbGljZXxlbnwwfHwwfHx8MA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000",
+          "file": null,
           "price": 100,
           "category": "Fast Food",
           "itemName": "Pizza"
@@ -1094,39 +1094,6 @@
       ],
       "ownerName": "Divya",
       "restaurantName": "Green Bowl"
-    },
-    {
-      "id": "c826",
-      "branches": [
-        {
-          "branchName": "central hub",
-          "branchCode": "CH010",
-          "complianceDetails": [
-            {
-              "licenseType": "FSSAI",
-              "licenseNumber": "FSS010",
-              "validFrom": "2026-10-01T18:30:00.000Z",
-              "validTill": "2027-10-01T18:30:00.000Z"
-            }
-          ]
-        }
-      ],
-      "menuItems": [
-        {
-          "file": null,
-          "price": 190,
-          "category": "Seafood",
-          "itemName": "Fish Fry"
-        },
-        {
-          "file": null,
-          "price": 230,
-          "category": "Seafood",
-          "itemName": "Prawn Curry"
-        }
-      ],
-      "ownerName": "Arun",
-      "restaurantName": "Ocean Taste"
     },
     {
       "id": "60d2",

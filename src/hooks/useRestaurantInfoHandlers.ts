@@ -12,6 +12,7 @@ type SnackbarState = {
 
 export const useRestaurantInfoHandlers = (
   reset: UseFormReset<RestaurantInfoValues>
+  
 ) => {
   const { addRestaurantInfo, fetchRestaurantInfo } = useRestaurantInfo();
 
