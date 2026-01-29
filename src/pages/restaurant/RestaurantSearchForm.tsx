@@ -11,7 +11,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import { FormProvider } from "react-hook-form";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
-import { RESTAURANT_TYPES ,RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
+import { RESTAURANT_TYPES ,RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
 
 type Props = {
   methods: any;

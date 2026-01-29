@@ -9,7 +9,7 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 import {
   RESTAURANT_TYPES,
   DELIVERY_TIME_OPTIONS,
-} from "../../config/constants/RestaurantConst";
+} from "../../config/constants/RestaurantConstant";
 import MyRadioButton from "../../components/newcomponents/radiobutton/MyRadioButton";
 import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 
@@ -29,7 +29,6 @@ const RestaurantTab: React.FC = () => {
           label="Restaurant Name"
           placeholder="Enter restaurant name"
           name="restaurantName"
-          control={control}
           errorMessage={errors.restaurantName?.message}
           required
         />
@@ -41,8 +40,7 @@ const RestaurantTab: React.FC = () => {
           name="category"
           label="Category"
           options={["Indian", "Chinese", "Fast Food", "Italian", "Mexican"]}
-          control={control}
-          errors={errors}
+
           required
         />
       </Grid>
@@ -53,8 +51,6 @@ const RestaurantTab: React.FC = () => {
           name="averageDeliveryTime"
           label="Average Delivery Time"
           options={[...DELIVERY_TIME_OPTIONS]}
-          control={control}
-          errors={errors}
         />
       </Grid>
 
@@ -83,7 +79,6 @@ const RestaurantTab: React.FC = () => {
           type="url"
           placeholder="Enter your website link"
           name="website"
-          control={control}
           errorMessage={errors.website?.message}
         />
       </Grid>

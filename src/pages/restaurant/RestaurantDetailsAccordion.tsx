@@ -20,7 +20,7 @@ import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
-import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConst";
+import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
 import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantHandlers";
 
 type RestaurantDetailsAccordionProps = {
