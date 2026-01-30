@@ -13,11 +13,11 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CloseIcon from "@mui/icons-material/Close";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/LoginSchema";
 import useUser from "../../hooks/useUser";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 interface LoginFormProps {
   show: boolean;
@@ -44,12 +44,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const [error, setError] = useState("");
 
   const { fetchUsers } = useUser();
-
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({ open: false, message: "", severity: "success" });
+const { showSnackbar } = useSnackbar();
 
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm")); // Mobile
@@ -69,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
       if (foundUser) {
         localStorage.setItem("user", JSON.stringify(foundUser));
         onLoginSuccess(foundUser);
-        setSnackbar({ open: true, message: "Login successful!", severity: "success" });
+        showSnackbar("Login successful!", "success");
         onClose();
         methods.reset();
       } else {
@@ -78,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Try again!");
-      setSnackbar({ open: true, message: "Something went wrong. Try again!", severity: "error" });
+      showSnackbar("Something went wrong. Try again!", "error");
     }
   };
 
@@ -205,12 +200,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
         </Box>
       </Modal>
 
-      <MySnackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      />
     </>
   );
 };

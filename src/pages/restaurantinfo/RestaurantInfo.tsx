@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import Typography from "@mui/material/Typography";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
+import { useSnackbar } from "../../context/SnackbarContext";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
@@ -24,6 +24,8 @@ type RestaurantInfoProps = {
   ) => Promise<void>;
   onUpdateSuccess?: () => void;
 };
+
+const { showSnackbar } = useSnackbar(); 
 
 const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
   restaurantData,
@@ -80,8 +82,6 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     setExpandedBranches,
     expandAll,
     setExpandAll,
-    snackbar,
-    setSnackbar,
     handleBranchAdded,
     handleReset,
     handleSubmitForm,
@@ -114,11 +114,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
       await editRestaurantInfo(id, data);
 
       // SHOW SUCCESS SNACKBAR
-      setSnackbar({
-        open: true,
-        message: "Restaurant updated successfully",
-        severity: "success",
-      });
+    showSnackbar("Restaurant updated successfully", "success"); 
 
       // DELAY NAVIGATION
       setTimeout(() => {
@@ -129,11 +125,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
         }
       }, 1500);
     } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Update failed. Please try again",
-        severity: "error",
-      });
+      showSnackbar("Update failed. Please try again", "error");
     }
   };
 
@@ -245,15 +237,6 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
             </form>
           </Paper>
 
-          {/* SNACKBAR */}
-          <MySnackbar
-            open={snackbar.open}
-            message={snackbar.message}
-            severity={snackbar.severity}
-            autoHideDuration={2000}
-            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-            position={{ vertical: "top", horizontal: "center" }}
-          />
         </Container>
       </LocalizationProvider>
     </FormProvider>

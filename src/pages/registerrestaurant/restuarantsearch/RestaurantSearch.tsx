@@ -6,7 +6,6 @@ import useRestaurants from "../../../hooks/restaurant/useRestaurant";
 import type { Restaurant } from "../../../types/RestaurantTypes";
 import RestaurantForm from "../RestaurantForm";
 import { restaurantDefaultValues } from "../../restaurant/data/restaurantDefaultValues";
-import MySnackbar from "../../../components/newcomponents/snackbar/MySnackbar";
 import MyDialog from "../../../components/newcomponents/dialog/MyDialog";
 import MyTab from "../../../components/newcomponents/tabs/MyTab";
 import RestaurantSearchForm from "../../restuarantsearch/RestaurantSearchForm";
@@ -42,9 +41,8 @@ const RestaurantSearch: React.FC = () => {
 
   // ACTIONS HOOK
   const {
-    snackbarOpen,
-    snackbarMessage,
-    snackbarSeverity,
+
+
     showConfirm,
     pendingAction,
     pendingIds,
@@ -52,7 +50,6 @@ const RestaurantSearch: React.FC = () => {
     handleRestoreClick,
     handleConfirmYes,
     handleConfirmNo,
-    setSnackbarOpen,
   } = useRestaurantTableActions(
     softDeleteRestaurant,
     activateRestaurant,
@@ -334,15 +331,6 @@ const RestaurantSearch: React.FC = () => {
           </Stack>
         </DialogContent>
       </MyDialog>
-
-      {/* SNACKBAR */}
-      <MySnackbar
-        open={snackbarOpen}
-        message={snackbarMessage}
-        severity={snackbarSeverity}
-        onClose={() => setSnackbarOpen(false)}
-        position={{ vertical: "top", horizontal: "center" }}
-      />
     </Container>
   );
 };

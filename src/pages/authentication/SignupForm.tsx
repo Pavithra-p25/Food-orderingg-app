@@ -7,6 +7,7 @@ import { useForm, Controller, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../schemas/SignupSchema";
 import useUser from "../../hooks/useUser";
+import { useSnackbar } from "../../context/SnackbarContext";
 
 interface SignupFormProps {
   show: boolean;
@@ -27,6 +28,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   onLoginClick,
 }) => {
   const { fetchUsers, addUser } = useUser();
+  const { showSnackbar } = useSnackbar();
   const [visibility, setVisibility] = useState({
     showPassword: false,
     showConfirmPassword: false,
@@ -64,12 +66,12 @@ const SignupForm: React.FC<SignupFormProps> = ({
         password: data.password.trim(),
       });
 
-      alert("Signup successful!");
+      showSnackbar("Signup successful!", "success");
       methods.reset();
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Try again!");
+      showSnackbar("Something went wrong. Try again!", "error");
     }
   };
 
@@ -92,7 +94,11 @@ const SignupForm: React.FC<SignupFormProps> = ({
       )}
 
       <FormProvider {...methods}>
-        <Box component="form" onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+        <Box
+          component="form"
+          onSubmit={methods.handleSubmit(onSubmit)}
+          noValidate
+        >
           {/* Full Name (no Controller) */}
           <Box mb={2}>
             <MyInput
@@ -174,7 +180,9 @@ const SignupForm: React.FC<SignupFormProps> = ({
           />
 
           <Box display="flex" justifyContent="center">
-            <MyButton type="submit" variant="cancel">Sign Up</MyButton>
+            <MyButton type="submit" variant="cancel">
+              Sign Up
+            </MyButton>
           </Box>
         </Box>
       </FormProvider>

@@ -10,7 +10,7 @@ import RestaurantTab from "./RestaurantTab";
 import ContactTab from "./ContactTab";
 import LocationTab from "./LocationTab";
 import MyTabs from "../../components/newcomponents/tabs/MyTab";
-import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
+import { useSnackbar } from "../../context/SnackbarContext";
 import { restaurantDefaultValues } from "../restaurant/data/restaurantDefaultValues";
 import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
@@ -44,11 +44,7 @@ const RestaurantForm: React.FC<Props> = ({
     return isAllTabsValid && isLastTab ? "Register" : "Save"; // new mode
   };
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success" as "success" | "error" | "warning" | "info",
-  });
+  const { showSnackbar } = useSnackbar(); //  global showSnackbar
 
   //json data storing
   const { addRestaurant, updateRestaurant } = useRestaurants();
@@ -84,7 +80,7 @@ const RestaurantForm: React.FC<Props> = ({
     restaurant: ["restaurantName", "restaurantType", "category"],
     contact: ["ownerName", "supportEmail", "phone"],
     location: ["address", "city", "state", "country", "pincode", "acceptTerms"],
-    "Group by":[],
+    "Group by": [],
   };
 
   //tab navigation order
@@ -111,11 +107,7 @@ const RestaurantForm: React.FC<Props> = ({
         // EDIT mode - update restaurant
         savedRestaurant = await updateRestaurant(restaurant.id, finalData);
 
-        setSnackbar({
-          open: true,
-          message: `"${data.restaurantName}" updated successfully`,
-          severity: "success",
-        });
+       showSnackbar(`"${data.restaurantName}" updated successfully`, "success");
       } else {
         // NEW registration - send only allowed fields
         const { id, isActive, createdAt, updatedAt, ...rest } = data;
@@ -126,11 +118,7 @@ const RestaurantForm: React.FC<Props> = ({
           status: "active",
         });
 
-        setSnackbar({
-          open: true,
-          message: "Restaurant registered successfully",
-          severity: "success",
-        });
+       showSnackbar("Restaurant registered successfully", "success");
       }
 
       if (onSave) onSave(savedRestaurant);
@@ -139,11 +127,7 @@ const RestaurantForm: React.FC<Props> = ({
         onClose(methods.getValues());
       }, 1500);
     } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Failed to save restaurant",
-        severity: "error",
-      });
+     showSnackbar("Failed to save restaurant", "error");
     }
   };
 
@@ -161,7 +145,7 @@ const RestaurantForm: React.FC<Props> = ({
     onFinalSubmit: onSubmit,
     getIsAllTabsValid: () =>
       Object.values(TAB_FIELDS).every((fields) =>
-        fields.every((field) => isFieldFilled(watchedValues[field]))
+        fields.every((field) => isFieldFilled(watchedValues[field])),
       ),
     onConfirmRegister: () => handleConfirmOpen("register"),
   });
@@ -172,14 +156,14 @@ const RestaurantForm: React.FC<Props> = ({
       const hasError = fields.some((field) => errors[field]);
       if (hasError) return [tab, "error"];
       const allFilled = fields.every((field) =>
-        isFieldFilled(watchedValues[field])
+        isFieldFilled(watchedValues[field]),
       );
       return [tab, allFilled ? "success" : "neutral"];
-    })
+    }),
   ) as Record<RestaurantTabKey, "neutral" | "error" | "success">;
 
   const isAllTabsValid = Object.values(tabStatusMap).every(
-    (status) => status === "success"
+    (status) => status === "success",
   );
 
   const hasErrors = Object.keys(errors).length > 0;
@@ -205,31 +189,31 @@ const RestaurantForm: React.FC<Props> = ({
   };
 
   const handleSaveDraft = async () => {
-  if (!onSave) return;
+    if (!onSave) return;
 
-  if (!isDirty) return;
+    if (!isDirty) return;
 
-  const values = methods.getValues();
+    const values = methods.getValues();
 
-  const draftId = values.id || Date.now().toString();
+    const draftId = values.id || Date.now().toString();
 
-  const draft: Restaurant = {
-    ...values,
-    id: draftId,
-    status: "draft",
-    isActive: false,
-    createdAt: values.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    const draft: Restaurant = {
+      ...values,
+      id: draftId,
+      status: "draft",
+      isActive: false,
+      createdAt: values.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    methods.setValue("id", draftId);
+    await onSave(draft);
   };
 
-  methods.setValue("id", draftId);
-  await onSave(draft);
-};
-
-const handleDialogClose = () => {
-  const values = methods.getValues();
-  onClose(values); // close dialog, no draft save here
-};
+  const handleDialogClose = () => {
+    const values = methods.getValues();
+    onClose(values); // close dialog, no draft save here
+  };
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
@@ -305,7 +289,7 @@ const handleDialogClose = () => {
                 variant="outlined"
                 onClick={() =>
                   handleReset(setActiveTab, isDirty, hasErrors, () =>
-                    handleConfirmOpen("reset")
+                    handleConfirmOpen("reset"),
                   )
                 }
               >
@@ -350,13 +334,6 @@ const handleDialogClose = () => {
             </Stack>
           </DialogContent>
         </MyDialog>
-
-        <MySnackbar
-          open={snackbar.open}
-          message={snackbar.message}
-          severity={snackbar.severity}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-        />
       </LocalizationProvider>
     </FormProvider>
   );

@@ -6,7 +6,7 @@ import {
   IconButton,
   Typography,
   Box,
- Button,
+  Button,
   Drawer,
   List,
   ListItem,
@@ -29,11 +29,10 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { ThemeContext } from "../context/ThemeContext";
 import LoginForm from "../pages/authentication/LoginForm";
 import SignupForm from "../pages/authentication/SignupForm";
-import MyToast from "../components/toast/MyToast";
 import { ListItemButton } from "@mui/material";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useLocation } from "react-router-dom";
-
+import { useSnackbar } from "../context/SnackbarContext";
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -43,8 +42,6 @@ interface HeaderState {
   collapsed: boolean;
   foodMode: FoodMode;
   user: any | null;
-  toastMessage: string;
-  showToast: boolean;
 }
 
 const Header: React.FC = () => {
@@ -57,11 +54,10 @@ const Header: React.FC = () => {
     collapsed: true,
     foodMode: null,
     user: null,
-    toastMessage: "",
-    showToast: false,
   });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -113,57 +109,57 @@ const Header: React.FC = () => {
   );
 
   const menuItems = [
-  {
-    text: "Home",
-    icon: <HomeIcon />,
-    to: "/HomePage",
-    roles: ["user", "admin"],
-  },
-  {
-    text: "Restaurants",
-    icon: <StoreIcon />,
-    to: "/restaurants",
-    roles: ["user", "admin"],
-  },
-  {
-    text: "Cart",
-    icon: <ShoppingCartIcon />,
-    to: "/cart",
-    roles: ["user", "admin"],
-  },
-  {
-    text: "Favorites",
-    icon: <FavoriteIcon />,
-    to: "/favorites",
-    roles: ["user", "admin"],
-  },
+    {
+      text: "Home",
+      icon: <HomeIcon />,
+      to: "/HomePage",
+      roles: ["user", "admin"],
+    },
+    {
+      text: "Restaurants",
+      icon: <StoreIcon />,
+      to: "/restaurants",
+      roles: ["user", "admin"],
+    },
+    {
+      text: "Cart",
+      icon: <ShoppingCartIcon />,
+      to: "/cart",
+      roles: ["user", "admin"],
+    },
+    {
+      text: "Favorites",
+      icon: <FavoriteIcon />,
+      to: "/favorites",
+      roles: ["user", "admin"],
+    },
 
-  //  ADMIN ONLY
-  {
-    text: "Add Restaurant",
-    icon: <AddCircleIcon />,
-    to: "/add-restaurant",
-    roles: ["admin"],
-  },
-  {
-    text: "Search Restaurant",
-    icon: <SearchIcon />,
-    to: "/RestaurantSearch",
-    roles: ["admin"],
-  },
-  {
-    text: "Restaurant Info",
-    icon: <DescriptionIcon />,
-    to: "/RestaurantInfo",
-    roles: ["admin"],
-  },
-  {
-    text: "Restaurant Info List",
-    icon: <FormatListBulletedIcon />,
-    to: "/RestaurantInfoList",
-    roles: ["admin"],
-  },
-];
+    //  ADMIN ONLY
+    {
+      text: "Add Restaurant",
+      icon: <AddCircleIcon />,
+      to: "/add-restaurant",
+      roles: ["admin"],
+    },
+    {
+      text: "Search Restaurant",
+      icon: <SearchIcon />,
+      to: "/RestaurantSearch",
+      roles: ["admin"],
+    },
+    {
+      text: "Restaurant Info",
+      icon: <DescriptionIcon />,
+      to: "/RestaurantInfo",
+      roles: ["admin"],
+    },
+    {
+      text: "Restaurant Info List",
+      icon: <FormatListBulletedIcon />,
+      to: "/RestaurantInfoList",
+      roles: ["admin"],
+    },
+  ];
   const renderPersonSection = () => {
     if (state.user) {
       return (
@@ -184,33 +180,25 @@ const Header: React.FC = () => {
             onClose={() => setAnchorEl(null)}
           >
             <MenuItem onClick={() => alert("Go to profile page")}>
-              <PersonIcon fontSize="small"  />
+              <PersonIcon fontSize="small" />
               My Profile
             </MenuItem>
-           
+
             <MenuItem
               onClick={() => {
                 localStorage.removeItem("user");
-                setState((prev) => ({
-                  ...prev,
-                  user: null,
-                  showToast: true,
-                  toastMessage: "Logged out successfully",
-                }));
+                setState((prev) => ({ ...prev, user: null }));
+                showSnackbar("Logged out successfully", "success"); //  global snackbar
                 setAnchorEl(null);
               }}
             >
-              <LogoutIcon fontSize="small"  />
+              <LogoutIcon fontSize="small" />
               Logout
             </MenuItem>
           </Menu>
         </>
       );
     }
-
-
-    
-
     return (
       <Box
         display="flex"
@@ -259,80 +247,91 @@ const Header: React.FC = () => {
       </AppBar>
 
       {/* Sidebar */}
-    {/* Sidebar */}
-{state.user && (  // ✅ Only show if logged in (user or admin)
-  <Drawer
-    variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
-    open={!state.collapsed}
-    onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
-    sx={{
-      width: state.collapsed ? 72 : 260,
-      flexShrink: 0,
-      "& .MuiDrawer-paper": {
-        width: state.collapsed ? 72 : 260,
-        boxSizing: "border-box",
-        top: "64px", // height of AppBar
-        transition: "width 0.3s",
-        overflowX: "hidden",
-      },
-    }}
-  >
-    <Box sx={{ mt: "8px", ml: "8px", pt: 0 }}>
-      <List>
-        {menuItems
-          .filter((item) => state.user && item.roles.includes(state.user.role))
-          .map((item) => (
-            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                component={Link}
-                to={item.to}
-                onClick={() =>
-                  window.innerWidth < 1200 &&
-                  setState((prev) => ({ ...prev, collapsed: true }))
-                }
-                sx={{
-                  minHeight: 48,
-                  justifyContent: state.collapsed ? "center" : "flex-start",
-                  px: 2.5,
-                  backgroundColor:
-                    location.pathname === item.to
-                      ? "rgba(226, 55, 68, 0.12)"
-                      : "transparent",
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: state.collapsed ? "auto" : 2,
-                    justifyContent: "center",
-                    color: "#333333",
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                {!state.collapsed && (
-                  <ListItemText
-                    primary={item.text}
-                    sx={{
-                      color: location.pathname === item.to ? "#e23744" : "inherit",
-                      fontWeight: location.pathname === item.to ? 600 : 400,
-                    }}
-                  />
-                )}
-              </ListItemButton>
-            </ListItem>
-          ))}
-      </List>
+      {/* Sidebar */}
+      {state.user && ( // ✅ Only show if logged in (user or admin)
+        <Drawer
+          variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
+          open={!state.collapsed}
+          onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
+          sx={{
+            width: state.collapsed ? 72 : 260,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: state.collapsed ? 72 : 260,
+              boxSizing: "border-box",
+              top: "64px", // height of AppBar
+              transition: "width 0.3s",
+              overflowX: "hidden",
+            },
+          }}
+        >
+          <Box sx={{ mt: "8px", ml: "8px", pt: 0 }}>
+            <List>
+              {menuItems
+                .filter(
+                  (item) => state.user && item.roles.includes(state.user.role),
+                )
+                .map((item) => (
+                  <ListItem
+                    key={item.text}
+                    disablePadding
+                    sx={{ display: "block" }}
+                  >
+                    <ListItemButton
+                      component={Link}
+                      to={item.to}
+                      onClick={() =>
+                        window.innerWidth < 1200 &&
+                        setState((prev) => ({ ...prev, collapsed: true }))
+                      }
+                      sx={{
+                        minHeight: 48,
+                        justifyContent: state.collapsed
+                          ? "center"
+                          : "flex-start",
+                        px: 2.5,
+                        backgroundColor:
+                          location.pathname === item.to
+                            ? "rgba(226, 55, 68, 0.12)"
+                            : "transparent",
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: state.collapsed ? "auto" : 2,
+                          justifyContent: "center",
+                          color: "#333333",
+                        }}
+                      >
+                        {item.icon}
+                      </ListItemIcon>
+                      {!state.collapsed && (
+                        <ListItemText
+                          primary={item.text}
+                          sx={{
+                            color:
+                              location.pathname === item.to
+                                ? "#e23744"
+                                : "inherit",
+                            fontWeight:
+                              location.pathname === item.to ? 600 : 400,
+                          }}
+                        />
+                      )}
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+            </List>
 
-      {/* Mobile toggles */}
-      <Box p={2} display={{ lg: "none" }} gap={2}>
-        {FoodToggle}
-        {DarkToggle}
-      </Box>
-    </Box>
-  </Drawer>
-)}
-
+            {/* Mobile toggles */}
+            <Box p={2} display={{ lg: "none" }} gap={2}>
+              {FoodToggle}
+              {DarkToggle}
+            </Box>
+          </Box>
+        </Drawer>
+      )}
 
       {/* Login */}
       {state.showLoginForm && (
@@ -377,16 +376,6 @@ const Header: React.FC = () => {
         />
       )}
 
-      {/* Toast */}
-      {state.showToast && (
-        <MyToast
-          show={state.showToast}
-          message={state.toastMessage}
-          onClose={() => setState((prev) => ({ ...prev, showToast: false }))}
-          position="top-center"
-          type="success"
-        />
-      )}
     </>
   );
 };

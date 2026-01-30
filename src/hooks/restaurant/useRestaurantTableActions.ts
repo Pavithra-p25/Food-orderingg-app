@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Restaurant } from "../../types/RestaurantTypes";
-
+import { useSnackbar } from "../../context/SnackbarContext";
 type PendingAction = "delete" | "restore" | null;
 
 export const useRestaurantTableActions = (
@@ -10,11 +10,7 @@ export const useRestaurantTableActions = (
  saveDraft?: (restaurant: Restaurant) => Promise<void>
  // optional handler for draft
 ) => {
-  const [snackbarOpen, setSnackbarOpen] = useState(false); //snack bar is opened/not
-  const [snackbarMessage, setSnackbarMessage] = useState(""); //snackbar message 
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "info" | "warning"
-  >("info"); //snackbar color /type
+  const { showSnackbar } = useSnackbar(); 
 
   const [showConfirm, setShowConfirm] = useState(false); //confirm popup visibility
   const [pendingIds, setPendingIds] = useState<string[]>([]); //show selected restaurant ids
@@ -85,11 +81,12 @@ export const useRestaurantTableActions = (
       )
   );
 
-  setSnackbarMessage(
-    pendingIds.length === 1
-      ? "Restaurant deleted successfully"
-      : `${pendingIds.length} restaurants deleted successfully`
-  );
+ showSnackbar(
+          pendingIds.length === 1
+            ? "Restaurant deleted successfully"
+            : `${pendingIds.length} restaurants deleted successfully`,
+          "success"
+        );
 }
 
       if (pendingAction === "restore") {
@@ -111,26 +108,27 @@ export const useRestaurantTableActions = (
           )
         );
 
-        setSnackbarMessage(
+      showSnackbar(
           pendingIds.length === 1
             ? "Restaurant restored successfully"
-            : `${pendingIds.length} restaurants restored successfully`
+            : `${pendingIds.length} restaurants restored successfully`,
+          "success"
         );
       }
 
-      setSnackbarSeverity("success");
+     
     } catch {
-      setSnackbarMessage(
+      showSnackbar(
         pendingAction === "delete"
           ? "Failed to delete restaurant(s)"
-          : "Failed to restore restaurant(s)"
+          : "Failed to restore restaurant(s)",
+        "error"
       );
-      setSnackbarSeverity("error");
+    
     } finally {
       setShowConfirm(false);
       setPendingIds([]);
       setPendingAction(null);
-      setSnackbarOpen(true);
     }
   };
 
@@ -173,9 +171,6 @@ export const useRestaurantTableActions = (
 
   return {
     // state
-    snackbarOpen,
-    snackbarMessage,
-    snackbarSeverity,
     showConfirm,
     pendingAction,
     pendingIds,
@@ -187,7 +182,5 @@ export const useRestaurantTableActions = (
     handleConfirmNo,
     handleCloseDraft,
 
-    // snackbar
-    setSnackbarOpen,
   };
 };

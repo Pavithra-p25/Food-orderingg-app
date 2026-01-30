@@ -3,12 +3,7 @@ import type { UseFormReset } from "react-hook-form";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import { defaultRestaurantValues } from "../pages/restaurantinfo/data/RestaurantInfoDefault";
 import { useRestaurantInfo } from "./useRestaurantInfo";
-
-type SnackbarState = {
-  open: boolean;
-  message: string;
-  severity: "success" | "error";
-};
+import { useSnackbar } from "../context/SnackbarContext";
 
 export const useRestaurantInfoHandlers = (
   reset: UseFormReset<RestaurantInfoValues>
@@ -20,13 +15,7 @@ export const useRestaurantInfoHandlers = (
   const [expandedRestaurant, setExpandedRestaurant] = React.useState(false);
   const [expandedBranches, setExpandedBranches] = React.useState<number[]>([]);
   const [expandAll, setExpandAll] = React.useState(false);
-
-  // Snackbar state
-  const [snackbar, setSnackbar] = React.useState<SnackbarState>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const { showSnackbar } = useSnackbar(); 
 
   const handleBranchAdded = (newIndex: number) => {
     setExpandedBranches((prev) => [...prev, newIndex]);
@@ -50,11 +39,7 @@ export const useRestaurantInfoHandlers = (
   // Reset form
   const handleReset = () => {
     reset(defaultRestaurantValues);
-    setSnackbar({
-      open: true,
-      message: "Form reset successfully",
-      severity: "success",
-    });
+    showSnackbar("Form reset successfully", "success");
   };
 
   // Form submit
@@ -62,18 +47,10 @@ export const useRestaurantInfoHandlers = (
     try {
       await addRestaurantInfo(data);
       await fetchRestaurantInfo();
-      setSnackbar({
-        open: true,
-        message: "Form submitted successfully!",
-        severity: "success",
-      });
+      showSnackbar("Form submitted successfully!", "success"); 
       reset(defaultRestaurantValues);
     } catch {
-      setSnackbar({
-        open: true,
-        message: "Submission failed!",
-        severity: "error",
-      });
+      showSnackbar("Submission failed!", "error");
     }
   };
 
@@ -84,8 +61,6 @@ export const useRestaurantInfoHandlers = (
     setExpandedBranches,
     expandAll,
     setExpandAll,
-    snackbar,
-    setSnackbar,
     handleBranchAdded,
     handleReset,
     handleSubmitForm,
