@@ -1,0 +1,1 @@
+export const canAddItem = (count: number, max: number = 3) => count < max;

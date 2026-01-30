@@ -5,7 +5,8 @@ import type {
   UseFormTrigger,
 } from "react-hook-form";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
-import { MAX_MENU_ITEMS, canAddItem } from "../config/constants/RestaurantConstant";
+import { MAX_MENU_ITEMS } from "../config/constants/RestaurantConstant";
+import { canAddItem } from "../utils/canAddItem";
 import { useState } from "react";
 
 

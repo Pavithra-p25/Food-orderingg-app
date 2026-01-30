@@ -5,45 +5,44 @@
       "fullName": "pavithra",
       "emailOrUsername": "pavi",
       "password": "123456",
-        "role":"user"
+      "role": "user"
     },
     {
       "id": "59e6",
       "fullName": "hari",
       "emailOrUsername": "hari@gmail.com",
       "password": "14120H",
-        "role":"user"
+      "role": "user"
     },
     {
       "id": "dc20",
       "fullName": "Kavin",
       "emailOrUsername": "kavin@gmail.cmo",
       "password": "123456",
-        "role":"user"
+      "role": "user"
     },
     {
       "id": "32b8",
       "fullName": "Deva shree",
       "emailOrUsername": "shree@gmail.com",
       "password": "shree",
-        "role":"user"
+      "role": "user"
     },
     {
       "id": "0c63",
       "fullName": "balan",
       "emailOrUsername": "balan",
       "password": "123",
-        "role":"user"
+      "role": "user"
     },
     {
       "id": "b320",
       "fullName": "dvsv",
       "emailOrUsername": "vsva",
       "password": "bfbSS33",
-      "role":"user"
-
+      "role": "user"
     },
-     {
+    {
       "id": "a001",
       "fullName": "Admin",
       "emailOrUsername": "admin",
@@ -775,7 +774,7 @@
           "branchCode": "SB456",
           "complianceDetails": [
             {
-              "licenseType": "FSSAI",
+              "licenseType": "FSSA",
               "licenseNumber": "67890",
               "validFrom": "2026-02-01T18:30:00.000Z",
               "validTill": "2027-02-01T18:30:00.000Z"

@@ -22,17 +22,15 @@ interface ListingState {
   showForm: boolean;
 }
 
-
 const CATEGORY_OPTIONS = ["", ...RESTAURANT_CATEGORIES];
 
 const RestaurantList: React.FC = () => {
   const navigate = useNavigate();
 
   //  state object
- const [state, setState] = useState<ListingState>({
-  showForm: false,
-});
-
+  const [state, setState] = useState<ListingState>({
+    showForm: false,
+  });
 
   const { showForm } = state;
 

@@ -21,7 +21,7 @@ const MyDropdown = <T extends FieldValues>({
   options,
   required = false,
   size = "medium",
-  fullWidth = false,
+  fullWidth = true,
 }: MyDropdownProps<T>) => {
   const { control } = useFormContext<T>(); 
 

@@ -1,28 +1,54 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "./context/ThemeContext"; // custom theme context,dark-light mode
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
+import { SnackbarProvider } from "./context/SnackbarContext";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
-import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
-import CssBaseline from "@mui/material/CssBaseline";
 import FormTheme from "./config/theme/Theme";
-import { useNavigate } from "react-router-dom";
-import RestaurantForm from "./pages/registerrestaurant/RestaurantForm";
-import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
+import { useRestaurantInfo } from "./hooks/useRestaurantInfo";
+
+import HomePage from "./pages/HomePage";
+import RestaurantList from "./pages/restaurant/RestaurantList";
+import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
 import RestaurantSearch from "./pages/restuarantsearch/RestaurantSearch";
 import RestaurantInfo from "./pages/restaurantinfo/RestaurantInfo";
 import RestaurantInfoList from "./pages/restaurantinfo/RestaurantInfoList";
-import HomePage from "./pages/HomePage";
-import RestaurantList from "./pages/restaurant/RestaurantList";
+import RestaurantForm from "./pages/registerrestaurant/RestaurantForm";
 
 const AddRestaurantModal = () => {
   const navigate = useNavigate();
 
+  return <RestaurantForm show={true} onClose={() => navigate(-1)} />;
+};
+
+const AppRoutes = () => {
+  const { editRestaurantInfo } = useRestaurantInfo(); 
+
   return (
-    <RestaurantForm
-      show={true}
-      onClose={() => navigate(-1)} // close popup - go back
-    />
+    <Routes>
+      <Route path="/HomePage" element={<HomePage />} />
+      <Route path="/restaurants" element={<RestaurantList />} />
+      <Route path="/restaurants/:id" element={<RestaurantMenu />} />
+      <Route path="/RestaurantSearch" element={<RestaurantSearch />} />
+      <Route path="/add-restaurant" element={<AddRestaurantModal />} />
+
+      {/* Add Restaurant Info */}
+      <Route
+        path="/restaurantinfo"
+        element={<RestaurantInfo editRestaurantInfo={editRestaurantInfo} />}
+      />
+
+      {/* Edit Restaurant Info */}
+      <Route
+        path="/restaurantinfo/edit/:id"
+        element={<RestaurantInfo editRestaurantInfo={editRestaurantInfo} />}
+      />
+
+      <Route path="/RestaurantInfoList" element={<RestaurantInfoList />} />
+    </Routes>
   );
 };
 
@@ -30,55 +56,17 @@ const App: React.FC = () => {
   return (
     <Router>
       <MuiThemeProvider theme={FormTheme}>
-        <CssBaseline /> {/* to reset default browser css */}
+        <CssBaseline />
         <ThemeProvider>
-        
-            {/* FULL PAGE FLEXBOX */}
+          <SnackbarProvider>
             <div className="d-flex flex-column min-vh-100">
               <Header />
-
-              {/* MAIN CONTENT  */}
               <main className="flex-grow-1 pt-5">
-                <Routes>
-                  <Route path="/HomePage" element={<HomePage />} />
-                  <Route
-    path="/restaurants"
-    element={
-     
-        <RestaurantList />
-     
-    }
-  />
-                  <Route path="/restaurants/:id" element={<RestaurantMenu />} />{" "}
-                  {/* Dynamic route for restaurant details */}
-                  <Route
-                    path="/RestaurantSearch"
-                    element={<RestaurantSearch />}
-                  />
-                  <Route
-                    path="/add-restaurant"
-                    element={<AddRestaurantModal />}
-                  />
-                  <Route
-                    path="/restaurantinfo"
-                    element={
-                      <RestaurantInfo
-                        editRestaurantInfo={async (id, data) => {
-                          console.log("Editing restaurant:", id, data);
-                        }}
-                      />
-                    }
-                  />
-                  <Route
-                    path="/RestaurantInfoList"
-                    element={<RestaurantInfoList />}
-                  />
-                </Routes>
+                <AppRoutes />
               </main>
-
               <Footer />
             </div>
-        
+          </SnackbarProvider>
         </ThemeProvider>
       </MuiThemeProvider>
     </Router>

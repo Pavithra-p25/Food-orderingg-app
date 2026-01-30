@@ -6,7 +6,8 @@ import type {
   UseFormTrigger,
 } from "react-hook-form";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
-import { MAX_BRANCHES, MAX_COMPLIANCE , canAddItem} from "../config/constants/RestaurantConstant";
+import { MAX_BRANCHES, MAX_COMPLIANCE } from "../config/constants/RestaurantConstant";
+import { canAddItem } from "../utils/canAddItem";
 
 
 /*   BRANCH HANDLERS */
