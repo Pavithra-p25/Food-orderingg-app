@@ -11,7 +11,7 @@ import ContactTab from "./ContactTab";
 import LocationTab from "./LocationTab";
 import MyTabs from "../../components/newcomponents/tabs/MyTab";
 import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
-import { restaurantDefaultValues } from "./data/restaurantDefaultValues";
+import { restaurantDefaultValues } from "../restaurant/data/restaurantDefaultValues";
 import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";

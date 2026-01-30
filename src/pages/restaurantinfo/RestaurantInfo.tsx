@@ -10,7 +10,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
-import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
+import { defaultRestaurantValues } from "../restaurant/data/RestaurantInfoDefault";
 import RestaurantDetailsAccordion from "./RestaurantDetailsAccordion";
 import BranchAccordion from "./BranchAccordion";
 import { useRestaurantInfoHandlers } from "../../hooks/useRestaurantInfoHandlers";

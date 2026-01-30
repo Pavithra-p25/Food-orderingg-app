@@ -8,11 +8,11 @@ import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormTheme from "./config/theme/Theme";
 import { useNavigate } from "react-router-dom";
-import RestaurantForm from "./pages/restaurant/RestaurantForm";
+import RestaurantForm from "./pages/registerrestaurant/RestaurantForm";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
-import RestaurantSearch from "./pages/restaurant/RestaurantSearch";
-import RestaurantInfo from "./pages/restaurant/RestaurantInfo";
-import RestaurantInfoList from "./pages/restaurant/RestaurantInfoList";
+import RestaurantSearch from "./pages/restuarantsearch/RestaurantSearch";
+import RestaurantInfo from "./pages/restaurantinfo/RestaurantInfo";
+import RestaurantInfoList from "./pages/restaurantinfo/RestaurantInfoList";
 import HomePage from "./pages/HomePage";
 import RestaurantList from "./pages/restaurant/RestaurantList";
 

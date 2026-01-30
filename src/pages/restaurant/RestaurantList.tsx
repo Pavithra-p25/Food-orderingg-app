@@ -13,7 +13,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import { useNavigate } from "react-router-dom";
 import { useFilter } from "../../context/FilterContext";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import RestaurantForm from "./RestaurantForm";
+import RestaurantForm from "../registerrestaurant/RestaurantForm";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
