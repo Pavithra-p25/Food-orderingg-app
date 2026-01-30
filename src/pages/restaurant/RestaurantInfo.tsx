@@ -45,6 +45,8 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     handleSubmit,
   } = methods;
 
+  const isEditMode = Boolean(restaurantData);
+
   const branchArray = useFieldArray({
     control,
     name: "branches",
@@ -68,6 +70,8 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     }
   }, [restaurantData, reset]);
 
+  
+
   // Use centralized handlers
   const {
     expandedRestaurant,
@@ -82,6 +86,21 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     handleReset,
     handleSubmitForm,
   } = useRestaurantInfoHandlers(reset);
+
+  useEffect(() => {
+  if (restaurantData && branchArray.fields.length > 0) {
+    // open restaurant accordion
+    setExpandedRestaurant(true);
+
+    // open ALL branch accordions
+    setExpandedBranches(
+      branchArray.fields.map((_, index) => index)
+    );
+
+    // sync expand-all icon
+    setExpandAll(true);
+  }
+}, [restaurantData, branchArray.fields.length]);
 
   const handleUpdate = async (data: RestaurantInfoValues) => {
     const id = data.id || restaurantData?.id;
@@ -172,6 +191,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
               <RestaurantDetailsAccordion
                 expanded={expandedRestaurant}
                 onToggle={() => setExpandedRestaurant((prev) => !prev)}
+                 isEditMode={isEditMode}
               />
 
               {/* BRANCH DETAILS */}
@@ -192,6 +212,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
                     )
                   }
                   onBranchAdded={handleBranchAdded}
+                    isEditMode={isEditMode}
                 />
               ))}
 

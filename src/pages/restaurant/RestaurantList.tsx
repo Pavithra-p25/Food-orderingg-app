@@ -7,8 +7,6 @@ import {
   CardMedia,
   Typography,
   TextField,
-  Select,
-  MenuItem,
   Paper,
 } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
@@ -17,6 +15,9 @@ import { useFilter } from "../../context/FilterContext";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import RestaurantForm from "./RestaurantForm";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
+import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
+import MyInput from "../../components/newcomponents/textfields/MyInput";
+import { useForm, FormProvider } from "react-hook-form";
 
 /* STATE TYPE  */
 interface ListingState {
@@ -24,17 +25,10 @@ interface ListingState {
   showForm: boolean;
 }
 
-const RestaurantListing: React.FC = () => {
+const RestaurantList: React.FC = () => {
   const navigate = useNavigate();
 
-  const {
-    search,
-    setSearch,
-    category,
-    setCategory,
-    filterType,
-    setFilterType,
-  } = useFilter();
+  const { search, setSearch, category, setCategory, filterType } = useFilter();
 
   //  state object
   const [state, setState] = useState<ListingState>({
@@ -52,6 +46,10 @@ const RestaurantListing: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState<number>(9);
 
   const { getAllRestaurants } = useRestaurants();
+
+  const methods = useForm({
+    defaultValues: { category: "", rating: "" },
+  });
 
   //  FETCH RESTAURANTS
   useEffect(() => {
@@ -104,36 +102,35 @@ const RestaurantListing: React.FC = () => {
 
       <Grid container spacing={3}>
         {/* FILTERS */}
-        <Grid size={{ xs: 12, md: 3 }}>
-          <Paper sx={{ p: 2, backgroundColor: "whitesmoke" }}>
-            <Typography fontWeight="bold" mb={2}>
-              Filters
-            </Typography>
+        <FormProvider {...methods}>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <Paper sx={{ p: 2, backgroundColor: "whitesmoke" }}>
+              <Typography fontWeight="bold" mb={2}>
+                Filters
+              </Typography>
 
-            {/* Category Input */}
-            <TextField
-              label="Category"
-              fullWidth
-              size="small"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              sx={{ mb: 2 }}
-            />
+              {/* Category Input */}
+              <MyInput
+                name="category"
+                label="Category"
+                fullWidth
+                size="small"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                sx={{ mb: 2 }}
+              />
 
-            {/* Rating Dropdown */}
-            <Select
-              fullWidth
-              size="small"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              displayEmpty
-            >
-              <MenuItem value="">Rating</MenuItem>
-              <MenuItem value="4+">Rating 4+</MenuItem>
-              <MenuItem value="3+">Rating 3+</MenuItem>
-            </Select>
-          </Paper>
-        </Grid>
+              {/* Rating Dropdown */}
+              <MyDropdown
+                name="rating"
+                label="Rating"
+                fullWidth
+                size="small"
+                options={["", "4+", "3+"]}
+              />
+            </Paper>
+          </Grid>
+        </FormProvider>
 
         {/* SEARCH + CARDS */}
         <Grid size={{ xs: 12, md: 9 }}>
@@ -205,7 +202,7 @@ const RestaurantListing: React.FC = () => {
                 variant="cancel"
                 onClick={() =>
                   setVisibleCount(
-                    visibleCount === 9 ? filteredRestaurants.length : 9,
+                    visibleCount === 9 ? filteredRestaurants.length : 9
                   )
                 }
               >
@@ -251,4 +248,4 @@ const RestaurantListing: React.FC = () => {
   );
 };
 
-export default RestaurantListing;
+export default RestaurantList;

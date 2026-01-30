@@ -54,6 +54,7 @@ export const useComplianceAccordionHandlers = (
   control: Control<RestaurantInfoValues>,
   branchIndex: number,
   trigger: UseFormTrigger<RestaurantInfoValues>,
+   isEditMode: boolean,
 ) => {
   const complianceArray = useFieldArray({
     control,
@@ -61,8 +62,15 @@ export const useComplianceAccordionHandlers = (
   });
 
   const [complianceEditable, setComplianceEditable] = React.useState<boolean[]>(
-    complianceArray.fields.map(() => true),
+  complianceArray.fields.map(() => !isEditMode),
+);
+
+React.useEffect(() => {
+  setComplianceEditable(
+    complianceArray.fields.map(() => !isEditMode),
   );
+}, [complianceArray.fields.length, isEditMode]);
+
 
   const addLicense = async () => {
       if (!canAddItem(complianceArray.fields.length, MAX_COMPLIANCE)) return;

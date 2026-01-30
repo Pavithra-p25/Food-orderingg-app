@@ -12,6 +12,7 @@ type MyDropdownProps<T extends FieldValues> = {
   options: string[];
   required?: boolean;
   size?: "small" | "medium";
+   fullWidth?: boolean; 
 };
 
 const MyDropdown = <T extends FieldValues>({
@@ -20,6 +21,7 @@ const MyDropdown = <T extends FieldValues>({
   options,
   required = false,
   size = "medium",
+  fullWidth = false,
 }: MyDropdownProps<T>) => {
   const { control } = useFormContext<T>(); 
 
@@ -31,7 +33,7 @@ const MyDropdown = <T extends FieldValues>({
         <TextField
           {...field}
           select
-          fullWidth
+           fullWidth={fullWidth} 
           label={label}
           required={required}
           size={size}

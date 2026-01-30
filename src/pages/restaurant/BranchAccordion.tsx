@@ -36,6 +36,7 @@ type BranchAccordionProps = {
   expanded: boolean;
   onToggle: () => void;
   onBranchAdded: (index: number) => void;
+  isEditMode: boolean;
 };
 
 type ComplianceRow = {
@@ -52,6 +53,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
   expanded,
   onToggle,
   onBranchAdded,
+   isEditMode,
 }) => {
   const { watch } = useFormContext<RestaurantInfoValues>();
 
@@ -69,7 +71,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
     saveLicense,
     editLicense,
     removeLicense,
-  } = useComplianceAccordionHandlers(control, branchIndex, trigger);
+  } = useComplianceAccordionHandlers(control, branchIndex, trigger,isEditMode,);
 
   /* TABLE DATA */
   const complianceRows: ComplianceRow[] = complianceArray.fields.map(
@@ -81,48 +83,43 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
 
   const isLastBranch = branchIndex === branchArray.fields.length - 1;
 
-  const hasErrorColumn = complianceRows.some((row) => {
-    const rowErrors = errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
-    return rowErrors && Object.keys(rowErrors).length > 0;
-  });
-
-
   const complianceColumns = [
-    ...(hasErrorColumn
-      ? [{
-        id: "error",
-        label: "",
-        sortable: false,
-        sx: {
-          width: "1%",
-          maxWidth: 20,
-          padding: 0,
-          textAlign: "center",
-          whiteSpace: "nowrap",
-        },
-        headCellSx: {
-          width: "1%",
-          maxWidth: 20,
-          padding: 0,
-          textAlign: "center",
-        },
-        render: (row: ComplianceRow) => {
-          const rowErrors = errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
+    {
+      id: "error",
+      label: "",
+      sortable: false,
+      sx: {
+        width: "1%",
+        maxWidth: 20,
+        padding: 0,
+        textAlign: "center",
+        whiteSpace: "nowrap",
+      },
+      headCellSx: {
+        width: "1%",
+        maxWidth: 20,
+        padding: 0,
+        textAlign: "center",
+      },
+      render: (row: ComplianceRow) => {
+        const rowErrors =
+          errors.branches?.[branchIndex]?.complianceDetails?.[row._index];
 
-          if (!rowErrors) return null;
+        const messages: string[] = rowErrors
+          ? Object.values(rowErrors)
+              .filter(
+                (e): e is FieldError => typeof e === "object" && "message" in e,
+              )
+              .map((e) => e.message)
+              .filter((msg): msg is string => Boolean(msg))
+          : [];
 
-          const messages: string[] = Object.values(rowErrors)
-            .filter(
-              (e): e is FieldError => typeof e === "object" && "message" in e
-            )
-            .map((e) => e.message)
-            .filter((msg): msg is string => !!msg);
+        const hasError = messages.length > 0;
 
-          if (messages.length === 0) return null;
-
-          return (
-            <Tooltip
-              title={
+        return (
+          <Tooltip
+            title={
+              hasError ? (
                 <Box>
                   {messages.map((msg, i) => (
                     <Typography key={i} sx={{ color: "white", fontSize: 12 }}>
@@ -130,20 +127,34 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
                     </Typography>
                   ))}
                 </Box>
-              }
-              arrow
-            >
+              ) : (
+                ""
+              )
+            }
+            arrow
+            disableHoverListener={!hasError}
+          >
+            {/* span is REQUIRED for disabled tooltip */}
+            <span>
               <IconButton
                 size="small"
-                sx={{ p: 0, minWidth: 0, width: 24, height: 24, color: "error.main" }}
+                disabled={!hasError}
+                sx={{
+                  p: 0,
+                  minWidth: 0,
+                  width: 24,
+                  height: 24,
+                  color: hasError ? "error.main" : "action.disabled",
+                }}
               >
                 <ErrorOutlineIcon fontSize="small" />
               </IconButton>
-            </Tooltip>
-          );
-        },
-      }]
-      : []),
+            </span>
+          </Tooltip>
+        );
+      },
+    },
+
     {
       id: "licenseType",
       label: "License Type",
@@ -255,7 +266,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
         whiteSpace: "nowrap",
       },
 
-      // HEADER CELL 
+      // HEADER CELL
       headCellSx: {
         position: "sticky",
         right: 0,
@@ -268,16 +279,13 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
       },
 
       render: (row: ComplianceRow) => {
-
         return (
           <Box
             display="flex"
             gap={1}
             justifyContent="center"
             alignItems="center"
-
           >
-
             {/* EDIT / SAVE */}
             {complianceEditable[row._index] ? (
               <Tooltip title="Save">
@@ -310,8 +318,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
           </Box>
         );
       },
-    }
-    ,
+    },
   ];
 
   return (
@@ -372,7 +379,6 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               BRANCH
             </Box>
           )}
-
         </Box>
       }
     >

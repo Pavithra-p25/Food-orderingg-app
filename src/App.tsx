@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext"; // custom theme context,dark-light mode
-import "./styles/theme.css";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import { FilterProvider } from "./context/FilterContext";
@@ -12,10 +11,10 @@ import { useNavigate } from "react-router-dom";
 import RestaurantForm from "./pages/restaurant/RestaurantForm";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"; //mui theme provider
 import RestaurantSearch from "./pages/restaurant/RestaurantSearch";
-import RestaurantListing from "./pages/restaurant/RestaurantList";
 import RestaurantInfo from "./pages/restaurant/RestaurantInfo";
 import RestaurantInfoList from "./pages/restaurant/RestaurantInfoList";
 import HomePage from "./pages/HomePage";
+import RestaurantList from "./pages/restaurant/RestaurantList";
 
 const AddRestaurantModal = () => {
   const navigate = useNavigate();
@@ -43,11 +42,15 @@ const App: React.FC = () => {
               <main className="flex-grow-1 pt-5">
                 <Routes>
                   <Route path="/HomePage" element={<HomePage />} />
-                  <Route path="/restaurants" element={<RestaurantListing />} />
                   <Route
-                    path="/restaurants/:id"
-                    element={<RestaurantMenu />}
-                  />{" "}
+    path="/restaurants"
+    element={
+      <FilterProvider>
+        <RestaurantList />
+      </FilterProvider>
+    }
+  />
+                  <Route path="/restaurants/:id" element={<RestaurantMenu />} />{" "}
                   {/* Dynamic route for restaurant details */}
                   <Route
                     path="/RestaurantSearch"

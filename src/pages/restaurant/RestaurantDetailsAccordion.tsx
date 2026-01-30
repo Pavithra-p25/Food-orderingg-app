@@ -26,11 +26,13 @@ import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantHandler
 type RestaurantDetailsAccordionProps = {
   expanded: boolean;
   onToggle: () => void;
+  isEditMode: boolean;
 };
 
 const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
   expanded,
   onToggle,
+  isEditMode,
 }) => {
   const {
     control,
@@ -46,7 +48,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
     saveMenuItem,
     editMenuItem,
     removeMenuItem,
-  } = useRestaurantAccordionHandlers(control, trigger);
+  } = useRestaurantAccordionHandlers(control, trigger,isEditMode);
 
   const FieldLabel = ({
     label,

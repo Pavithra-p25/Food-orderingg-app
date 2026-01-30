@@ -6,12 +6,14 @@ import type {
 } from "react-hook-form";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import { MAX_MENU_ITEMS, canAddItem } from "../config/constants/RestaurantConstant";
+import { useState } from "react";
 
 
 /*  RESTAURANT ACCORDION HANDLERS */
 export const useRestaurantAccordionHandlers = (
   control: Control<RestaurantInfoValues>,
   trigger: UseFormTrigger<RestaurantInfoValues>,
+   isEditMode: boolean,
 ) => {
   /*  MENU ITEMS  */
   const menuItemsArray = useFieldArray({
@@ -19,16 +21,17 @@ export const useRestaurantAccordionHandlers = (
     name: "menuItems",
   });
 
-
-  const [menuEditable, setMenuEditable] = React.useState<boolean[]>(
-  menuItemsArray.fields.map(() => true),
+const [menuEditable, setMenuEditable] = useState<boolean[]>(
+  menuItemsArray.fields.map(() => !isEditMode),
 );
 
 React.useEffect(() => {
-  if (menuItemsArray.fields.length && menuEditable.length === 0) {
-    setMenuEditable(menuItemsArray.fields.map(() => true));
-  }
-}, []); 
+  setMenuEditable(
+    menuItemsArray.fields.map(() => !isEditMode),
+  );
+}, [menuItemsArray.fields.length, isEditMode]);
+
+
 
   const addMenuItem = async () => {
     if (!canAddItem(menuItemsArray.fields.length, MAX_MENU_ITEMS)) return;

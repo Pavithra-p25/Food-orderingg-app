@@ -5,17 +5,19 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import CloseIcon from "@mui/icons-material/Close";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
-import useUser from "../../hooks/useUser";
+import MyButton from "../../components/newcomponents/button/MyButton";
+import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/LoginSchema";
-import MySnackbar from "../../components/newcomponents/snackbar/MySnackbar";
-import MyButton from "../../components/newcomponents/button/MyButton";
-import CloseIcon from "@mui/icons-material/Close";
+import useUser from "../../hooks/useUser";
 
 interface LoginFormProps {
   show: boolean;
@@ -30,7 +32,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onSignupClick,
   onLoginSuccess,
 }) => {
-  // Single useForm instance
   const methods = useForm({
     defaultValues: {
       emailOrUsername: "",
@@ -48,35 +49,27 @@ const LoginForm: React.FC<LoginFormProps> = ({
     open: boolean;
     message: string;
     severity: "success" | "error";
-  }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  }>({ open: false, message: "", severity: "success" });
 
-  const onSubmit = async (data: {
-    emailOrUsername: string;
-    password: string;
-  }) => {
-    setError(""); // reset API error
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down("sm")); // Mobile
+  const isSm = useMediaQuery(theme.breakpoints.between("sm", "md")); // Tablet
+
+  const onSubmit = async (data: { emailOrUsername: string; password: string }) => {
+    setError("");
     try {
       const users = await fetchUsers();
       const foundUser = users.find(
         (u) =>
           (u.emailOrUsername === data.emailOrUsername ||
             u.fullName === data.emailOrUsername) &&
-          u.password === data.password,
+          u.password === data.password
       );
 
       if (foundUser) {
         localStorage.setItem("user", JSON.stringify(foundUser));
         onLoginSuccess(foundUser);
-        // Show success snackbar
-        setSnackbar({
-          open: true,
-          message: "Login successful!",
-          severity: "success",
-        });
+        setSnackbar({ open: true, message: "Login successful!", severity: "success" });
         onClose();
         methods.reset();
       } else {
@@ -85,12 +78,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Try again!");
-      // Show error snackbar
-      setSnackbar({
-        open: true,
-        message: "Something went wrong. Try again!",
-        severity: "error",
-      });
+      setSnackbar({ open: true, message: "Something went wrong. Try again!", severity: "error" });
     }
   };
 
@@ -103,15 +91,17 @@ const LoginForm: React.FC<LoginFormProps> = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 450,
-            minHeight: 500,
+            width: isXs ? "90%" : isSm ? 400 : 450,
+            maxHeight: "90vh",
+            overflowY: "auto",
             bgcolor: "background.paper",
             borderRadius: 2,
             boxShadow: 24,
-            p: 4,
+            p: isXs ? 3 : 4,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
+      
           }}
         >
           {/* Close Icon */}
@@ -126,18 +116,23 @@ const LoginForm: React.FC<LoginFormProps> = ({
           >
             <CloseIcon />
           </IconButton>
-          
+
           <Typography
-            variant="h6"
+            variant={isXs ? "h6" : "h5"}
             component="h2"
             align="center"
             fontWeight="bold"
-            mb={3}
+            mb={2}
           >
             Login
           </Typography>
 
-          <Typography align="center" color="text.secondary" mb={3}>
+          <Typography
+            align="center"
+            color="text.secondary"
+            mb={3}
+            sx={{ fontSize: isXs ? 14 : 15 }}
+          >
             Don’t have an account?{" "}
             <span
               style={{ color: "red", fontWeight: 600, cursor: "pointer" }}
@@ -153,7 +148,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
             </Typography>
           )}
 
-          {/* Wrap inputs inside FormProvider */}
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
               <MyInput
@@ -176,10 +170,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -195,7 +186,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   mx: "auto",
                   mt: 2,
                   mb: 1,
-                  width: "60%",
+                  width: isXs ? "80%" : isSm ? "70%" : "60%",
+                  fontSize: isXs ? "0.875rem" : "1rem",
                 }}
               >
                 Login
@@ -206,12 +198,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
           <Typography
             align="center"
             color="error"
-            sx={{ fontSize: 14, cursor: "pointer" }}
+            sx={{ fontSize: 14, cursor: "pointer", mt: 1 }}
           >
             Forgot password?
           </Typography>
         </Box>
       </Modal>
+
       <MySnackbar
         open={snackbar.open}
         message={snackbar.message}
