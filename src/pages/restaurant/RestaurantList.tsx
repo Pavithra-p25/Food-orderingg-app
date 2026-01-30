@@ -6,50 +6,49 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  TextField,
   Paper,
 } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useNavigate } from "react-router-dom";
-import { useFilter } from "../../context/FilterContext";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import RestaurantForm from "../registerrestaurant/RestaurantForm";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
-import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
-import MyInput from "../../components/newcomponents/textfields/MyInput";
-import { useForm, FormProvider } from "react-hook-form";
+import CommonInput from "../../components/newcomponents/textfields/CommonInput";
+import CommonSelect from "../../components/newcomponents/textfields/CommonSelect";
+import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
 
 /* STATE TYPE  */
 interface ListingState {
-  search: string;
   showForm: boolean;
 }
+
+
+const CATEGORY_OPTIONS = ["", ...RESTAURANT_CATEGORIES];
 
 const RestaurantList: React.FC = () => {
   const navigate = useNavigate();
 
-  const { search, setSearch, category, setCategory, filterType } = useFilter();
-
   //  state object
-  const [state, setState] = useState<ListingState>({
-    search: "",
-    showForm: false,
-  });
+ const [state, setState] = useState<ListingState>({
+  showForm: false,
+});
+
 
   const { showForm } = state;
 
   //  LOCAL STATE
+  const [search, setSearch] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [visibleCount, setVisibleCount] = useState<number>(9);
 
-  const { getAllRestaurants } = useRestaurants();
-
-  const methods = useForm({
-    defaultValues: { category: "", rating: "" },
+  const [filters, setFilters] = useState({
+    category: "",
   });
+
+  const { getAllRestaurants } = useRestaurants();
 
   //  FETCH RESTAURANTS
   useEffect(() => {
@@ -72,22 +71,31 @@ const RestaurantList: React.FC = () => {
 
   // FILTER LOGIC
   const filteredRestaurants = restaurants.filter((r) => {
-    const matchesName = r.restaurantName
+    const matchesSearch = r.restaurantName
       .toLowerCase()
       .includes(search.toLowerCase());
 
-    if (!category.trim()) return matchesName;
+    const matchesCategory = filters.category
+      ? r.category === filters.category
+      : true;
 
-    return (
-      matchesName && r.category.toLowerCase().includes(category.toLowerCase())
-    );
+    return matchesSearch && matchesCategory;
   });
+
+  const visibleRestaurants = filteredRestaurants.slice(0, visibleCount);
+
+  const handleFilterChange =
+    (field: keyof typeof filters) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }));
+    };
 
   useEffect(() => {
     setVisibleCount(9);
-  }, [search, category, filterType]);
-
-  const visibleRestaurants = filteredRestaurants.slice(0, visibleCount);
+  }, [search, filters.category]);
 
   return (
     <Box
@@ -102,44 +110,28 @@ const RestaurantList: React.FC = () => {
 
       <Grid container spacing={3}>
         {/* FILTERS */}
-        <FormProvider {...methods}>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Paper sx={{ p: 2, backgroundColor: "whitesmoke" }}>
-              <Typography fontWeight="bold" mb={2}>
-                Filters
-              </Typography>
 
-              {/* Category Input */}
-              <MyInput
-                name="category"
-                label="Category"
-                fullWidth
-                size="small"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                sx={{ mb: 2 }}
-              />
+        <Grid size={{ xs: 12, md: 3 }}>
+          <Paper sx={{ p: 2, backgroundColor: "whitesmoke" }}>
+            <Typography fontWeight="bold" mb={2}>
+              Filters
+            </Typography>
 
-              {/* Rating Dropdown */}
-              <MyDropdown
-                name="rating"
-                label="Rating"
-                fullWidth
-                size="small"
-                options={["", "4+", "3+"]}
-              />
-            </Paper>
-          </Grid>
-        </FormProvider>
+            <CommonSelect
+              label="Category"
+              value={filters.category}
+              onChange={handleFilterChange("category")}
+              options={CATEGORY_OPTIONS}
+            />
+          </Paper>
+        </Grid>
 
         {/* SEARCH + CARDS */}
         <Grid size={{ xs: 12, md: 9 }}>
           {/* Search */}
-          <TextField
+          <CommonInput
             label="Search"
             placeholder="Search restaurants..."
-            fullWidth
-            size="small"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{ mb: 3 }}
@@ -202,7 +194,7 @@ const RestaurantList: React.FC = () => {
                 variant="cancel"
                 onClick={() =>
                   setVisibleCount(
-                    visibleCount === 9 ? filteredRestaurants.length : 9
+                    visibleCount === 9 ? filteredRestaurants.length : 9,
                   )
                 }
               >

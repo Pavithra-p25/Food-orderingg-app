@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext"; // custom theme context,dark-light mode
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
-import { FilterProvider } from "./context/FilterContext";
 import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
 import CssBaseline from "@mui/material/CssBaseline";
 import FormTheme from "./config/theme/Theme";
@@ -33,7 +32,7 @@ const App: React.FC = () => {
       <MuiThemeProvider theme={FormTheme}>
         <CssBaseline /> {/* to reset default browser css */}
         <ThemeProvider>
-          <FilterProvider>
+        
             {/* FULL PAGE FLEXBOX */}
             <div className="d-flex flex-column min-vh-100">
               <Header />
@@ -45,9 +44,9 @@ const App: React.FC = () => {
                   <Route
     path="/restaurants"
     element={
-      <FilterProvider>
+     
         <RestaurantList />
-      </FilterProvider>
+     
     }
   />
                   <Route path="/restaurants/:id" element={<RestaurantMenu />} />{" "}
@@ -79,7 +78,7 @@ const App: React.FC = () => {
 
               <Footer />
             </div>
-          </FilterProvider>
+        
         </ThemeProvider>
       </MuiThemeProvider>
     </Router>

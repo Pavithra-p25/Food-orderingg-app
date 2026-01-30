@@ -1,5 +1,5 @@
 
-import type { User } from "../types/types";
+import type { User } from "../types/userTypes";
 import { userService } from "../services/userService";
 
 export const useUser = () => {

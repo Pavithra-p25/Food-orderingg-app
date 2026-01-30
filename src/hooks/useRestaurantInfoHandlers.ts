@@ -1,7 +1,7 @@
 import React from "react";
 import type { UseFormReset } from "react-hook-form";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
-import { defaultRestaurantValues } from "../pages/restaurant/data/RestaurantInfoDefault";
+import { defaultRestaurantValues } from "../pages/restaurantinfo/data/RestaurantInfoDefault";
 import { useRestaurantInfo } from "./useRestaurantInfo";
 
 type SnackbarState = {
