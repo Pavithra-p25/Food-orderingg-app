@@ -4,7 +4,7 @@
       "id": "1469",
       "fullName": "pavithra",
       "emailOrUsername": "pavi",
-      "password": "123456",
+      "password": "12345P",
       "role": "user"
     },
     {
@@ -17,29 +17,22 @@
     {
       "id": "dc20",
       "fullName": "Kavin",
-      "emailOrUsername": "kavin@gmail.cmo",
-      "password": "123456",
+      "emailOrUsername": "kavin@gmail.com",
+      "password": "12345K",
       "role": "user"
     },
     {
       "id": "32b8",
       "fullName": "Deva shree",
       "emailOrUsername": "shree@gmail.com",
-      "password": "shree",
-      "role": "user"
-    },
-    {
-      "id": "0c63",
-      "fullName": "balan",
-      "emailOrUsername": "balan",
-      "password": "123",
+      "password": "shreeD",
       "role": "user"
     },
     {
       "id": "b320",
       "fullName": "dvsv",
       "emailOrUsername": "vsva",
-      "password": "bfbSS33",
+      "password": "BfbSS3",
       "role": "user"
     },
     {

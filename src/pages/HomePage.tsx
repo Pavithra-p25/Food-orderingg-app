@@ -1,10 +1,26 @@
 import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
-import { Link } from "react-router-dom";
 import MyButton from "../components/newcomponents/button/MyButton";
 import MyCard from "../components/newcomponents/card/MyCard";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "../context/SnackbarContext";
 
 const HomePage: React.FC = () => {
+  //  hooks
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
+  const user = localStorage.getItem("user");
+
+  const handleAuthNavigate = (message: string) => {
+    if (!user) {
+      showSnackbar(message, "warning");
+      window.dispatchEvent(new Event("open-login"));
+      return;
+    }
+
+    navigate("/restaurants");
+  };
+
   const features = [
     {
       title: "Fast Delivery",
@@ -31,7 +47,7 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <Box
         sx={{
-          position: "relative", 
+          position: "relative",
           minHeight: "80vh",
           display: "flex",
           flexDirection: "column",
@@ -75,8 +91,9 @@ const HomePage: React.FC = () => {
 
         <Box display="flex" gap={2}>
           <MyButton
-            component={Link}
-            to="/restaurants"
+            onClick={() =>
+              handleAuthNavigate("Please login to explore restaurants")
+            }
             variant="cancel"
             size="large"
           >
@@ -125,8 +142,7 @@ const HomePage: React.FC = () => {
         </Typography>
         <Box>
           <MyButton
-            component={Link}
-            to="/restaurants"
+            onClick={() => handleAuthNavigate("Please login to start ordering")}
             variant="contained"
             size="large"
             sx={{

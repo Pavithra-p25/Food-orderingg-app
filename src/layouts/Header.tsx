@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -115,28 +114,30 @@ const Header: React.FC = () => {
       text: "Home",
       icon: <HomeIcon />,
       to: "/HomePage",
-      roles: ["user", "admin"],
+      roles: ["guest", "user", "admin"],
     },
     {
       text: "Restaurants",
       icon: <StoreIcon />,
       to: "/restaurants",
-      roles: ["user", "admin"],
+      roles: ["guest", "user", "admin"],
     },
     {
       text: "Cart",
       icon: <ShoppingCartIcon />,
       to: "/cart",
-      roles: ["user", "admin"],
+      roles: ["guest", "user", "admin"],
+      protected: true,
     },
     {
       text: "Favorites",
       icon: <FavoriteIcon />,
       to: "/favorites",
-      roles: ["user", "admin"],
+      roles: ["guest", "user", "admin"],
+      protected: true,
     },
 
-    //  ADMIN ONLY
+    // ADMIN ONLY
     {
       text: "Add Restaurant",
       icon: <AddCircleIcon />,
@@ -162,6 +163,23 @@ const Header: React.FC = () => {
       roles: ["admin"],
     },
   ];
+
+  const handleMenuClick = (item: any) => {
+    if (item.protected && !state.user) {
+      showSnackbar("Please login to continue", "warning");
+      setState((prev) => ({ ...prev, showLoginForm: true }));
+      return;
+    }
+
+    navigate(item.to);
+
+    if (window.innerWidth < 1200) {
+      setState((prev) => ({ ...prev, collapsed: true }));
+    }
+  };
+
+  
+
   const renderPersonSection = () => {
     if (state.user) {
       return (
@@ -269,9 +287,11 @@ const Header: React.FC = () => {
         <Box sx={{ mt: "8px", ml: "8px", pt: 0 }}>
           <List>
             {menuItems
-              .filter(
-                (item) => state.user && item.roles.includes(state.user.role),
-              )
+              .filter((item) => {
+                const role = state.user?.role || "guest";
+                return item.roles.includes(role);
+              })
+
               .map((item) => (
                 <ListItem
                   key={item.text}
@@ -279,17 +299,10 @@ const Header: React.FC = () => {
                   sx={{ display: "block" }}
                 >
                   <ListItemButton
-                    component={Link}
-                    to={item.to}
-                    onClick={() =>
-                      window.innerWidth < 1200 &&
-                      setState((prev) => ({ ...prev, collapsed: true }))
-                    }
+                    onClick={() => handleMenuClick(item)}
                     sx={{
                       minHeight: 48,
-                      justifyContent: state.collapsed
-                        ? "center"
-                        : "flex-start",
+                      justifyContent: state.collapsed ? "center" : "flex-start",
                       px: 2.5,
                       backgroundColor:
                         location.pathname === item.to
@@ -315,8 +328,7 @@ const Header: React.FC = () => {
                             location.pathname === item.to
                               ? "#e23744"
                               : "inherit",
-                          fontWeight:
-                            location.pathname === item.to ? 600 : 400,
+                          fontWeight: location.pathname === item.to ? 600 : 400,
                         }}
                       />
                     )}
@@ -332,7 +344,6 @@ const Header: React.FC = () => {
           </Box>
         </Box>
       </Drawer>
-
 
       {/* Login */}
       {state.showLoginForm && (
@@ -376,7 +387,6 @@ const Header: React.FC = () => {
           }
         />
       )}
-
     </>
   );
 };

@@ -1,15 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import { ThemeProvider } from "./context/ThemeContext";
 import { SnackbarProvider } from "./context/SnackbarContext";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import FormTheme from "./config/theme/Theme";
-
+import FavoritesPage from "./pages/FavoritesPage";
+import CartPage from "./pages/CartPage";
 import HomePage from "./pages/HomePage";
 import RestaurantList from "./pages/restaurant/RestaurantList";
 import RestaurantMenu from "./pages/restaurant/RestaurantMenu";
@@ -26,8 +25,8 @@ const AppRoutes = () => {
       <Route path="/HomePage" element={<HomePage />} />
       <Route path="/restaurants" element={<RestaurantList />} />
       <Route path="/restaurants/:id" element={<RestaurantMenu />} />
-
-      {/* Admin */}
+      <Route path="/favorites" element={<FavoritesPage />} />
+      <Route path="/cart" element={<CartPage />} />
       <Route path="/RestaurantSearch" element={<RestaurantSearch />} />
       <Route path="/RestaurantForm" element={<RestaurantForm />} />
       <Route path="/restaurant/register" element={<RestaurantForm />} />
