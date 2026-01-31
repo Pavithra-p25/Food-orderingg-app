@@ -33,6 +33,7 @@ import { ListItemButton } from "@mui/material";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useLocation } from "react-router-dom";
 import { useSnackbar } from "../context/SnackbarContext";
+import { useNavigate } from "react-router-dom";
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -47,6 +48,7 @@ interface HeaderState {
 const Header: React.FC = () => {
   const { darkMode, setDarkMode } = useContext(ThemeContext);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [state, setState] = useState<HeaderState>({
     showLoginForm: false,
@@ -190,6 +192,7 @@ const Header: React.FC = () => {
                 setState((prev) => ({ ...prev, user: null }));
                 showSnackbar("Logged out successfully", "success"); //  global snackbar
                 setAnchorEl(null);
+                navigate("/HomePage"); 
               }}
             >
               <LogoutIcon fontSize="small" />
@@ -247,8 +250,6 @@ const Header: React.FC = () => {
       </AppBar>
 
       {/* Sidebar */}
-      {/* Sidebar */}
-      {state.user && ( // ✅ Only show if logged in (user or admin)
         <Drawer
           variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
           open={!state.collapsed}
@@ -331,7 +332,7 @@ const Header: React.FC = () => {
             </Box>
           </Box>
         </Drawer>
-      )}
+  
 
       {/* Login */}
       {state.showLoginForm && (

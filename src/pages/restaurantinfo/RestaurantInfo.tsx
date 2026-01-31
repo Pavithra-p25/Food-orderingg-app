@@ -1,38 +1,34 @@
 import React, { useEffect } from "react";
-import { Container, Paper, Box, IconButton, Tooltip } from "@mui/material";
+import {
+  Container,
+  Paper,
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { FormProvider, useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import Typography from "@mui/material/Typography";
-import MyButton from "../../components/newcomponents/button/MyButton";
-import { useSnackbar } from "../../context/SnackbarContext";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
+import MyButton from "../../components/newcomponents/button/MyButton";
+import { useSnackbar } from "../../context/SnackbarContext";
+
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
 import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
+import { useNavigate, useParams } from "react-router-dom";
 import RestaurantDetailsAccordion from "./RestaurantDetailsAccordion";
 import BranchAccordion from "./BranchAccordion";
 import { useRestaurantInfoHandlers } from "../../hooks/useRestaurantInfoHandlers";
-import { useNavigate } from "react-router-dom";
+import { useRestaurantInfo } from "../../hooks/useRestaurantInfo";
 
-type RestaurantInfoProps = {
-  restaurantData?: RestaurantInfoValues;
-  editRestaurantInfo: (
-    id: string | number,
-    data: RestaurantInfoValues,
-  ) => Promise<void>;
-  onUpdateSuccess?: () => void;
-};
-
-const { showSnackbar } = useSnackbar(); 
-
-const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
-  restaurantData,
-  editRestaurantInfo,
-  onUpdateSuccess,
-}) => {
+const RestaurantInfo: React.FC = () => {
   const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
+
   const methods = useForm<RestaurantInfoValues>({
     defaultValues: defaultRestaurantValues,
     resolver: yupResolver(restaurantInfoSchema),
@@ -47,6 +43,17 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     handleSubmit,
   } = methods;
 
+  const { id } = useParams();
+  const { restaurantInfoList, editRestaurantInfo, fetchRestaurantInfo } =
+    useRestaurantInfo();
+  const restaurantData = restaurantInfoList.find(
+    (r) => String(r.id) === String(id),
+  );
+
+  useEffect(() => {
+  fetchRestaurantInfo();
+}, []);
+
   const isEditMode = Boolean(restaurantData);
 
   const branchArray = useFieldArray({
@@ -54,7 +61,7 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
     name: "branches",
   });
 
-  // Pre-fill form if restaurantData prop exists
+  /* Prefill form in edit mode */
   useEffect(() => {
     if (restaurantData) {
       const sanitizedData = {
@@ -62,19 +69,15 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
         menuItems:
           restaurantData.menuItems?.map((item: any) => ({
             ...item,
-            // If file is a string (URL) or not a File object, set to null to pass validation
-            // (Schema expects File | null, but matches checks for File properties)
             file: item.file instanceof File ? item.file : null,
           })) || [],
       };
-      console.log("Resetting form with sanitized data:", sanitizedData);
+
       reset(sanitizedData);
     }
   }, [restaurantData, reset]);
 
-  
-
-  // Use centralized handlers
+  /*  Accordion handlers  */
   const {
     expandedRestaurant,
     setExpandedRestaurant,
@@ -88,43 +91,30 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
   } = useRestaurantInfoHandlers(reset);
 
   useEffect(() => {
-  if (restaurantData && branchArray.fields.length > 0) {
-    // open restaurant accordion
-    setExpandedRestaurant(true);
+    if (restaurantData && branchArray.fields.length > 0) {
+      setExpandedRestaurant(true);
+      setExpandedBranches(branchArray.fields.map((_, i) => i));
+      setExpandAll(true);
+    }
+  }, [restaurantData, branchArray.fields.length]);
 
-    // open ALL branch accordions
-    setExpandedBranches(
-      branchArray.fields.map((_, index) => index)
-    );
-
-    // sync expand-all icon
-    setExpandAll(true);
-  }
-}, [restaurantData, branchArray.fields.length]);
-
+  /*  Update handler  */
   const handleUpdate = async (data: RestaurantInfoValues) => {
     const id = data.id || restaurantData?.id;
 
-    if (id === undefined || id === null || id === "") {
-      console.error("Update aborted: Missing ID");
+    if (!id) {
+      showSnackbar("Missing restaurant ID", "error");
       return;
     }
 
     try {
       await editRestaurantInfo(id, data);
+      showSnackbar("Restaurant updated successfully", "success");
 
-      // SHOW SUCCESS SNACKBAR
-    showSnackbar("Restaurant updated successfully", "success"); 
-
-      // DELAY NAVIGATION
       setTimeout(() => {
-        if (onUpdateSuccess) {
-          onUpdateSuccess();
-        } else {
-          navigate("/restaurant"); //  table route
-        }
+        navigate("/RestaurantInfoList");
       }, 1500);
-    } catch (error) {
+    } catch {
       showSnackbar("Update failed. Please try again", "error");
     }
   };
@@ -135,37 +125,19 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
         <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
           <Paper elevation={8} sx={{ p: 4, mt: 4, borderRadius: 4 }}>
             {/* HEADER */}
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              mb={3}
-            >
+            <Box display="flex" justifyContent="space-between" mb={3}>
               <Box width={40} />
-              <Box flex={1} textAlign="center">
-                <Typography fontWeight="bold" variant="h6">
-                  Restaurant Information
-                </Typography>
-              </Box>
+              <Typography fontWeight="bold" variant="h6" textAlign="center">
+                Restaurant Information
+              </Typography>
+
               <Tooltip
                 title={expandAll ? "Collapse All Forms" : "Expand All Forms"}
               >
-                <IconButton
-                  onClick={() => setExpandAll((prev) => !prev)}
-                  sx={{
-                    backgroundColor: "primary.light",
-                    color: "primary.main",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "primary.main",
-                      color: "white",
-                    },
-                  }}
-                >
+                <IconButton onClick={() => setExpandAll((p) => !p)}>
                   <UnfoldMoreIcon
                     sx={{
                       transform: expandAll ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.3s ease",
                     }}
                   />
                 </IconButton>
@@ -174,69 +146,52 @@ const RestaurantInfo: React.FC<RestaurantInfoProps> = ({
 
             <form
               onSubmit={handleSubmit(
-                restaurantData ? handleUpdate : handleSubmitForm,
-                (errors) => console.error("Form Validation Failed:", errors),
+                isEditMode ? handleUpdate : handleSubmitForm,
               )}
               noValidate
             >
-              {/* RESTAURANT DETAILS */}
               <RestaurantDetailsAccordion
                 expanded={expandedRestaurant}
-                onToggle={() => setExpandedRestaurant((prev) => !prev)}
-                 isEditMode={isEditMode}
+                onToggle={() => setExpandedRestaurant((p) => !p)}
+                isEditMode={isEditMode}
               />
 
-              {/* BRANCH DETAILS */}
-              {branchArray.fields.map((branch, branchIndex) => (
+              {branchArray.fields.map((branch, index) => (
                 <BranchAccordion
                   key={branch.id}
-                  branchIndex={branchIndex}
+                  branchIndex={index}
                   control={control}
                   branchArray={branchArray}
                   errors={errors}
                   trigger={trigger}
-                  expanded={expandedBranches.includes(branchIndex)}
+                  expanded={expandedBranches.includes(index)}
                   onToggle={() =>
                     setExpandedBranches((prev) =>
-                      prev.includes(branchIndex)
-                        ? prev.filter((i) => i !== branchIndex)
-                        : [...prev, branchIndex],
+                      prev.includes(index)
+                        ? prev.filter((i) => i !== index)
+                        : [...prev, index],
                     )
                   }
                   onBranchAdded={handleBranchAdded}
-                    isEditMode={isEditMode}
+                  isEditMode={isEditMode}
                 />
               ))}
 
-              {/* ACTION BUTTONS */}
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                gap={2}
-                mt={4}
-                flexWrap="nowrap"
-              >
+              <Box display="flex" justifyContent="center" gap={2} mt={4}>
                 <MyButton
                   type="button"
                   variant="outlined"
                   onClick={handleReset}
-                  sx={{ px: 3, py: 1, borderRadius: 2 }}
                 >
                   Reset
                 </MyButton>
 
-                <MyButton
-                  type="submit"
-                  variant="primary"
-                  sx={{ px: 3, py: 1, borderRadius: 2 }}
-                >
-                  {restaurantData ? "Update" : "Submit"}
+                <MyButton type="submit" variant="primary">
+                  {isEditMode ? "Update" : "Submit"}
                 </MyButton>
               </Box>
             </form>
           </Paper>
-
         </Container>
       </LocalizationProvider>
     </FormProvider>
