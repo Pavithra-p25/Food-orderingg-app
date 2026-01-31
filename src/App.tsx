@@ -30,6 +30,8 @@ const AppRoutes = () => {
       {/* Admin */}
       <Route path="/RestaurantSearch" element={<RestaurantSearch />} />
       <Route path="/RestaurantForm" element={<RestaurantForm />} />
+      <Route path="/restaurant/register" element={<RestaurantForm />} />
+      <Route path="/restaurant/edit/:id" element={<RestaurantForm />} />
       <Route path="/RestaurantInfo" element={<RestaurantInfo />} />
       <Route path="/RestaurantInfo/edit/:id" element={<RestaurantInfo />} />
       <Route path="/RestaurantInfoList" element={<RestaurantInfoList />} />

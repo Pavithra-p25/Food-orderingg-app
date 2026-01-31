@@ -11,28 +11,16 @@ import {
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useNavigate } from "react-router-dom";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import RestaurantForm from "../registerrestaurant/RestaurantForm";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import CommonInput from "../../components/newcomponents/textfields/CommonInput";
 import CommonSelect from "../../components/newcomponents/textfields/CommonSelect";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
 
-/* STATE TYPE  */
-interface ListingState {
-  showForm: boolean;
-}
 
 const CATEGORY_OPTIONS = ["", ...RESTAURANT_CATEGORIES];
 
 const RestaurantList: React.FC = () => {
   const navigate = useNavigate();
-
-  //  state object
-  const [state, setState] = useState<ListingState>({
-    showForm: false,
-  });
-
-  const { showForm } = state;
 
   //  LOCAL STATE
   const [search, setSearch] = useState<string>("");
@@ -84,12 +72,12 @@ const RestaurantList: React.FC = () => {
 
   const handleFilterChange =
     (field: keyof typeof filters) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilters((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-    };
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilters((prev) => ({
+          ...prev,
+          [field]: e.target.value,
+        }));
+      };
 
   useEffect(() => {
     setVisibleCount(9);
@@ -223,17 +211,12 @@ const RestaurantList: React.FC = () => {
           </Typography>
           <MyButton
             variant="cancel"
-            onClick={() => setState((prev) => ({ ...prev, showForm: true }))}
+            onClick={() => navigate("/restaurant/register")}
           >
             Register Now
           </MyButton>
         </Card>
       </Box>
-
-      <RestaurantForm
-        show={showForm}
-        onClose={() => setState((prev) => ({ ...prev, showForm: false }))}
-      />
     </Box>
   );
 };

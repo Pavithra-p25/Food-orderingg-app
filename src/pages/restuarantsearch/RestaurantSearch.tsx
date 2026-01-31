@@ -4,7 +4,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import { useForm } from "react-hook-form";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import RestaurantForm from "../registerrestaurant/RestaurantForm";
+import { useNavigate } from "react-router-dom";
 import { restaurantDefaultValues } from "../restaurant/data/restaurantDefaultValues";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import MyTab from "../../components/newcomponents/tabs/MyTab";
@@ -14,11 +14,13 @@ import RestaurantTable from "./RestaurantTable";
 import { useRestaurantTableActions } from "../../hooks/restaurant/useRestaurantTableActions";
 
 const RestaurantSearch: React.FC = () => {
+  const navigate = useNavigate();
+
   const methods = useForm<Restaurant>({
     defaultValues: { ...restaurantDefaultValues },
   });
 
-  const {  handleSubmit, reset } = methods;
+  const { handleSubmit, reset } = methods;
 
   const [results, setResults] = useState<Restaurant[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
@@ -27,16 +29,9 @@ const RestaurantSearch: React.FC = () => {
     getAllRestaurants,
     softDeleteRestaurant,
     activateRestaurant,
-    addRestaurant,
     deleteRestaurant,
-    updateRestaurant,
   } = useRestaurants();
 
-  const [openAddForm, setOpenAddForm] = useState(false);
-
-  const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(
-    null
-  );
 
   // ACTIONS HOOK
   const {
@@ -51,45 +46,6 @@ const RestaurantSearch: React.FC = () => {
     softDeleteRestaurant,
     activateRestaurant,
     deleteRestaurant,
-    async (draft) => {
-      try {
-        const exists = allRestaurants.some((r) => r.id === draft.id);
-
-        if (!exists) {
-          //  first time draft - CREATE
-          await addRestaurant({
-            ...draft,
-            status: "draft",
-          });
-        } else {
-          //  existing draft - UPDATE
-          await updateRestaurant(draft.id, draft);
-        }
-
-        //  Update frontend state
-        setAllRestaurants((prev) => {
-          const index = prev.findIndex((r) => r.id === draft.id);
-          if (index > -1) {
-            const copy = [...prev];
-            copy[index] = draft;
-            return copy;
-          }
-          return [...prev, draft];
-        });
-
-        setResults((prev) => {
-          const index = prev.findIndex((r) => r.id === draft.id);
-          if (index > -1) {
-            const copy = [...prev];
-            copy[index] = draft;
-            return copy;
-          }
-          return [...prev, draft];
-        });
-      } catch (err) {
-        console.error("Failed to save draft", err);
-      }
-    }
   );
 
   useEffect(() => {
@@ -157,10 +113,7 @@ const RestaurantSearch: React.FC = () => {
       tabContent: (
         <RestaurantTable
           results={results}
-          onEdit={(r) => {
-            setEditingRestaurant(r);
-            setOpenAddForm(true);
-          }}
+          onEdit={(r) => navigate(`/restaurant/edit/${r.id}`)}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="all"
@@ -173,10 +126,7 @@ const RestaurantSearch: React.FC = () => {
       tabContent: (
         <RestaurantTable
           results={results.filter((r) => r.isActive && r.status !== "draft")}
-          onEdit={(r) => {
-            setEditingRestaurant(r);
-            setOpenAddForm(true);
-          }}
+          onEdit={(r) => navigate(`/restaurant/edit/${r.id}`)}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="active"
@@ -189,10 +139,7 @@ const RestaurantSearch: React.FC = () => {
       tabContent: (
         <RestaurantTable
           results={results.filter((r) => !r.isActive && r.status !== "draft")}
-          onEdit={(r) => {
-            setEditingRestaurant(r);
-            setOpenAddForm(true);
-          }}
+          onEdit={(r) => navigate(`/restaurant/edit/${r.id}`)}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="inactive"
@@ -205,10 +152,7 @@ const RestaurantSearch: React.FC = () => {
       tabContent: (
         <RestaurantTable
           results={activeRestaurants}
-          onEdit={(r) => {
-            setEditingRestaurant(r);
-            setOpenAddForm(true);
-          }}
+          onEdit={(r) => navigate(`/restaurant/edit/${r.id}`)}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="Groupby"
@@ -228,10 +172,7 @@ const RestaurantSearch: React.FC = () => {
             handleSubmit={handleSubmit}
             onSubmit={onSubmit}
             handleReset={handleReset}
-            onAdd={() => {
-              setEditingRestaurant(null);
-              setOpenAddForm(true);
-            }}
+            onAdd={() => navigate("/restaurant/register")}
           />
         </Grid>
 
@@ -248,55 +189,6 @@ const RestaurantSearch: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* ADD - EDIT RESTAURANT POPUP */}
-      <RestaurantForm
-        show={openAddForm}
-        restaurant={editingRestaurant}
-        onClose={() => {
-          setOpenAddForm(false);
-          setEditingRestaurant(null);
-        }}
-        onSave={async (draft) => {
-          try {
-            const exists = allRestaurants.some((r) => r.id === draft.id);
-
-            if (!exists) {
-              // first time draft - CREATE
-              await addRestaurant({
-                ...draft,
-                status: "draft",
-              });
-            } else {
-              // existing draft - UPDATE
-              await updateRestaurant(draft.id, draft);
-            }
-
-            // Update frontend state (UPSERT)
-            setAllRestaurants((prev) => {
-              const index = prev.findIndex((r) => r.id === draft.id);
-              if (index > -1) {
-                const copy = [...prev];
-                copy[index] = draft;
-                return copy;
-              }
-              return [...prev, draft];
-            });
-
-            setResults((prev) => {
-              const index = prev.findIndex((r) => r.id === draft.id);
-              if (index > -1) {
-                const copy = [...prev];
-                copy[index] = draft;
-                return copy;
-              }
-              return [...prev, draft];
-            });
-          } catch (err) {
-            console.error("Failed to save draft", err);
-          }
-        }}
-      />
-
       {/* CONFIRMATION DIALOG */}
       <MyDialog open={showConfirm} onClose={handleConfirmNo} maxWidth="xs">
         <DialogContent sx={{ textAlign: "center" }}>
@@ -305,8 +197,8 @@ const RestaurantSearch: React.FC = () => {
               ? "Are you sure you want to delete this restaurant?"
               : `Are you sure you want to delete ${pendingIds.length} restaurants?`
             : pendingIds.length === 1
-            ? "Are you sure you want to restore this restaurant?"
-            : `Are you sure you want to restore ${pendingIds.length} restaurants?`}
+              ? "Are you sure you want to restore this restaurant?"
+              : `Are you sure you want to restore ${pendingIds.length} restaurants?`}
 
           <Stack
             direction="row"

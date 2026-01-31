@@ -83,7 +83,7 @@
       "password": "Spice@123",
       "confirmPassword": "Spice@123",
       "isActive": true,
-      "restaurantName": "Spice Hub",
+      "restaurantName": "Spice Hu",
       "restaurantType": "Non-Veg",
       "category": "Biryani",
       "openingTime": "11:00",
@@ -103,7 +103,8 @@
       "acceptTerms": true,
       "id": "f693",
       "createdAt": "2025-11-10T06:45:00.000Z",
-      "updatedAt": "2026-01-13T05:06:01.586Z"
+      "updatedAt": "2026-01-31T12:50:32.581Z",
+      "status": "active"
     },
     {
       "email": "annapoorna@gmail.com",

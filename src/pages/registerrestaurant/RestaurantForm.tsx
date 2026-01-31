@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { DialogContent, DialogActions, Stack, Box } from "@mui/material";
+import { Container, Paper, Stack, Box, Typography} from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -19,62 +20,60 @@ import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
 import { isFieldFilled } from "../../utils/RestaurantFormUtils";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { CreateRestaurantDTO } from "../../hooks/restaurant/useRestaurant";
+import { useNavigate, useParams } from "react-router-dom";
+import DialogContent from "@mui/material/DialogContent";
 
-interface Props {
-  show: boolean; // show or hide the dialog
-  onClose: (formValues: Restaurant) => void;
-  restaurant?: Restaurant | null; //if present - edit mode
-  onSave?: (updated: Restaurant) => void; //notify parent after save or draft
-}
+const RestaurantForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = Boolean(id);
 
-const RestaurantForm: React.FC<Props> = ({
-  show,
-  onClose,
-  restaurant = null, //add mode , not null -edit mode
-  onSave,
-}) => {
-  const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login"); //which tab is currently active
-  const [showConfirm, setShowConfirm] = useState(false); //confirm dialog is open or not
-  const [actionType, setActionType] = useState<
-    "register" | "reset" | "cancel" | null
-  >(null); //which action is triggered
+  const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [actionType, setActionType] = useState<"register" | "reset" | "cancel" | null>(null);
+
+  // Local state for the restaurant object being edited
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+
+  const { showSnackbar } = useSnackbar();
+  const { addRestaurant, updateRestaurant, getRestaurantDetails } = useRestaurants();
+
+  // Load data if in edit mode
+  useEffect(() => {
+    if (isEditMode && id) {
+      const loadData = async () => {
+        const data = await getRestaurantDetails(id);
+        if (data) {
+          setRestaurant(data);
+          methods.reset(data); // Reset form with fetched data
+        } else {
+          showSnackbar("Failed to load restaurant details", "error");
+          navigate("/RestaurantSearch"); // Fallback
+        }
+      };
+      loadData();
+    }
+  }, [id, isEditMode, getRestaurantDetails, showSnackbar, navigate]);
 
   const getCenterButtonLabel = () => {
-    if (restaurant) return "Update"; // edit mode
-    return isAllTabsValid && isLastTab ? "Register" : "Save"; // new mode
+    if (isEditMode) return "Update";
+    return isAllTabsValid && isLastTab ? "Register" : "Save";
   };
 
-  const { showSnackbar } = useSnackbar(); //  global showSnackbar
-
-  //json data storing
-  const { addRestaurant, updateRestaurant } = useRestaurants();
-
-  // react-hook-form with Yup schema
   const methods = useForm<Restaurant>({
-    mode: "onChange", // validation occurs onChange
+    mode: "onChange",
     reValidateMode: "onChange",
     resolver: yupResolver(restaurantSchema),
-    defaultValues: restaurant || restaurantDefaultValues,
+    defaultValues: restaurantDefaultValues,
   });
 
   const {
-    formState: { errors, isDirty }, //for tab error tracking , dirty - any changes made
-    watch, //check filled fields
+    formState: { errors, isDirty },
+    watch,
   } = methods;
 
   const watchedValues = watch();
 
-  useEffect(() => {
-    if (restaurant) {
-      // Edit mode - fill with restaurant data
-      methods.reset(restaurant);
-    } else {
-      // Add mode - reset to default values
-      methods.reset(restaurantDefaultValues);
-    }
-  }, [restaurant, methods]);
-
-  // which fields belong to which tab - validation/tab status tracking
   const TAB_FIELDS: Record<RestaurantTabKey, (keyof Restaurant)[]> = {
     login: ["email", "password", "confirmPassword"],
     restaurant: ["restaurantName", "restaurantType", "category"],
@@ -83,55 +82,38 @@ const RestaurantForm: React.FC<Props> = ({
     "Group by": [],
   };
 
-  //tab navigation order
-  const tabOrder: RestaurantTabKey[] = [
-    "login",
-    "restaurant",
-    "contact",
-    "location",
-  ];
+  const tabOrder: RestaurantTabKey[] = ["login", "restaurant", "contact", "location"];
 
-  //submit handler
   const onSubmit = async (data: Restaurant) => {
     try {
-      let savedRestaurant: Restaurant;
-
       const finalData: Restaurant = {
         ...data,
-        status: "active", //  promote draft - active
-        isActive: true, //  make it active
+        status: "active",
+        isActive: true,
         updatedAt: new Date().toISOString(),
       };
 
-      if (restaurant?.id) {
-        // EDIT mode - update restaurant
-        savedRestaurant = await updateRestaurant(restaurant.id, finalData);
-
-       showSnackbar(`"${data.restaurantName}" updated successfully`, "success");
+      if (isEditMode && id) {
+        await updateRestaurant(id, finalData);
+        showSnackbar(`"${data.restaurantName}" updated successfully`, "success");
       } else {
-        // NEW registration - send only allowed fields
-        const { id, isActive, createdAt, updatedAt, ...rest } = data;
+        const { id: _, isActive, createdAt, updatedAt, ...rest } = data;
         const createData: CreateRestaurantDTO = { ...rest };
-
-        savedRestaurant = await addRestaurant({
+        await addRestaurant({
           ...createData,
           status: "active",
         });
-
-       showSnackbar("Restaurant registered successfully", "success");
+        showSnackbar("Restaurant registered successfully", "success");
       }
 
-      if (onSave) onSave(savedRestaurant);
-
       setTimeout(() => {
-        onClose(methods.getValues());
+        navigate(-1); // Go back
       }, 1500);
     } catch (error) {
-     showSnackbar("Failed to save restaurant", "error");
+      showSnackbar("Failed to save restaurant", "error");
     }
   };
 
-  //useFormHandlers hook
   const {
     handleNext,
     handleBack,
@@ -155,20 +137,14 @@ const RestaurantForm: React.FC<Props> = ({
       const fields = TAB_FIELDS[tab];
       const hasError = fields.some((field) => errors[field]);
       if (hasError) return [tab, "error"];
-      const allFilled = fields.every((field) =>
-        isFieldFilled(watchedValues[field]),
-      );
+      const allFilled = fields.every((field) => isFieldFilled(watchedValues[field]));
       return [tab, allFilled ? "success" : "neutral"];
     }),
   ) as Record<RestaurantTabKey, "neutral" | "error" | "success">;
 
-  const isAllTabsValid = Object.values(tabStatusMap).every(
-    (status) => status === "success",
-  );
-
+  const isAllTabsValid = Object.values(tabStatusMap).every((status) => status === "success");
   const hasErrors = Object.keys(errors).length > 0;
 
-  // CONFIRMATION
   const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
     setActionType(type);
     setShowConfirm(true);
@@ -189,45 +165,44 @@ const RestaurantForm: React.FC<Props> = ({
   };
 
   const handleSaveDraft = async () => {
-    if (!onSave) return;
-
     if (!isDirty) return;
-
     const values = methods.getValues();
+    
+    try {
+      const draftId = values.id || Date.now().toString();
+      const draft: Restaurant = {
+        ...values,
+        id: draftId,
+        status: "draft",
+        isActive: false,
+        createdAt: values.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    const draftId = values.id || Date.now().toString();
-
-    const draft: Restaurant = {
-      ...values,
-      id: draftId,
-      status: "draft",
-      isActive: false,
-      createdAt: values.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    methods.setValue("id", draftId);
-    await onSave(draft);
+      if (isEditMode && id) {
+        await updateRestaurant(id, draft);
+      } else {
+       
+        if (values.id && restaurant?.id) {
+          await updateRestaurant(restaurant.id, draft);
+        } else {
+        
+          const { id: _, ...rest } = draft;
+          await addRestaurant(rest);
+      
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleDialogClose = () => {
-    const values = methods.getValues();
-    onClose(values); // close dialog, no draft save here
-  };
 
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
-    {
-      key: "restaurant",
-      tabName: "Restaurant Details",
-      tabContent: <RestaurantTab />,
-    },
+    { key: "restaurant", tabName: "Restaurant Details", tabContent: <RestaurantTab /> },
     { key: "contact", tabName: "Contact Info", tabContent: <ContactTab /> },
-    {
-      key: "location",
-      tabName: "Location Details",
-      tabContent: <LocationTab />,
-    },
+    { key: "location", tabName: "Location Details", tabContent: <LocationTab /> },
   ];
 
   const activeTabIndex = tabOrder.indexOf(activeTab);
@@ -235,108 +210,119 @@ const RestaurantForm: React.FC<Props> = ({
   const isLastTab = activeTabIndex === tabOrder.length - 1;
 
   return (
-    <FormProvider {...methods}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <MyDialog
-          open={show}
-          onClose={handleDialogClose}
-          title="Register Your Restaurant"
-        >
-          <Box
-            sx={{ minHeight: 400, display: "flex", flexDirection: "column" }}
-          >
-            <MyTabs
-              tabs={tabsData}
-              activeTab={tabOrder.indexOf(activeTab)}
-              onTabChange={(index) =>
-                handleTabChange(activeTab, tabOrder[index], setActiveTab)
-              }
-              tabStatus={tabStatusMap}
-            />
-          </Box>
+ <Container
+  maxWidth="lg"
+  disableGutters
+  sx={{ mt: 4, mb: 4, px: 2 }} // px: 1 or 2
+>
 
-          <DialogActions sx={{ justifyContent: "space-between", paddingX: 3 }}>
-            <MyButton
-              variant="outlined"
-              onClick={() => handleBack(activeTab, setActiveTab)}
-              disabled={isFirstTab}
-            >
-              Back
-            </MyButton>
 
-            <Stack direction="row" spacing={2}>
-              <MyButton
-                variant="success"
-                onClick={async () => {
-                  if (restaurant) {
-                    await handleFinalSubmit();
-                    return;
-                  }
+      <Paper elevation={3} sx={{ p: 0, overflow: 'hidden' }}>
+        <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+          <Typography variant="h5">
+            {isEditMode ? "Edit Restaurant" : "Register Your Restaurant"}
+          </Typography>
+        </Box>
 
-                  if (isAllTabsValid && isLastTab) {
-                    handleConfirmOpen("register");
-                    return;
-                  }
-
-                  await handleSaveDraft(); // save same draft
-                  handleNext(activeTab, setActiveTab);
-                }}
-              >
-                {getCenterButtonLabel()}
-              </MyButton>
-
-              <MyButton
-                variant="outlined"
-                onClick={() =>
-                  handleReset(setActiveTab, isDirty, hasErrors, () =>
-                    handleConfirmOpen("reset"),
-                  )
+        <FormProvider {...methods}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box sx={{ minHeight: 400, display: "flex", flexDirection: "column" ,  px: 3 }}>
+              <MyTabs
+                tabs={tabsData}
+                activeTab={tabOrder.indexOf(activeTab)}
+                onTabChange={(index) =>
+                  handleTabChange(activeTab, tabOrder[index], setActiveTab)
                 }
-              >
-                Reset
-              </MyButton>
-            </Stack>
+                tabStatus={tabStatusMap}
+              />
+            </Box>
 
-            <MyButton
-              variant="contained"
-              onClick={() => handleNext(activeTab, setActiveTab)}
-              disabled={isLastTab}
-            >
-              Next
-            </MyButton>
-          </DialogActions>
-        </MyDialog>
-
-        <MyDialog
-          open={showConfirm}
-          onClose={() => setShowConfirm(false)}
-          maxWidth="xs"
-        >
-          <DialogContent sx={{ textAlign: "center" }}>
-            {actionType === "register"
-              ? "Proceed with restaurant registration?"
-              : "Are you sure?"}
-            <Stack
-              direction="row"
-              spacing={2}
-              justifyContent="center"
-              sx={{ mt: 3 }}
-            >
+            <Box sx={{ display: 'flex', justifyContent: "space-between", padding: 3, borderTop: 1, borderColor: 'divider' }}>
               <MyButton
                 variant="outlined"
-                onClick={() => setShowConfirm(false)}
+                onClick={() => handleBack(activeTab, setActiveTab)}
+                disabled={isFirstTab}
               >
-                No
+                Back
               </MyButton>
-              <MyButton variant="contained" onClick={handleConfirmYes}>
-                Yes
+
+              <Stack direction="row" spacing={2}>
+                <MyButton
+                  variant="success"
+                  onClick={async () => {
+                    // If explicit "Update" or "Register" needed
+                    if (isEditMode) {
+                      await handleFinalSubmit();
+                      return;
+                    }
+
+                    if (isAllTabsValid && isLastTab) {
+                      handleConfirmOpen("register");
+                      return;
+                    }
+
+                  
+                    await handleSaveDraft();
+                    handleNext(activeTab, setActiveTab);
+                  }}
+                >
+                  {getCenterButtonLabel()}
+                </MyButton>
+
+                <MyButton
+                  variant="outlined"
+                  onClick={() =>
+                    handleReset(setActiveTab, isDirty, hasErrors, () =>
+                      handleConfirmOpen("reset"),
+                    )
+                  }
+                >
+                  Reset
+                </MyButton>
+              </Stack>
+
+              <MyButton
+                variant="contained"
+                onClick={() => handleNext(activeTab, setActiveTab)}
+                disabled={isLastTab}
+              >
+                Next
               </MyButton>
-            </Stack>
-          </DialogContent>
-        </MyDialog>
-      </LocalizationProvider>
-    </FormProvider>
+            </Box>
+            <MyDialog
+              open={showConfirm}
+              onClose={() => setShowConfirm(false)}
+              maxWidth="xs"
+            >
+              <DialogContent sx={{ textAlign: "center" }}>
+                {actionType === "register"
+                  ? "Proceed with restaurant registration?"
+                  : "Are you sure?"}
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  justifyContent="center"
+                  sx={{ mt: 3 }}
+                >
+                  <MyButton
+                    variant="outlined"
+                    onClick={() => setShowConfirm(false)}
+                  >
+                    No
+                  </MyButton>
+                  <MyButton variant="contained" onClick={handleConfirmYes}>
+                    Yes
+                  </MyButton>
+                </Stack>
+              </DialogContent>
+            </MyDialog>
+          </LocalizationProvider>
+        </FormProvider>
+      </Paper>
+    </Container>
   );
 };
 
 export default RestaurantForm;
+
+

@@ -140,7 +140,7 @@ const Header: React.FC = () => {
     {
       text: "Add Restaurant",
       icon: <AddCircleIcon />,
-      to: "/add-restaurant",
+      to: "/restaurant/register",
       roles: ["admin"],
     },
     {
@@ -192,7 +192,7 @@ const Header: React.FC = () => {
                 setState((prev) => ({ ...prev, user: null }));
                 showSnackbar("Logged out successfully", "success"); //  global snackbar
                 setAnchorEl(null);
-                navigate("/HomePage"); 
+                navigate("/HomePage");
               }}
             >
               <LogoutIcon fontSize="small" />
@@ -250,89 +250,89 @@ const Header: React.FC = () => {
       </AppBar>
 
       {/* Sidebar */}
-        <Drawer
-          variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
-          open={!state.collapsed}
-          onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
-          sx={{
+      <Drawer
+        variant={window.innerWidth >= 1200 ? "permanent" : "temporary"}
+        open={!state.collapsed}
+        onClose={() => setState((prev) => ({ ...prev, collapsed: true }))}
+        sx={{
+          width: state.collapsed ? 72 : 260,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
             width: state.collapsed ? 72 : 260,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: state.collapsed ? 72 : 260,
-              boxSizing: "border-box",
-              top: "64px", // height of AppBar
-              transition: "width 0.3s",
-              overflowX: "hidden",
-            },
-          }}
-        >
-          <Box sx={{ mt: "8px", ml: "8px", pt: 0 }}>
-            <List>
-              {menuItems
-                .filter(
-                  (item) => state.user && item.roles.includes(state.user.role),
-                )
-                .map((item) => (
-                  <ListItem
-                    key={item.text}
-                    disablePadding
-                    sx={{ display: "block" }}
+            boxSizing: "border-box",
+            top: "64px", // height of AppBar
+            transition: "width 0.3s",
+            overflowX: "hidden",
+          },
+        }}
+      >
+        <Box sx={{ mt: "8px", ml: "8px", pt: 0 }}>
+          <List>
+            {menuItems
+              .filter(
+                (item) => state.user && item.roles.includes(state.user.role),
+              )
+              .map((item) => (
+                <ListItem
+                  key={item.text}
+                  disablePadding
+                  sx={{ display: "block" }}
+                >
+                  <ListItemButton
+                    component={Link}
+                    to={item.to}
+                    onClick={() =>
+                      window.innerWidth < 1200 &&
+                      setState((prev) => ({ ...prev, collapsed: true }))
+                    }
+                    sx={{
+                      minHeight: 48,
+                      justifyContent: state.collapsed
+                        ? "center"
+                        : "flex-start",
+                      px: 2.5,
+                      backgroundColor:
+                        location.pathname === item.to
+                          ? "rgba(226, 55, 68, 0.12)"
+                          : "transparent",
+                    }}
                   >
-                    <ListItemButton
-                      component={Link}
-                      to={item.to}
-                      onClick={() =>
-                        window.innerWidth < 1200 &&
-                        setState((prev) => ({ ...prev, collapsed: true }))
-                      }
+                    <ListItemIcon
                       sx={{
-                        minHeight: 48,
-                        justifyContent: state.collapsed
-                          ? "center"
-                          : "flex-start",
-                        px: 2.5,
-                        backgroundColor:
-                          location.pathname === item.to
-                            ? "rgba(226, 55, 68, 0.12)"
-                            : "transparent",
+                        minWidth: 0,
+                        mr: state.collapsed ? "auto" : 2,
+                        justifyContent: "center",
+                        color: "#333333",
                       }}
                     >
-                      <ListItemIcon
+                      {item.icon}
+                    </ListItemIcon>
+                    {!state.collapsed && (
+                      <ListItemText
+                        primary={item.text}
                         sx={{
-                          minWidth: 0,
-                          mr: state.collapsed ? "auto" : 2,
-                          justifyContent: "center",
-                          color: "#333333",
+                          color:
+                            location.pathname === item.to
+                              ? "#e23744"
+                              : "inherit",
+                          fontWeight:
+                            location.pathname === item.to ? 600 : 400,
                         }}
-                      >
-                        {item.icon}
-                      </ListItemIcon>
-                      {!state.collapsed && (
-                        <ListItemText
-                          primary={item.text}
-                          sx={{
-                            color:
-                              location.pathname === item.to
-                                ? "#e23744"
-                                : "inherit",
-                            fontWeight:
-                              location.pathname === item.to ? 600 : 400,
-                          }}
-                        />
-                      )}
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-            </List>
+                      />
+                    )}
+                  </ListItemButton>
+                </ListItem>
+              ))}
+          </List>
 
-            {/* Mobile toggles */}
-            <Box p={2} display={{ lg: "none" }} gap={2}>
-              {FoodToggle}
-              {DarkToggle}
-            </Box>
+          {/* Mobile toggles */}
+          <Box p={2} display={{ lg: "none" }} gap={2}>
+            {FoodToggle}
+            {DarkToggle}
           </Box>
-        </Drawer>
-  
+        </Box>
+      </Drawer>
+
 
       {/* Login */}
       {state.showLoginForm && (
