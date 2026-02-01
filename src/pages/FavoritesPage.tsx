@@ -11,7 +11,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useNavigate } from "react-router-dom";
 import { useCartFav } from "../context/FavContext";
-import MyCard from "../components/newcomponents/card/MyCard"; // use your MyCard
+import MyCard from "../components/newcomponents/card/MyCard"; 
 import MyButton from "../components/newcomponents/button/MyButton";
 
 const FavoritesPage: React.FC = () => {
