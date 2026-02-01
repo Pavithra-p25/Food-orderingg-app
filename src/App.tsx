@@ -16,6 +16,8 @@ import RestaurantSearch from "./pages/restuarantsearch/RestaurantSearch";
 import RestaurantInfo from "./pages/restaurantinfo/RestaurantInfo";
 import RestaurantInfoList from "./pages/restaurantinfo/RestaurantInfoList";
 import RestaurantForm from "./pages/registerrestaurant/RestaurantForm";
+import { FavProvider } from "./context/FavContext";
+
 
 /*  Routes */
 const AppRoutes = () => {
@@ -46,6 +48,7 @@ const App: React.FC = () => {
         <CssBaseline />
         <ThemeProvider>
           <SnackbarProvider>
+             <FavProvider>
             <div className="d-flex flex-column min-vh-100">
               <Header />
               <main className="flex-grow-1 pt-5">
@@ -53,6 +56,7 @@ const App: React.FC = () => {
               </main>
               <Footer />
             </div>
+            </FavProvider>
           </SnackbarProvider>
         </ThemeProvider>
       </MuiThemeProvider>

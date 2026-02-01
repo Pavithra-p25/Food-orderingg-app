@@ -6,3 +6,11 @@ export interface User {
   emailOrUsername: string;
   password: string;
 }
+
+export type FavoriteItem = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+};
+

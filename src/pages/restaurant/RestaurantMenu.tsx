@@ -15,6 +15,9 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import MyCard from "../../components/newcomponents/card/MyCard";
 import db from "../../../server/db.json";
+import { useCartFav } from "../../context/FavContext";
+import type { FavoriteItem } from "../../types/userTypes";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 // Types
 type MenuItem = {
@@ -34,7 +37,7 @@ type Restaurant = {
 const RestaurantMenu: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const { favorites, addToFavorites, removeFromFavorites } = useCartFav();
   const [error, setError] = useState<string | null>(null);
 
   // Merge restaurant + menuItems
@@ -66,11 +69,29 @@ const RestaurantMenu: React.FC = () => {
   }, [id]);
 
   // Handlers
-  const toggleFavorite = (index: number) => {
-    setFavorites((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
-    );
+const handleFavorite = (
+  item: MenuItem,
+  itemId: string,
+  isFavorite: boolean
+) => {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  if (!user) {
+    alert("Please login to add favorites");
+    return;
+  }
+
+  const favItem: FavoriteItem = {
+    id: itemId,
+    name: item.itemName,
+    price: item.price,
+    image: item.file || "/placeholder.jpg",
   };
+
+  isFavorite
+    ? removeFromFavorites(itemId)
+    : addToFavorites(favItem);
+};
+
 
   const addToCart = (itemName: string) => {
     console.log(`Added ${itemName} to cart`);
@@ -141,11 +162,14 @@ const RestaurantMenu: React.FC = () => {
       <Grid container spacing={3}>
         {restaurant.menuItems && restaurant.menuItems.length > 0
           ? restaurant.menuItems.map((item, index) => {
-              const isFavorite = favorites.includes(index);
+             const itemId = `${restaurant.id}-${index}`;
+
+
+              const isFavorite = favorites.some((fav) => fav.id === itemId);
+
               return (
-                <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid key={itemId} size={{ xs: 12, sm: 6, md: 4 }}>
                   <MyCard image={item.file || "/placeholder.jpg"}>
-                    {/* Title + Price Row */}
                     <Box
                       sx={{
                         display: "flex",
@@ -155,7 +179,6 @@ const RestaurantMenu: React.FC = () => {
                       }}
                     >
                       <Typography fontWeight="bold">{item.itemName}</Typography>
-
                       <Typography fontWeight="bold" color="success.main">
                         ₹{item.price}
                       </Typography>
@@ -177,9 +200,15 @@ const RestaurantMenu: React.FC = () => {
                       >
                         <IconButton
                           color={isFavorite ? "error" : "default"}
-                          onClick={() => toggleFavorite(index)}
+                          onClick={() =>
+                            handleFavorite(item, itemId, isFavorite)
+                          }
                         >
-                          <FavoriteIcon />
+                          {isFavorite ? (
+                            <FavoriteIcon />
+                          ) : (
+                            <FavoriteBorderIcon />
+                          )}
                         </IconButton>
                       </Tooltip>
 
