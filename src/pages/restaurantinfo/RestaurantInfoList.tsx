@@ -14,11 +14,8 @@ import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
 
 const RestaurantInfoList = () => {
-  const {
-    restaurantInfoList,
-    fetchRestaurantInfo,
-    removeRestaurantInfo,
-  } = useRestaurantInfo();
+  const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo } =
+    useRestaurantInfo();
 
   const navigate = useNavigate();
 
@@ -88,16 +85,15 @@ const RestaurantInfoList = () => {
     },
   ];
 
-
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Paper elevation={6} sx={{ p: 4, borderRadius: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 4 } }}>
+      <Paper elevation={6} sx={{ p: { xs: 2, sm: 3, md: 4 }, borderRadius: 4 }}>
         <Typography variant="h6" fontWeight="bold" mb={3} textAlign="center">
           Restaurant Information List
         </Typography>
 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
-          <Box sx={{ minWidth: 650 }}>
+          <Box sx={{ minWidth: { xs: 900, md: "100%" } }}>
             <MyTable
               columns={restaurantColumns}
               rows={restaurantInfoList}

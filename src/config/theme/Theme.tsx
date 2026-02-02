@@ -1,89 +1,76 @@
 import { createTheme } from "@mui/material/styles";
 
-const Theme = createTheme({
-  components: {
-    MuiFormHelperText: {
-      styleOverrides: {
-        root: {
-          marginLeft: 0,
-          marginRight: 0,
-        },
-      },
+export const getTheme = (mode: "light" | "dark") =>
+  createTheme({
+    palette: {
+      mode,
+      ...(mode === "light"
+        ? {
+            background: {
+              default: "#f9f9f9",
+              paper: "#ffffff",
+            },
+            text: {
+              primary: "#000000",
+            },
+          }
+        : {
+            background: {
+              default: "#121212",
+              paper: "#1e1e1e",
+            },
+            text: {
+              primary: "#ffffff",
+            },
+          }),
     },
 
-    MuiTableCell: {
-      styleOverrides: {
-        head: {
-          textAlign: "center",
-          fontWeight: "bold",
-          backgroundColor: "#9e9e9e",
-          color: "#ffffff",
+    components: {
+      MuiFormHelperText: {
+        styleOverrides: {
+          root: { marginLeft: 0, marginRight: 0 },
         },
       },
-    },
 
-    // Center sort labels
-    MuiTableSortLabel: {
-      styleOverrides: {
-        root: {
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
+      MuiTableCell: {
+        styleOverrides: {
+          head: {
+            textAlign: "center",
+            fontWeight: "bold",
+            backgroundColor: mode === "dark" ? "#424242" : "#9e9e9e",
+            color: "#ffffff",
+          },
         },
       },
-    },
 
-    //Pagination consistency
-    MuiTablePagination: {
-      styleOverrides: {
-        toolbar: {
-          minHeight: "52px",
-          alignItems: "center",
-        },
-        selectLabel: {
-          marginBottom: 0,
-          display: "flex",
-          alignItems: "center",
-        },
-        displayedRows: {
-          marginBottom: 0,
-          display: "flex",
-          alignItems: "center",
-        },
-        actions: {
-          display: "flex",
-          alignItems: "center",
+      MuiTableSortLabel: {
+        styleOverrides: {
+          root: {
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+          },
         },
       },
-    },
 
-    // Checkbox padding (table selection)
-    MuiCheckbox: {
-      styleOverrides: {
-        root: {
-          padding: 8,
+      MuiTablePagination: {
+        styleOverrides: {
+          toolbar: { minHeight: "52px", alignItems: "center" },
+          selectLabel: { marginBottom: 0 },
+          displayedRows: { marginBottom: 0 },
         },
       },
-    },
 
-    // Icon buttons (bulk delete / restore)
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          border: "none",
-        },
+      MuiCheckbox: {
+        styleOverrides: { root: { padding: 8 } },
+      },
+
+      MuiIconButton: {
+        styleOverrides: { root: { border: "none" } },
+      },
+
+      MuiPaper: {
+        styleOverrides: { root: { overflow: "hidden" } },
       },
     },
-
-    // Paper default for tables
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          overflow: "hidden",
-        },
-      },
-    },
-  },
-});
-
-export default Theme;
+  });

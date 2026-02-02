@@ -82,7 +82,7 @@ const Header: React.FC = () => {
   ];
 
   const FoodToggle = (
-    <ButtonGroup size="small" fullWidth sx={{ width: 170 }}>
+    <ButtonGroup size="small" fullWidth sx={{ width: 180 }}>
       {foodOptions.map((opt) => {
         const isActive = state.foodMode === opt.value;
 
@@ -90,7 +90,7 @@ const Header: React.FC = () => {
           <MyButton
             key={opt.value}
             variant={isActive ? opt.activeVariant : "outlined"}
-            sx={{ flex: 0.5 }}
+            sx={{ flex: 1 }}
             onClick={() =>
               setState((prev) => ({
                 ...prev,
@@ -239,10 +239,12 @@ const Header: React.FC = () => {
       {/* AppBar */}
       <AppBar position="fixed" color={darkMode ? "default" : "inherit"}>
         <Toolbar>
-          {/* LEFT: Menu + Title */}
+          {/* Menu + Title */}
           <Box display="flex" alignItems="center" gap={1}>
             <IconButton
-              sx={{ color: "#333333" }}
+              sx={{
+                color: darkMode ? "text.primary" : "#e23744",
+              }}
               onClick={() =>
                 setState((prev) => ({ ...prev, collapsed: !prev.collapsed }))
               }
@@ -286,9 +288,13 @@ const Header: React.FC = () => {
           "& .MuiDrawer-paper": {
             width: state.collapsed ? 72 : 260,
             boxSizing: "border-box",
-            top: "64px", // height of AppBar
+            top: "64px",
             transition: "width 0.3s",
             overflowX: "hidden",
+            bgcolor: "background.paper",
+            color: "text.primary",
+            borderRight: "1px solid",
+            borderColor: "divider",
           },
         }}
       >
@@ -323,11 +329,15 @@ const Header: React.FC = () => {
                         minWidth: 0,
                         mr: state.collapsed ? "auto" : 2,
                         justifyContent: "center",
-                        color: "#333333",
+                        color:
+                          location.pathname === item.to
+                            ? "error.main"
+                            : "text.secondary",
                       }}
                     >
                       {item.icon}
                     </ListItemIcon>
+
                     {!state.collapsed && (
                       <ListItemText
                         primary={item.text}

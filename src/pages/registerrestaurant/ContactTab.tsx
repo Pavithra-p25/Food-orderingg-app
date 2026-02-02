@@ -7,9 +7,9 @@ const ContactTab: React.FC = () => {
   const { formState: { errors } } = useFormContext();
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={{ xs: 2, sm: 3 }}>
       {/* Owner Name */}
-      <Grid size={12}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="ownerName"
           label="Owner Name"
@@ -20,7 +20,7 @@ const ContactTab: React.FC = () => {
       </Grid>
 
       {/* Support Email */}
-      <Grid size={12}>
+    <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="supportEmail"
           label="Support Email"
@@ -31,7 +31,7 @@ const ContactTab: React.FC = () => {
       </Grid>
 
       {/* Phone */}
-      <Grid size={12}>
+        <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="phone"
           label="Phone"
@@ -42,7 +42,7 @@ const ContactTab: React.FC = () => {
       </Grid>
 
       {/* Alternate Phone */}
-      <Grid size={12}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="alternatePhone"
           label="Alternate Phone"

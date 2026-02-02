@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Container, Paper, Stack, Box, Typography} from "@mui/material";
+import { Container, Paper, Stack, Box, Typography } from "@mui/material";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -30,13 +29,16 @@ const RestaurantForm: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login");
   const [showConfirm, setShowConfirm] = useState(false);
-  const [actionType, setActionType] = useState<"register" | "reset" | "cancel" | null>(null);
+  const [actionType, setActionType] = useState<
+    "register" | "reset" | "cancel" | null
+  >(null);
 
   // Local state for the restaurant object being edited
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
   const { showSnackbar } = useSnackbar();
-  const { addRestaurant, updateRestaurant, getRestaurantDetails } = useRestaurants();
+  const { addRestaurant, updateRestaurant, getRestaurantDetails } =
+    useRestaurants();
 
   // Load data if in edit mode
   useEffect(() => {
@@ -82,7 +84,12 @@ const RestaurantForm: React.FC = () => {
     "Group by": [],
   };
 
-  const tabOrder: RestaurantTabKey[] = ["login", "restaurant", "contact", "location"];
+  const tabOrder: RestaurantTabKey[] = [
+    "login",
+    "restaurant",
+    "contact",
+    "location",
+  ];
 
   const onSubmit = async (data: Restaurant) => {
     try {
@@ -95,7 +102,10 @@ const RestaurantForm: React.FC = () => {
 
       if (isEditMode && id) {
         await updateRestaurant(id, finalData);
-        showSnackbar(`"${data.restaurantName}" updated successfully`, "success");
+        showSnackbar(
+          `"${data.restaurantName}" updated successfully`,
+          "success",
+        );
       } else {
         const { id: _, isActive, createdAt, updatedAt, ...rest } = data;
         const createData: CreateRestaurantDTO = { ...rest };
@@ -137,12 +147,16 @@ const RestaurantForm: React.FC = () => {
       const fields = TAB_FIELDS[tab];
       const hasError = fields.some((field) => errors[field]);
       if (hasError) return [tab, "error"];
-      const allFilled = fields.every((field) => isFieldFilled(watchedValues[field]));
+      const allFilled = fields.every((field) =>
+        isFieldFilled(watchedValues[field]),
+      );
       return [tab, allFilled ? "success" : "neutral"];
     }),
   ) as Record<RestaurantTabKey, "neutral" | "error" | "success">;
 
-  const isAllTabsValid = Object.values(tabStatusMap).every((status) => status === "success");
+  const isAllTabsValid = Object.values(tabStatusMap).every(
+    (status) => status === "success",
+  );
   const hasErrors = Object.keys(errors).length > 0;
 
   const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
@@ -167,7 +181,7 @@ const RestaurantForm: React.FC = () => {
   const handleSaveDraft = async () => {
     if (!isDirty) return;
     const values = methods.getValues();
-    
+
     try {
       const draftId = values.id || Date.now().toString();
       const draft: Restaurant = {
@@ -182,14 +196,11 @@ const RestaurantForm: React.FC = () => {
       if (isEditMode && id) {
         await updateRestaurant(id, draft);
       } else {
-       
         if (values.id && restaurant?.id) {
           await updateRestaurant(restaurant.id, draft);
         } else {
-        
           const { id: _, ...rest } = draft;
           await addRestaurant(rest);
-      
         }
       }
     } catch (e) {
@@ -197,12 +208,19 @@ const RestaurantForm: React.FC = () => {
     }
   };
 
-
   const tabsData = [
     { key: "login", tabName: "Login Details", tabContent: <LoginTab /> },
-    { key: "restaurant", tabName: "Restaurant Details", tabContent: <RestaurantTab /> },
+    {
+      key: "restaurant",
+      tabName: "Restaurant Details",
+      tabContent: <RestaurantTab />,
+    },
     { key: "contact", tabName: "Contact Info", tabContent: <ContactTab /> },
-    { key: "location", tabName: "Location Details", tabContent: <LocationTab /> },
+    {
+      key: "location",
+      tabName: "Location Details",
+      tabContent: <LocationTab />,
+    },
   ];
 
   const activeTabIndex = tabOrder.indexOf(activeTab);
@@ -210,23 +228,44 @@ const RestaurantForm: React.FC = () => {
   const isLastTab = activeTabIndex === tabOrder.length - 1;
 
   return (
- <Container
-  maxWidth="lg"
-  disableGutters
-  sx={{ mt: 4, mb: 4, px: 2 }} // px: 1 or 2
->
-
-
-      <Paper elevation={3} sx={{ p: 0, overflow: 'hidden' }}>
-        <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
-          <Typography variant="h5">
+    <Container
+      maxWidth="lg"
+      disableGutters
+      sx={{
+        mt: { xs: 2, sm: 3, md: 4 },
+        mb: { xs: 2, sm: 3, md: 4 },
+        px: { xs: 1, sm: 2, md: 3 },
+      }}
+    >
+      <Paper elevation={3} sx={{ p: 0, overflow: "hidden" }}>
+        <Box
+          sx={{
+            p: { xs: 1.5, sm: 2 },
+            bgcolor: "primary.main",
+            color: "white",
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.5rem" },
+              textAlign: { xs: "center", sm: "left" },
+            }}
+          >
             {isEditMode ? "Edit Restaurant" : "Register Your Restaurant"}
           </Typography>
         </Box>
 
         <FormProvider {...methods}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{ minHeight: 400, display: "flex", flexDirection: "column" ,  px: 3 }}>
+            <Box
+              sx={{
+                minHeight: { xs: "auto", md: 400 },
+                display: "flex",
+                flexDirection: "column",
+                px: { xs: 1, sm: 2, md: 3 },
+              }}
+            >
               <MyTabs
                 tabs={tabsData}
                 activeTab={tabOrder.indexOf(activeTab)}
@@ -237,7 +276,17 @@ const RestaurantForm: React.FC = () => {
               />
             </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: "space-between", padding: 3, borderTop: 1, borderColor: 'divider' }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 2,
+                justifyContent: "space-between",
+                p: { xs: 2, sm: 3 },
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
               <MyButton
                 variant="outlined"
                 onClick={() => handleBack(activeTab, setActiveTab)}
@@ -246,11 +295,14 @@ const RestaurantForm: React.FC = () => {
                 Back
               </MyButton>
 
-              <Stack direction="row" spacing={2}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{ width: { xs: "100%", md: "auto" } }}
+              >
                 <MyButton
                   variant="success"
                   onClick={async () => {
-                    // If explicit "Update" or "Register" needed
                     if (isEditMode) {
                       await handleFinalSubmit();
                       return;
@@ -261,7 +313,6 @@ const RestaurantForm: React.FC = () => {
                       return;
                     }
 
-                  
                     await handleSaveDraft();
                     handleNext(activeTab, setActiveTab);
                   }}
@@ -324,5 +375,3 @@ const RestaurantForm: React.FC = () => {
 };
 
 export default RestaurantForm;
-
-

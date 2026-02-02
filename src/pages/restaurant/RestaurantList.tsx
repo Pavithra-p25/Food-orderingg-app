@@ -16,7 +16,6 @@ import CommonInput from "../../components/newcomponents/textfields/CommonInput";
 import CommonSelect from "../../components/newcomponents/textfields/CommonSelect";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
 
-
 const CATEGORY_OPTIONS = ["", ...RESTAURANT_CATEGORIES];
 
 const RestaurantList: React.FC = () => {
@@ -72,12 +71,12 @@ const RestaurantList: React.FC = () => {
 
   const handleFilterChange =
     (field: keyof typeof filters) =>
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters((prev) => ({
-          ...prev,
-          [field]: e.target.value,
-        }));
-      };
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilters((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }));
+    };
 
   useEffect(() => {
     setVisibleCount(9);
@@ -98,8 +97,8 @@ const RestaurantList: React.FC = () => {
         {/* FILTERS */}
 
         <Grid size={{ xs: 12, md: 3 }}>
-          <Paper sx={{ p: 2, backgroundColor: "whitesmoke" }}>
-            <Typography fontWeight="bold" mb={2}>
+          <Paper sx={{ p: 2, bgcolor: "background.paper" }}>
+            <Typography fontWeight="bold" mb={2} color="text.primary">
               Filters
             </Typography>
 
@@ -127,7 +126,12 @@ const RestaurantList: React.FC = () => {
           <Grid container spacing={3}>
             {visibleRestaurants.map((restaurant) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={restaurant.id}>
-                <Card>
+                <Card
+                  sx={{
+                    bgcolor: "background.paper",
+                    color: "text.primary",
+                  }}
+                >
                   <CardMedia
                     component="img"
                     height="140"
@@ -197,9 +201,12 @@ const RestaurantList: React.FC = () => {
           sx={{
             p: 4,
             textAlign: "center",
-            background: "linear-gradient(135deg, #ffffff 0%, #ff4d4d 100%)",
-            color: "#333333",
             borderRadius: 3,
+            background: (theme) =>
+              theme.palette.mode === "dark"
+                ? "linear-gradient(135deg, #b71c1c 0%, #000000 100%)"
+                : "linear-gradient(135deg, #ffffff 0%, #ff4d4d 100%)",
+            color: "text.primary",
           }}
         >
           <Typography variant="h5" mb={2}>

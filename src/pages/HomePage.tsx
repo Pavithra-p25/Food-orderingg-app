@@ -113,7 +113,7 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Features Section */}
-      <Box sx={{ py: 8, px: 2, backgroundColor: "#f9f9f9" }}>
+      <Box sx={{ py: 8, px: 2,  backgroundColor: (theme) => theme.palette.background.default,}}>
         <Typography variant="h4" textAlign="center" fontWeight="bold" mb={6}>
           Why Choose FoodExpress?
         </Typography>
@@ -126,7 +126,6 @@ const HomePage: React.FC = () => {
                   description={feature.description}
                   image={feature.image}
                   sx={{
-                    maxWidth: 200,
                     mx: "auto",
                     textAlign: "center",
                   }}

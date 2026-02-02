@@ -14,9 +14,9 @@ const LocationTab: React.FC = () => {
 
  
   return (
-    <Grid container spacing={2}>
-      {/* Address - full width */}
-      <Grid size={12}>
+     <Grid container spacing={{ xs: 2, sm: 3 }}>
+      
+      <Grid size={{ xs: 12 }}>
         <MyTextarea
           name="address"
           control={control}
@@ -29,7 +29,7 @@ const LocationTab: React.FC = () => {
       </Grid>
 
       {/* City */}
-      <Grid size={6}>
+     <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="city"
           label="City"
@@ -40,7 +40,7 @@ const LocationTab: React.FC = () => {
       </Grid>
 
       {/* State */}
-      <Grid size={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="state"
           label="State"
@@ -51,7 +51,7 @@ const LocationTab: React.FC = () => {
       </Grid>
 
       {/* Country */}
-      <Grid size={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="country"
           label="Country"
@@ -62,7 +62,7 @@ const LocationTab: React.FC = () => {
       </Grid>
 
       {/* Pincode */}
-      <Grid size={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
         <MyInput
           name="pincode"
           label="Pincode"
@@ -71,13 +71,13 @@ const LocationTab: React.FC = () => {
           errorMessage={errors.pincode?.message?.toString()}
         />
       </Grid>
-
+ <Grid size={{ xs: 12 }}>
       <MyCheckbox
         name="acceptTerms"
         label="I agree to the Terms & Conditions"
        required
       />
-
+</Grid>
     </Grid>
   );
 };
