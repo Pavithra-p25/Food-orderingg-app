@@ -18,7 +18,6 @@ import RestaurantInfoList from "./pages/restaurantinfo/RestaurantInfoList";
 import RestaurantForm from "./pages/registerrestaurant/RestaurantForm";
 import { FavProvider } from "./context/FavContext";
 
-
 /*  Routes */
 const AppRoutes = () => {
   return (
@@ -34,7 +33,9 @@ const AppRoutes = () => {
       <Route path="/restaurant/register" element={<RestaurantForm />} />
       <Route path="/restaurant/edit/:id" element={<RestaurantForm />} />
       <Route path="/RestaurantInfo" element={<RestaurantInfo />} />
-      <Route path="/RestaurantInfo/edit/:id" element={<RestaurantInfo />} />
+      <Route path="/restaurant-info/edit/:id" element={<RestaurantInfo />} />
+      <Route path="/restaurant-info/edit/:id" element={<RestaurantInfo />} />
+
       <Route path="/RestaurantInfoList" element={<RestaurantInfoList />} />
     </Routes>
   );
@@ -48,14 +49,14 @@ const App: React.FC = () => {
         <CssBaseline />
         <ThemeProvider>
           <SnackbarProvider>
-             <FavProvider>
-            <div className="d-flex flex-column min-vh-100">
-              <Header />
-              <main className="flex-grow-1 pt-5">
-                <AppRoutes />
-              </main>
-              <Footer />
-            </div>
+            <FavProvider>
+              <div className="d-flex flex-column min-vh-100">
+                <Header />
+                <main className="flex-grow-1 pt-5">
+                  <AppRoutes />
+                </main>
+                <Footer />
+              </div>
             </FavProvider>
           </SnackbarProvider>
         </ThemeProvider>

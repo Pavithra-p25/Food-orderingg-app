@@ -1,24 +1,36 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, Grid } from "@mui/material";
 import MyButton from "../components/newcomponents/button/MyButton";
 import MyCard from "../components/newcomponents/card/MyCard";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "../context/SnackbarContext";
+import LoginForm from "./authentication/LoginForm";
 
 const HomePage: React.FC = () => {
   //  hooks
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
   const user = localStorage.getItem("user");
+  // State to show/hide login form
+  const [showLoginForm, setShowLoginForm] = useState(false);
+
+  // Listen for the custom event from handleAuthNavigate
+  useEffect(() => {
+    const openLoginListener = () => setShowLoginForm(true);
+    window.addEventListener("open-login", openLoginListener);
+
+    return () => window.removeEventListener("open-login", openLoginListener);
+  }, []);
 
   const handleAuthNavigate = (message: string) => {
     if (!user) {
-      showSnackbar(message, "warning");
-      window.dispatchEvent(new Event("open-login"));
+      showSnackbar(message, "warning"); // show warning
+      window.dispatchEvent(new Event("open-login")); // open login form
       return;
     }
 
-    navigate("/restaurants");
+    navigate("/restaurants"); // if logged in, go to restaurants
   };
 
   const features = [
@@ -91,9 +103,7 @@ const HomePage: React.FC = () => {
 
         <Box display="flex" gap={2}>
           <MyButton
-            onClick={() =>
-              handleAuthNavigate("Please login to explore restaurants")
-            }
+            onClick={() => navigate("/restaurants")}
             variant="cancel"
             size="large"
           >
@@ -157,6 +167,17 @@ const HomePage: React.FC = () => {
           </MyButton>
         </Box>
       </Box>
+      {/* Login Form */}
+      {showLoginForm && (
+        <LoginForm
+          show={showLoginForm}
+          onClose={() => setShowLoginForm(false)}
+          onLoginSuccess={() => {
+            setShowLoginForm(false); // close login form
+            navigate("/restaurants"); // navigate after successful login
+          }}
+        />
+      )}
     </Box>
   );
 };

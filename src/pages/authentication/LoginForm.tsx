@@ -15,7 +15,7 @@ import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "../../schemas/LoginSchema";
+import { loginSchema } from "../../schemas/loginSchema";
 import useUser from "../../hooks/useUser";
 import { useSnackbar } from "../../context/SnackbarContext";
 

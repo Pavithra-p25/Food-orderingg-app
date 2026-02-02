@@ -5,7 +5,6 @@ import {
   IconButton,
   Typography,
   Box,
-  Button,
   Drawer,
   List,
   ListItem,
@@ -15,6 +14,8 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import { ButtonGroup } from "@mui/material";
+import MyButton from "../components/newcomponents/button/MyButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import StoreIcon from "@mui/icons-material/Store";
@@ -71,35 +72,37 @@ const Header: React.FC = () => {
     document.body.classList.toggle("dark-mode", darkMode);
   }, [darkMode]);
 
+  const foodOptions: {
+    label: string;
+    value: Exclude<FoodMode, null>;
+    activeVariant: "success" | "cancel";
+  }[] = [
+    { label: "Veg", value: "veg", activeVariant: "success" },
+    { label: "Non-Veg", value: "nonveg", activeVariant: "cancel" },
+  ];
+
   const FoodToggle = (
-    <Box display="flex" width="220px">
-      <Button
-        fullWidth
-        variant={state.foodMode === "veg" ? "contained" : "outlined"}
-        color="success"
-        onClick={() =>
-          setState((prev) => ({
-            ...prev,
-            foodMode: prev.foodMode === "veg" ? null : "veg",
-          }))
-        }
-      >
-        Veg
-      </Button>
-      <Button
-        fullWidth
-        variant={state.foodMode === "nonveg" ? "contained" : "outlined"}
-        color="error"
-        onClick={() =>
-          setState((prev) => ({
-            ...prev,
-            foodMode: prev.foodMode === "nonveg" ? null : "nonveg",
-          }))
-        }
-      >
-        Non-Veg
-      </Button>
-    </Box>
+    <ButtonGroup size="small" fullWidth sx={{ width: 170 }}>
+      {foodOptions.map((opt) => {
+        const isActive = state.foodMode === opt.value;
+
+        return (
+          <MyButton
+            key={opt.value}
+            variant={isActive ? opt.activeVariant : "outlined"}
+            sx={{ flex: 0.5 }}
+            onClick={() =>
+              setState((prev) => ({
+                ...prev,
+                foodMode: isActive ? null : opt.value,
+              }))
+            }
+          >
+            {opt.label}
+          </MyButton>
+        );
+      })}
+    </ButtonGroup>
   );
 
   const DarkToggle = (
@@ -178,8 +181,6 @@ const Header: React.FC = () => {
     }
   };
 
-  
-
   const renderPersonSection = () => {
     if (state.user) {
       return (
@@ -237,25 +238,32 @@ const Header: React.FC = () => {
     <>
       {/* AppBar */}
       <AppBar position="fixed" color={darkMode ? "default" : "inherit"}>
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <IconButton
-            sx={{ color: "#333333" }}
-            onClick={() =>
-              setState((prev) => ({ ...prev, collapsed: !prev.collapsed }))
-            }
-          >
-            <MenuIcon />
-          </IconButton>
+        <Toolbar>
+          {/* LEFT: Menu + Title */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <IconButton
+              sx={{ color: "#333333" }}
+              onClick={() =>
+                setState((prev) => ({ ...prev, collapsed: !prev.collapsed }))
+              }
+            >
+              <MenuIcon />
+            </IconButton>
 
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            sx={{ color: darkMode ? "white" : "#e23744" }}
-          >
-            FoodExpress
-          </Typography>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              sx={{ color: darkMode ? "white" : "#e23744", ml: 2 }}
+            >
+              FoodExpress
+            </Typography>
+          </Box>
 
-          <Box display={{ xs: "none", lg: "flex" }} gap={1}>
+          {/* SPACER */}
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* RIGHT */}
+          <Box display={{ xs: "none", lg: "flex" }} gap={1} alignItems="center">
             {DarkToggle}
             {FoodToggle}
             {renderPersonSection()}

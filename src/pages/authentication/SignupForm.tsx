@@ -5,7 +5,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signupSchema } from "../../schemas/SignupSchema";
+import { signupSchema } from "../../schemas/signupSchema";
 import useUser from "../../hooks/useUser";
 import { useSnackbar } from "../../context/SnackbarContext";
 

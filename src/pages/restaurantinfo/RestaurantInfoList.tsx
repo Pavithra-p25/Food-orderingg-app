@@ -6,11 +6,10 @@ import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import RestaurantInfo from "./RestaurantInfo";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
 
@@ -18,11 +17,11 @@ const RestaurantInfoList = () => {
   const {
     restaurantInfoList,
     fetchRestaurantInfo,
-    editRestaurantInfo,
     removeRestaurantInfo,
   } = useRestaurantInfo();
 
-  const [editingRestaurant, setEditingRestaurant] = useState<any>(null);
+  const navigate = useNavigate();
+
   const [previewRestaurant, setPreviewRestaurant] =
     React.useState<RestaurantInfoValues | null>(null);
   const [deleteRestaurant, setDeleteRestaurant] =
@@ -63,7 +62,7 @@ const RestaurantInfoList = () => {
           <Tooltip title="Edit">
             <IconButton
               color="primary"
-              onClick={() => setEditingRestaurant(row)}
+              onClick={() => navigate(`/restaurant-info/edit/${row.id}`)}
             >
               <EditNoteIcon fontSize="small" />
             </IconButton>
@@ -89,28 +88,12 @@ const RestaurantInfoList = () => {
     },
   ];
 
-  // If a restaurant is being edited, render the form
-
-  if (editingRestaurant) {
-    return (
-      <RestaurantInfo
-        restaurantData={editingRestaurant}
-        editRestaurantInfo={editRestaurantInfo} 
-        onUpdateSuccess={() => {
-          fetchRestaurantInfo(); // refresh table
-          setEditingRestaurant(null); // close form
-        }}
-      />
-    );
-  }
-
- 
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Paper elevation={6} sx={{ p: 4, borderRadius: 4 }}>
         <Typography variant="h6" fontWeight="bold" mb={3} textAlign="center">
-        Restaurant Information List
+          Restaurant Information List
         </Typography>
 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
@@ -193,7 +176,7 @@ const RestaurantInfoList = () => {
               }}
             >
               <Typography variant="subtitle1" color="text.primary" align="left">
-               Owner: {previewRestaurant.ownerName.toUpperCase()}
+                Owner: {previewRestaurant.ownerName.toUpperCase()}
               </Typography>
             </Box>
 
@@ -234,10 +217,10 @@ const RestaurantInfoList = () => {
                               color: isExpired ? "error.main" : "text.primary",
                             }}
                           >
-                             {c.licenseType.toUpperCase()} – {c.licenseNumber}{" "}
+                            {c.licenseType.toUpperCase()} – {c.licenseNumber}{" "}
                             <br />
                             <small>
-                               {new Date(c.validFrom).toLocaleDateString()} →{" "}
+                              {new Date(c.validFrom).toLocaleDateString()} →{" "}
                               {new Date(c.validTill).toLocaleDateString()}
                               {isExpired ? " (Expired)" : ""}
                             </small>
@@ -298,45 +281,42 @@ const RestaurantInfoList = () => {
           </Box>
         )}
       </MyDialog>
-      
-    <MyDialog
-  open={!!deleteRestaurant}
-  onClose={() => setDeleteRestaurant(null)}
-  maxWidth="xs"
->
-  <Typography textAlign="center">
-    Are you sure you want to delete this restaurant?
-  </Typography>
 
-  <Stack
-    direction="row"
-    spacing={2}
-    justifyContent="center"
-    sx={{ mt: 3 }}
-  >
-    <MyButton
-      variant="outlined"
-      onClick={() => setDeleteRestaurant(null)}
-    >
-      No
-    </MyButton>
+      <MyDialog
+        open={!!deleteRestaurant}
+        onClose={() => setDeleteRestaurant(null)}
+        maxWidth="xs"
+      >
+        <Typography textAlign="center">
+          Are you sure you want to delete this restaurant?
+        </Typography>
 
-    <MyButton
-      variant="cancel"
-     
-      onClick={async () => {
-        if (!deleteRestaurant?.id) return;
+        <Stack
+          direction="row"
+          spacing={2}
+          justifyContent="center"
+          sx={{ mt: 3 }}
+        >
+          <MyButton
+            variant="outlined"
+            onClick={() => setDeleteRestaurant(null)}
+          >
+            No
+          </MyButton>
 
-        await removeRestaurantInfo(deleteRestaurant.id);
-        setDeleteRestaurant(null);
-      }}
-    >
-      Yes
-    </MyButton>
-  </Stack>
-</MyDialog>
+          <MyButton
+            variant="cancel"
+            onClick={async () => {
+              if (!deleteRestaurant?.id) return;
 
-
+              await removeRestaurantInfo(deleteRestaurant.id);
+              setDeleteRestaurant(null);
+            }}
+          >
+            Yes
+          </MyButton>
+        </Stack>
+      </MyDialog>
     </Container>
   );
 };
