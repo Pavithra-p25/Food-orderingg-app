@@ -10,7 +10,7 @@ import RestaurantTab from "./RestaurantTab";
 import ContactTab from "./ContactTab";
 import LocationTab from "./LocationTab";
 import MyTabs from "../../components/newcomponents/tabs/MyTab";
-import { useSnackbar } from "../../context/SnackbarContext";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 import { restaurantDefaultValues } from "../restaurant/data/restaurantDefaultValues";
 import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
@@ -36,7 +36,7 @@ const RestaurantForm: React.FC = () => {
   // Local state for the restaurant object being edited
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
   const { addRestaurant, updateRestaurant, getRestaurantDetails } =
     useRestaurants();
 

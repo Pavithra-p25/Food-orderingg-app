@@ -4,10 +4,9 @@ import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
-import { SnackbarProvider } from "./context/SnackbarContext";
 import { FavProvider } from "./context/FavContext";
 import { getTheme } from "./config/theme/Theme";
-
+import { DialogSnackbarProvider } from "./context/DialogSnackbarContext";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
 import FavoritesPage from "./pages/FavoritesPage";
@@ -45,7 +44,7 @@ const AppContent = () => {
   return (
     <MuiThemeProvider theme={getTheme(darkMode ? "dark" : "light")}>
       <CssBaseline />
-      <SnackbarProvider>
+      <DialogSnackbarProvider>
         <FavProvider>
           <div className="d-flex flex-column min-vh-100">
             <Header />
@@ -55,7 +54,7 @@ const AppContent = () => {
             <Footer />
           </div>
         </FavProvider>
-      </SnackbarProvider>
+      </DialogSnackbarProvider>
     </MuiThemeProvider>
   );
 };

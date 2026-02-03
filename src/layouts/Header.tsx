@@ -32,7 +32,7 @@ import SignupForm from "../pages/authentication/SignupForm";
 import { ListItemButton } from "@mui/material";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useLocation } from "react-router-dom";
-import { useSnackbar } from "../context/SnackbarContext";
+import { useDialogSnackbar } from "../context/DialogSnackbarContext";
 import { useNavigate } from "react-router-dom";
 
 type FoodMode = "veg" | "nonveg" | null;
@@ -59,7 +59,7 @@ const Header: React.FC = () => {
   });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Restaurant } from "../../types/RestaurantTypes";
-import { useSnackbar } from "../../context/SnackbarContext";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 type PendingAction = "delete" | "restore" | null;
 
 export const useRestaurantTableActions = (
@@ -10,7 +10,7 @@ export const useRestaurantTableActions = (
  saveDraft?: (restaurant: Restaurant) => Promise<void>
  // optional handler for draft
 ) => {
-  const { showSnackbar } = useSnackbar(); 
+  const { showSnackbar } = useDialogSnackbar(); 
 
   const [showConfirm, setShowConfirm] = useState(false); //confirm popup visibility
   const [pendingIds, setPendingIds] = useState<string[]>([]); //show selected restaurant ids

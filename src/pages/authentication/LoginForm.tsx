@@ -17,7 +17,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/loginSchema";
 import useUser from "../../hooks/useUser";
-import { useSnackbar } from "../../context/SnackbarContext";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 interface LoginFormProps {
   show: boolean;
@@ -44,7 +44,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const [error, setError] = useState("");
 
   const { fetchUsers } = useUser();
-const { showSnackbar } = useSnackbar();
+const { showSnackbar } = useDialogSnackbar();
 
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm")); // Mobile

@@ -14,7 +14,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import MyButton from "../../components/newcomponents/button/MyButton";
-import { useSnackbar } from "../../context/SnackbarContext";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
@@ -27,7 +27,7 @@ import { useRestaurantInfo } from "../../hooks/useRestaurantInfo";
 
 const RestaurantInfo: React.FC = () => {
   const navigate = useNavigate();
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
 
   const methods = useForm<RestaurantInfoValues>({
     defaultValues: defaultRestaurantValues,

@@ -7,7 +7,7 @@ import { useForm, Controller, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../schemas/signupSchema";
 import useUser from "../../hooks/useUser";
-import { useSnackbar } from "../../context/SnackbarContext";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 interface SignupFormProps {
   show: boolean;
@@ -28,7 +28,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   onLoginClick,
 }) => {
   const { fetchUsers, addUser } = useUser();
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
   const [visibility, setVisibility] = useState({
     showPassword: false,
     showConfirmPassword: false,

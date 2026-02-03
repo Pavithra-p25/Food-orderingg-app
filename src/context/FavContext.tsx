@@ -12,9 +12,6 @@ const FavContext = createContext<FavContextType | null>(null);
 
 export const FavProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<{ id: string } | null>(null);
-  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
-
-  const { fetchFavorites, addFavorite, removeFavorite } = useFavorites();
 
   // load user
   useEffect(() => {
@@ -22,30 +19,26 @@ export const FavProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setUser(storedUser);
   }, []);
 
-  // load favorites from db.json
+  const {
+    favorites,
+    fetchFavorites,
+    addFavorite,
+    removeFavorite,
+  } = useFavorites(user?.id);
+
   useEffect(() => {
-    if (!user?.id) return;
-
-    fetchFavorites(user.id).then(setFavorites);
-  }, [user]);
-
-  const addToFavorites = async (item: FavoriteItem) => {
-    if (!user) return;
-
-    const updatedFavs = await addFavorite(user.id, favorites, item);
-    setFavorites(updatedFavs);
-  };
-
-  const removeFromFavorites = async (id: string) => {
-    if (!user) return;
-
-    const updatedFavs = await removeFavorite(user.id, favorites, id);
-    setFavorites(updatedFavs);
-  };
+    if (user?.id) {
+      fetchFavorites();
+    }
+  }, [user?.id]);
 
   return (
     <FavContext.Provider
-      value={{ favorites, addToFavorites, removeFromFavorites }}
+      value={{
+        favorites,
+        addToFavorites: addFavorite,
+        removeFromFavorites: removeFavorite,
+      }}
     >
       {children}
     </FavContext.Provider>

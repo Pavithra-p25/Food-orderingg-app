@@ -4,13 +4,13 @@ import { Box, Typography, Grid } from "@mui/material";
 import MyButton from "../components/newcomponents/button/MyButton";
 import MyCard from "../components/newcomponents/card/MyCard";
 import { useNavigate } from "react-router-dom";
-import { useSnackbar } from "../context/SnackbarContext";
+import { useDialogSnackbar } from "../context/DialogSnackbarContext";
 import LoginForm from "./authentication/LoginForm";
 
 const HomePage: React.FC = () => {
   //  hooks
   const navigate = useNavigate();
-  const { showSnackbar } = useSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
   const user = localStorage.getItem("user");
   // State to show/hide login form
   const [showLoginForm, setShowLoginForm] = useState(false);
