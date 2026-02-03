@@ -171,7 +171,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               )}
             />
           ) : (
-            <Typography fontWeight={600}>
+            <Typography fontWeight={200}>
               {watch(
                 `branches.${branchIndex}.complianceDetails.${row._index}.licenseType`,
               ) || "-"}
@@ -196,7 +196,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               )}
             />
           ) : (
-            <Typography fontWeight={600}>
+            <Typography fontWeight={200}>
               {watch(
                 `branches.${branchIndex}.complianceDetails.${row._index}.licenseNumber`,
               ) || "-"}
@@ -216,7 +216,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               size="small"
             />
           ) : (
-            <Typography fontWeight={600}>
+            <Typography fontWeight={200}>
               {formatDate(
                 watch(
                   `branches.${branchIndex}.complianceDetails.${row._index}.validFrom`,
@@ -238,7 +238,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               size="small"
             />
           ) : (
-            <Typography fontWeight={600}>
+            <Typography fontWeight={200}>
               {formatDate(
                 watch(
                   `branches.${branchIndex}.complianceDetails.${row._index}.validTill`,

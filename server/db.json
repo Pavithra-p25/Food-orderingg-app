@@ -5,35 +5,47 @@
       "fullName": "pavithra",
       "emailOrUsername": "pavi",
       "password": "12345P",
-      "role": "user"
+      "role": "user",
+      "favorites":[]
     },
     {
       "id": "59e6",
       "fullName": "hari",
       "emailOrUsername": "hari@gmail.com",
       "password": "14120H",
-      "role": "user"
+      "role": "user",
+      "favorites": [
+        {
+          "id": "df0b-0",
+          "name": "Salad",
+          "price": 140,
+          "image": "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg?resize=1200%2C630"
+        }
+      ]
     },
     {
       "id": "dc20",
       "fullName": "Kavin",
       "emailOrUsername": "kavin@gmail.com",
       "password": "12345K",
-      "role": "user"
+      "role": "user",
+      "favorites":[]
     },
     {
       "id": "32b8",
       "fullName": "Deva shree",
       "emailOrUsername": "shree@gmail.com",
       "password": "shreeD",
-      "role": "user"
+      "role": "user",
+      "favorites":[]
     },
     {
       "id": "b320",
       "fullName": "dvsv",
       "emailOrUsername": "vsva",
       "password": "BfbSS3",
-      "role": "user"
+      "role": "user",
+      "favorites":[]
     },
     {
       "id": "a001",

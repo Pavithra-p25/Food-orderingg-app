@@ -112,6 +112,7 @@ const Header: React.FC = () => {
     </Box>
   );
 
+  const isMobile = window.innerWidth < 1200;
   const menuItems = [
     {
       text: "Home",
@@ -288,7 +289,7 @@ const Header: React.FC = () => {
           "& .MuiDrawer-paper": {
             width: state.collapsed ? 72 : 260,
             boxSizing: "border-box",
-            top: "64px",
+            top: isMobile ? 0 : "64px",
             transition: "width 0.3s",
             overflowX: "hidden",
             bgcolor: "background.paper",

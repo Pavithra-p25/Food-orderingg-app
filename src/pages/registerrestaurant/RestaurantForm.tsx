@@ -16,7 +16,7 @@ import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
-import { isFieldFilled } from "../../utils/RestaurantFormUtils";
+import { isFieldFilled } from "../../utils/FormUtils";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { CreateRestaurantDTO } from "../../hooks/restaurant/useRestaurant";
 import { useNavigate, useParams } from "react-router-dom";

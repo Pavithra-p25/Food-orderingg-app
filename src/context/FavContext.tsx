@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import type { FavoriteItem } from "../types/userTypes";
+import useFavorites from "../hooks/useFavorites";
 
 type FavContextType = {
   favorites: FavoriteItem[];
@@ -8,42 +9,44 @@ type FavContextType = {
 };
 
 const FavContext = createContext<FavContextType | null>(null);
+
 export const FavProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<{ id: string } | null>(null);
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
-  // Detect logged-in user on mount or when user changes
+  const { fetchFavorites, addFavorite, removeFavorite } = useFavorites();
+
+  // load user
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user") || "null");
     setUser(storedUser);
   }, []);
 
-  // Load favorites whenever user changes
+  // load favorites from db.json
   useEffect(() => {
     if (!user?.id) return;
 
-    const savedFav = localStorage.getItem(`fav_${user.id}`);
-    setFavorites(savedFav ? JSON.parse(savedFav) : []);
+    fetchFavorites(user.id).then(setFavorites);
   }, [user]);
 
-  // Save favorites whenever favorites change
-  useEffect(() => {
-    if (!user?.id) return;
-    localStorage.setItem(`fav_${user.id}`, JSON.stringify(favorites));
-  }, [favorites, user]);
+  const addToFavorites = async (item: FavoriteItem) => {
+    if (!user) return;
 
-  const addToFavorites = (item: FavoriteItem) => {
-    setFavorites((prev) =>
-      prev.some((i) => i.id === item.id) ? prev : [...prev, item]
-    );
+    const updatedFavs = await addFavorite(user.id, favorites, item);
+    setFavorites(updatedFavs);
   };
 
-  const removeFromFavorites = (id: string) => {
-    setFavorites((prev) => prev.filter((item) => item.id !== id));
+  const removeFromFavorites = async (id: string) => {
+    if (!user) return;
+
+    const updatedFavs = await removeFavorite(user.id, favorites, id);
+    setFavorites(updatedFavs);
   };
 
   return (
-    <FavContext.Provider value={{ favorites, addToFavorites, removeFromFavorites }}>
+    <FavContext.Provider
+      value={{ favorites, addToFavorites, removeFromFavorites }}
+    >
       {children}
     </FavContext.Provider>
   );
@@ -52,7 +55,7 @@ export const FavProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 export const useCartFav = () => {
   const context = useContext(FavContext);
   if (!context) {
-    throw new Error("useCartFav must be used inside CartFavProvider");
+    throw new Error("useCartFav must be used inside FavProvider");
   }
   return context;
 };
