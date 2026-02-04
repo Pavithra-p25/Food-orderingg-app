@@ -15,7 +15,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import MyCard from "../../components/newcomponents/card/MyCard";
 import db from "../../../server/db.json";
-import { useCartFav } from "../../context/FavContext";
+import { useFav } from "../../context/FavContext";
 import type { FavoriteItem } from "../../types/userTypes";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
@@ -37,7 +37,7 @@ type Restaurant = {
 const RestaurantMenu: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const { favorites, addToFavorites, removeFromFavorites } = useCartFav();
+  const { favorites, addToFavorites, removeFromFavorites } = useFav();
   const [error, setError] = useState<string | null>(null);
 
   // Merge restaurant + menuItems

@@ -14,13 +14,12 @@ import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 import { restaurantDefaultValues } from "../restaurant/data/restaurantDefaultValues";
 import { restaurantSchema } from "../../schemas/restaurantSchema";
 import type { Restaurant, RestaurantTabKey } from "../../types/RestaurantTypes";
-import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useFormHandlers } from "../../hooks/restaurant/useFormHandlers";
 import { isFieldFilled } from "../../utils/FormUtils";
 import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import type { CreateRestaurantDTO } from "../../hooks/restaurant/useRestaurant";
 import { useNavigate, useParams } from "react-router-dom";
-import DialogContent from "@mui/material/DialogContent";
+
 
 const RestaurantForm: React.FC = () => {
   const navigate = useNavigate();
@@ -28,15 +27,11 @@ const RestaurantForm: React.FC = () => {
   const isEditMode = Boolean(id);
 
   const [activeTab, setActiveTab] = useState<RestaurantTabKey>("login");
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [actionType, setActionType] = useState<
-    "register" | "reset" | "cancel" | null
-  >(null);
 
   // Local state for the restaurant object being edited
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
-  const { showSnackbar } = useDialogSnackbar();
+  const { showSnackbar, showDialog} = useDialogSnackbar();
   const { addRestaurant, updateRestaurant, getRestaurantDetails } =
     useRestaurants();
 
@@ -159,25 +154,33 @@ const RestaurantForm: React.FC = () => {
   );
   const hasErrors = Object.keys(errors).length > 0;
 
-  const handleConfirmOpen = (type: "register" | "reset" | "cancel") => {
-    setActionType(type);
-    setShowConfirm(true);
-  };
+ const handleConfirmOpen = (type: "register" | "reset") => {
+  showDialog({
+    title: "Confirmation",
+    maxWidth: "xs",
+    content: (
+      <Typography textAlign="center">
+        {type === "register"
+          ? "Proceed with restaurant registration?"
+          : "Are you sure you want to reset the form?"}
+      </Typography>
+    ),
+    confirmText: "Yes",
+    cancelText: "No",
+    onConfirm: async () => {
+      if (type === "register") {
+        await handleFinalSubmit();
+      }
 
-  const handleConfirmYes = async () => {
-    if (actionType === "register") {
-      await handleFinalSubmit();
-      setShowConfirm(false);
-      return;
-    }
+      if (type === "reset") {
+        methods.reset(restaurantDefaultValues);
+      }
+    },
+  });
+};
 
-    if (actionType === "reset") {
-      methods.reset(restaurantDefaultValues);
-      setShowConfirm(false);
-      return;
-    }
-  };
 
+ 
   const handleSaveDraft = async () => {
     if (!isDirty) return;
     const values = methods.getValues();
@@ -340,33 +343,7 @@ const RestaurantForm: React.FC = () => {
                 Next
               </MyButton>
             </Box>
-            <MyDialog
-              open={showConfirm}
-              onClose={() => setShowConfirm(false)}
-              maxWidth="xs"
-            >
-              <DialogContent sx={{ textAlign: "center" }}>
-                {actionType === "register"
-                  ? "Proceed with restaurant registration?"
-                  : "Are you sure?"}
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  justifyContent="center"
-                  sx={{ mt: 3 }}
-                >
-                  <MyButton
-                    variant="outlined"
-                    onClick={() => setShowConfirm(false)}
-                  >
-                    No
-                  </MyButton>
-                  <MyButton variant="contained" onClick={handleConfirmYes}>
-                    Yes
-                  </MyButton>
-                </Stack>
-              </DialogContent>
-            </MyDialog>
+         
           </LocalizationProvider>
         </FormProvider>
       </Paper>

@@ -10,13 +10,13 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useNavigate } from "react-router-dom";
-import { useCartFav } from "../context/FavContext";
+import { useFav } from "../context/FavContext";
 import MyCard from "../components/newcomponents/card/MyCard"; 
 import MyButton from "../components/newcomponents/button/MyButton";
 
 const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
-  const { favorites, removeFromFavorites } = useCartFav();
+  const { favorites, removeFromFavorites } = useFav();
 
   // EMPTY STATE
   if (favorites.length === 0) {

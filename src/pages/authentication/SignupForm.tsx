@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import MyInput from "../../components/newcomponents/textfields/MyInput";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../schemas/signupSchema";
@@ -10,7 +9,6 @@ import useUser from "../../hooks/useUser";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 interface SignupFormProps {
-  show: boolean;
   onClose: () => void;
   onLoginClick?: () => void;
 }
@@ -23,12 +21,12 @@ interface SignupFormValues {
 }
 
 const SignupForm: React.FC<SignupFormProps> = ({
-  show,
   onClose,
   onLoginClick,
 }) => {
   const { fetchUsers, addUser } = useUser();
-  const { showSnackbar } = useDialogSnackbar();
+ const { showSnackbar} = useDialogSnackbar();
+
   const [visibility, setVisibility] = useState({
     showPassword: false,
     showConfirmPassword: false,
@@ -76,7 +74,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   };
 
   return (
-    <MyDialog open={show} onClose={onClose} title="Sign Up" maxWidth="xs">
+   <>
       <Typography align="center" color="text.secondary" mb={4}>
         Already have an account?{" "}
         <span
@@ -186,7 +184,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           </Box>
         </Box>
       </FormProvider>
-    </MyDialog>
+      </>
   );
 };
 

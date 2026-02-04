@@ -45,10 +45,10 @@ export const FavProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
-export const useCartFav = () => {
+export const useFav = () => {
   const context = useContext(FavContext);
   if (!context) {
-    throw new Error("useCartFav must be used inside FavProvider");
+    throw new Error("useFav must be used inside FavProvider");
   }
   return context;
 };

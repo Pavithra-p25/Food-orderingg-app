@@ -34,12 +34,13 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { useLocation } from "react-router-dom";
 import { useDialogSnackbar } from "../context/DialogSnackbarContext";
 import { useNavigate } from "react-router-dom";
+import Badge from "@mui/material/Badge";
+import { useFav } from "../context/FavContext";
 
 type FoodMode = "veg" | "nonveg" | null;
 
 interface HeaderState {
   showLoginForm: boolean;
-  showSignupForm: boolean;
   collapsed: boolean;
   foodMode: FoodMode;
   user: any | null;
@@ -52,14 +53,21 @@ const Header: React.FC = () => {
 
   const [state, setState] = useState<HeaderState>({
     showLoginForm: false,
-    showSignupForm: false,
     collapsed: true,
     foodMode: null,
     user: null,
   });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { showSnackbar } = useDialogSnackbar();
+  const { showSnackbar, showDialog, hideDialog } = useDialogSnackbar();
+  const { favorites } = useFav();
+  const toTitleCase = (name: string) =>
+    name
+      ?.toLowerCase()
+      .split(" ")
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -135,7 +143,15 @@ const Header: React.FC = () => {
     },
     {
       text: "Favorites",
-      icon: <FavoriteIcon />,
+      icon: (
+        <Badge
+          badgeContent={favorites.length}
+          color="error"
+          invisible={favorites.length === 0}
+        >
+          <FavoriteIcon />
+        </Badge>
+      ),
       to: "/favorites",
       roles: ["guest", "user", "admin"],
       protected: true,
@@ -182,6 +198,23 @@ const Header: React.FC = () => {
     }
   };
 
+  const openSignupDialog = () => {
+    showDialog({
+      title: "Sign Up",
+      maxWidth: "xs",
+      fullWidth: true,
+      content: (
+        <SignupForm
+          onClose={hideDialog}
+          onLoginClick={() => {
+            hideDialog();
+            setState((prev) => ({ ...prev, showLoginForm: true }));
+          }}
+        />
+      ),
+    });
+  };
+
   const renderPersonSection = () => {
     if (state.user) {
       return (
@@ -189,11 +222,12 @@ const Header: React.FC = () => {
           <Box
             display="flex"
             alignItems="center"
+            gap={1}
             sx={{ cursor: "pointer" }}
             onClick={(e) => setAnchorEl(e.currentTarget)}
           >
             <PersonIcon />
-            <Typography ml={1}>{state.user.fullName}</Typography>
+            <Typography >{toTitleCase(state.user.fullName)}</Typography>
           </Box>
 
           <Menu
@@ -371,13 +405,10 @@ const Header: React.FC = () => {
           onClose={() =>
             setState((prev) => ({ ...prev, showLoginForm: false }))
           }
-          onSignupClick={() =>
-            setState((prev) => ({
-              ...prev,
-              showLoginForm: false,
-              showSignupForm: true,
-            }))
-          }
+          onSignupClick={() => {
+            setState((prev) => ({ ...prev, showLoginForm: false }));
+            openSignupDialog();
+          }}
           onLoginSuccess={(loggedUser) =>
             setState((prev) => ({
               ...prev,
@@ -385,23 +416,6 @@ const Header: React.FC = () => {
               showLoginForm: false,
               showToast: true,
               toastMessage: `Welcome back, ${loggedUser.fullName}`,
-            }))
-          }
-        />
-      )}
-
-      {/* Signup */}
-      {state.showSignupForm && (
-        <SignupForm
-          show={state.showSignupForm}
-          onClose={() =>
-            setState((prev) => ({ ...prev, showSignupForm: false }))
-          }
-          onLoginClick={() =>
-            setState((prev) => ({
-              ...prev,
-              showSignupForm: false,
-              showLoginForm: true,
             }))
           }
         />

@@ -19,18 +19,21 @@ type DialogConfig = {
   confirmText?: string;
   cancelText?: string;
   onConfirm?: () => void;
-}
+  maxWidth?: "xs" | "sm" | "md" | "lg";
+  fullWidth?: boolean;
+};
 
-type DialogSnackbarContextType= {
+type DialogSnackbarContextType = {
   showSnackbar: (message: string, severity?: SnackbarSeverity) => void;
   showDialog: (config: DialogConfig) => void;
   hideDialog: () => void;
-}
+};
 
 /* CONTEXT  */
 
-const DialogSnackbarContext =
-  createContext<DialogSnackbarContextType | undefined>(undefined);
+const DialogSnackbarContext = createContext<
+  DialogSnackbarContextType | undefined
+>(undefined);
 
 /* PROVIDER  */
 
@@ -54,7 +57,7 @@ export const DialogSnackbarProvider: React.FC<{ children: ReactNode }> = ({
     (message: string, severity: SnackbarSeverity = "success") => {
       setSnackbar({ open: true, message, severity });
     },
-    []
+    [],
   );
 
   const hideSnackbar = () => {
@@ -81,7 +84,7 @@ export const DialogSnackbarProvider: React.FC<{ children: ReactNode }> = ({
     >
       {children}
 
-      {/* GLOBAL SNACKBAR */}
+      {/* SNACKBAR */}
       <MySnackbar
         open={snackbar.open}
         message={snackbar.message}
@@ -89,11 +92,13 @@ export const DialogSnackbarProvider: React.FC<{ children: ReactNode }> = ({
         onClose={hideSnackbar}
       />
 
-      {/* GLOBAL DIALOG */}
+      {/* DIALOG */}
       <MyDialog
         open={dialog.open}
         onClose={hideDialog}
         title={dialog.title}
+        maxWidth={dialog.maxWidth || "xs"}
+        fullWidth={dialog.fullWidth ?? true}
       >
         {dialog.content}
 
@@ -118,7 +123,7 @@ export const useDialogSnackbar = () => {
   const context = useContext(DialogSnackbarContext);
   if (!context) {
     throw new Error(
-      "useDialogSnackbar must be used inside DialogSnackbarProvider"
+      "useDialogSnackbar must be used inside DialogSnackbarProvider",
     );
   }
   return context;
