@@ -12,7 +12,7 @@ export const useRestaurantInfo = () => {
     RestaurantInfoValues[]
   >([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   /* GET ALL */
   const fetchRestaurantInfo = async () => {
@@ -20,8 +20,12 @@ export const useRestaurantInfo = () => {
       setLoading(true);
       const data = await getRestaurantInfoList();
       setRestaurantInfoList(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    } catch (err: any) {
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("Failed to fetch restaurant info"),
+      );
     } finally {
       setLoading(false);
     }
@@ -34,9 +38,8 @@ export const useRestaurantInfo = () => {
       await createRestaurantInfo(data);
       await fetchRestaurantInfo(); // refresh list
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to save restaurant info",
-      );
+      if (err instanceof Error) throw err;
+      throw new Error("Failed to save restaurant info");
     } finally {
       setLoading(false);
     }
@@ -55,9 +58,8 @@ export const useRestaurantInfo = () => {
         prev.map((r) => (r.id === id ? updated : r)),
       );
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to update restaurant info",
-      );
+      if (err instanceof Error) throw err;
+      throw new Error("Failed to update restaurant info");
     } finally {
       setLoading(false);
     }
@@ -76,10 +78,6 @@ export const useRestaurantInfo = () => {
 
       // optional but safe
       await fetchRestaurantInfo();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete restaurant info",
-      );
     } finally {
       setLoading(false);
     }

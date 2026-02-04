@@ -48,18 +48,17 @@ const RestaurantSearch: React.FC = () => {
     deleteRestaurant,
   );
 
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        const data = await getAllRestaurants();
-        setAllRestaurants(data);
-        setResults(data);
-      } catch (error) {
-        console.error("Failed to fetch restaurants:", error);
-      }
-    };
-    fetchRestaurants();
-  }, []);
+  
+ useEffect(() => {
+  const fetchRestaurants = async () => {
+    const data = await getAllRestaurants(); // throws if API fails
+    setAllRestaurants(data);
+    setResults(data);
+  };
+  fetchRestaurants();
+}, [getAllRestaurants]);
+
+
 
   const handleReset = () => {
     reset(restaurantDefaultValues); //reset search form

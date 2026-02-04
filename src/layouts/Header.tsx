@@ -323,7 +323,16 @@ const Header: React.FC = () => {
             <Typography
               variant="h5"
               fontWeight="bold"
-              sx={{ color: darkMode ? "white" : "#e23744", ml: 2 }}
+              sx={{
+                color: darkMode ? "white" : "#e23744",
+                ml: 2,
+                cursor: "pointer",
+                userSelect: "none",
+                "&:hover": {
+                  opacity: 0.85,
+                },
+              }}
+              onClick={() => navigate("/HomePage")}
             >
               FoodExpress
             </Typography>

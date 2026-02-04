@@ -13,9 +13,14 @@ import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
 
+
 const RestaurantInfoList = () => {
-  const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo } =
+  const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo , error} =
     useRestaurantInfo();
+
+   if (error) {
+    throw error;
+  }
 
   const navigate = useNavigate();
 

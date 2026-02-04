@@ -42,15 +42,10 @@ const RestaurantInfo: React.FC = () => {
   } = methods;
 
   const { id } = useParams();
-  const { restaurantInfoList, editRestaurantInfo, fetchRestaurantInfo,error } =
+  const { restaurantInfoList, editRestaurantInfo, fetchRestaurantInfo } =
     useRestaurantInfo();
-    
-    useEffect(() => {
-  if (error) {
-    showSnackbar(error, "error");
-  }
-}, [error]);
 
+   
   const restaurantData = restaurantInfoList.find(
     (r) => String(r.id) === String(id),
   );

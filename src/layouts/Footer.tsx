@@ -5,6 +5,8 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { ThemeContext } from "../context/ThemeContext";
+import EmailIcon from "@mui/icons-material/Email";
+
 
 const Footer: React.FC = () => {
   const { darkMode } = useContext(ThemeContext);
@@ -13,69 +15,68 @@ const Footer: React.FC = () => {
     <Box
       component="footer"
       sx={{
-        mt: 4,
-        py: 4,
+        mt: 1,
+        py: 1,
+        pl: { xs: 1, lg: "79px" }, // sidebar-safe on desktop
+        pr: 1,
         backgroundColor: darkMode ? "grey.900" : "grey.100",
         color: darkMode ? "common.white" : "common.black",
       }}
     >
-      <Container>
-        <Grid container spacing={4} alignItems="center">
-          {/* Brand */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="h5" fontWeight="bold">
-              FoodExpress
-            </Typography>
-            <Typography variant="body2">
-              Fastest food delivery at your doorstep.
-            </Typography>
-          </Grid>
-
+      <Container maxWidth={false} disableGutters>
+        <Grid container alignItems="center" spacing={{ xs: 1, md: 0 }}>
           {/* Contact */}
           <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              Contact
-            </Typography>
-            <Typography variant="body2">
-              Email: support@foodexpress.com
-            </Typography>
-            <Typography variant="body2">
-              Phone: +91 9876543210
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={2}
+              flexWrap="wrap" // wraps nicely on mobile
+            >
+              <Box display="flex" alignItems="center" gap={0.5}>
+                <EmailIcon fontSize="small" sx={{ color: "#D44638" }} />{" "}
+                {/* Gmail red */}
+                <Typography variant="body2">support@foodexpress.com</Typography>
+              </Box>
+
+              
+            </Box>
+          </Grid>
+
+          {/* Copyright */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="body2" align="center" sx={{ opacity: 0.8 }}>
+              © 2025 FoodExpress. All rights reserved.
             </Typography>
           </Grid>
 
+          {/* Social Icons */}
           {/* Social Icons */}
           <Grid
             size={{ xs: 12, md: 4 }}
             sx={{
               display: "flex",
-              justifyContent: { xs: "flex-start", md: "flex-end" },
+              justifyContent: { xs: "center", md: "flex-end" },
               gap: 1,
             }}
           >
-            <IconButton color="inherit">
-              <FacebookIcon />
+            <IconButton>
+              <FacebookIcon sx={{ color: "#1877F2" }} />
             </IconButton>
-            <IconButton color="inherit">
-              <InstagramIcon />
+
+            <IconButton>
+              <InstagramIcon sx={{ color: "#E4405F" }} />
             </IconButton>
-            <IconButton color="inherit">
-              <YouTubeIcon />
+
+            <IconButton>
+              <YouTubeIcon sx={{ color: "#FF0000" }} />
             </IconButton>
-            <IconButton color="inherit">
-              <TwitterIcon />
+
+            <IconButton>
+              <TwitterIcon sx={{ color: "#1DA1F2" }} />
             </IconButton>
           </Grid>
         </Grid>
-
-        {/* Bottom line */}
-        <Typography
-          variant="body2"
-          align="center"
-          sx={{ mt: 4, opacity: 0.8 }}
-        >
-          © 2025 FoodExpress. All rights reserved.
-        </Typography>
       </Container>
     </Box>
   );
