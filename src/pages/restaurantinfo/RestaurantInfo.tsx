@@ -12,10 +12,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
-
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
 import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
@@ -44,8 +42,15 @@ const RestaurantInfo: React.FC = () => {
   } = methods;
 
   const { id } = useParams();
-  const { restaurantInfoList, editRestaurantInfo, fetchRestaurantInfo } =
+  const { restaurantInfoList, editRestaurantInfo, fetchRestaurantInfo,error } =
     useRestaurantInfo();
+    
+    useEffect(() => {
+  if (error) {
+    showSnackbar(error, "error");
+  }
+}, [error]);
+
   const restaurantData = restaurantInfoList.find(
     (r) => String(r.id) === String(id),
   );
@@ -99,25 +104,23 @@ const RestaurantInfo: React.FC = () => {
   }, [restaurantData, branchArray.fields.length]);
 
   /*  Update handler  */
-  const handleUpdate = async (data: RestaurantInfoValues) => {
-    const id = data.id || restaurantData?.id;
+ const handleUpdate = async (data: RestaurantInfoValues) => {
+  const id = data.id || restaurantData?.id;
 
-    if (!id) {
-      showSnackbar("Missing restaurant ID", "error");
-      return;
-    }
+  if (!id) {
+    showSnackbar("Missing restaurant ID", "error");
+    return;
+  }
 
-    try {
-      await editRestaurantInfo(id, data);
-      showSnackbar("Restaurant updated successfully", "success");
+  await editRestaurantInfo(id, data);
 
-      setTimeout(() => {
-        navigate("/RestaurantInfoList");
-      }, 1500);
-    } catch {
-      showSnackbar("Update failed. Please try again", "error");
-    }
-  };
+  showSnackbar("Restaurant updated successfully", "success");
+
+  setTimeout(() => {
+    navigate("/RestaurantInfoList");
+  }, 1500);
+};
+
 
   return (
     <FormProvider {...methods}>

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // Base url for all api calls
 const API_BASE_URL = "http://localhost:5000"; 
@@ -10,6 +10,26 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+/* GLOBAL ERROR INTERCEPTOR */
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<{ message?: string }>) => {
+    let message = "Unexpected error occurred";
+
+    if (error.response) {
+      message =
+        error.response.data?.message ||
+        `Server error (${error.response.status})`;
+    } else if (error.request) {
+      message = "Network error. Please check your connection.";
+    }
+
+    // throw normal Error for ErrorBoundary
+    return Promise.reject(new Error(message));
+  }
+);
 
 // Reusable API service
 export const apiService = { // reusable api wrapper 

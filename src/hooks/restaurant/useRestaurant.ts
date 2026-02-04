@@ -14,25 +14,17 @@ const nowISO = () => new Date().toISOString(); //return current date and time in
 type UpdateRestaurantDTO = Partial<CreateRestaurantDTO>;
 
 export const useRestaurants = () => {
-  const getAllRestaurants = useCallback(async () => {
-    try {
-      const data = await restaurantService.getRestaurants();
-      return data ?? [];
-    } catch (error) {
-      console.error("Failed to fetch restaurants:", error);
-      return [];
-    }
-  }, []);
+ const getAllRestaurants = useCallback(async () => {
+  const data = await restaurantService.getRestaurants();
+  return data ?? [];
+}, []);
 
-  const getRestaurantDetails = useCallback(async (id: string) => {
-    try {
-      const data = await restaurantService.getRestaurantById(id);
-      return data ?? null;
-    } catch (error) {
-      console.error("Failed to fetch restaurant details:", error);
-      return null;
-    }
-  }, []);
+
+ const getRestaurantDetails = useCallback(async (id: string) => {
+  const data = await restaurantService.getRestaurantById(id);
+  return data ?? null;
+}, []);
+
 
   const addRestaurant = useCallback(async (formData: CreateRestaurantDTO) => {
     try {

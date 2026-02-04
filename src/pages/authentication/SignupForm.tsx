@@ -20,12 +20,9 @@ interface SignupFormValues {
   confirmPassword: string;
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({
-  onClose,
-  onLoginClick,
-}) => {
+const SignupForm: React.FC<SignupFormProps> = ({ onClose, onLoginClick }) => {
   const { fetchUsers, addUser } = useUser();
- const { showSnackbar} = useDialogSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
 
   const [visibility, setVisibility] = useState({
     showPassword: false,
@@ -68,13 +65,16 @@ const SignupForm: React.FC<SignupFormProps> = ({
       methods.reset();
       onClose();
     } catch (err) {
-      console.error(err);
-      showSnackbar("Something went wrong. Try again!", "error");
+      if (err instanceof Error) {
+        showSnackbar(err.message, "error");
+      } else {
+        showSnackbar("Something went wrong. Try again!", "error");
+      }
     }
   };
 
   return (
-   <>
+    <>
       <Typography align="center" color="text.secondary" mb={4}>
         Already have an account?{" "}
         <span
@@ -184,7 +184,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           </Box>
         </Box>
       </FormProvider>
-      </>
+    </>
   );
 };
 

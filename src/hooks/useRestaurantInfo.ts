@@ -20,8 +20,8 @@ export const useRestaurantInfo = () => {
       setLoading(true);
       const data = await getRestaurantInfoList();
       setRestaurantInfoList(data);
-    } catch {
-      setError("Failed to fetch restaurant info");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,9 @@ export const useRestaurantInfo = () => {
       await createRestaurantInfo(data);
       await fetchRestaurantInfo(); // refresh list
     } catch (err) {
-      setError("Failed to save restaurant info");
+      setError(
+        err instanceof Error ? err.message : "Failed to save restaurant info",
+      );
     } finally {
       setLoading(false);
     }
@@ -52,33 +54,36 @@ export const useRestaurantInfo = () => {
       setRestaurantInfoList((prev) =>
         prev.map((r) => (r.id === id ? updated : r)),
       );
-    } catch {
-      setError("Failed to update restaurant info");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update restaurant info",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   /* DELETE */
-const removeRestaurantInfo = async (id: string | number) => {
-  try {
-    setLoading(true);
-    await deleteRestaurantInfo(id);
+  const removeRestaurantInfo = async (id: string | number) => {
+    try {
+      setLoading(true);
+      await deleteRestaurantInfo(id);
 
-    // update UI
-    setRestaurantInfoList((prev) =>
-      prev.filter((r) => String(r.id) !== String(id))
-    );
+      // update UI
+      setRestaurantInfoList((prev) =>
+        prev.filter((r) => String(r.id) !== String(id)),
+      );
 
-    // optional but safe
-    await fetchRestaurantInfo();
-  } catch {
-    setError("Failed to delete restaurant info");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      // optional but safe
+      await fetchRestaurantInfo();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to delete restaurant info",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     restaurantInfoList,
@@ -87,6 +92,6 @@ const removeRestaurantInfo = async (id: string | number) => {
     addRestaurantInfo,
     fetchRestaurantInfo,
     editRestaurantInfo,
-    removeRestaurantInfo
+    removeRestaurantInfo,
   };
 };

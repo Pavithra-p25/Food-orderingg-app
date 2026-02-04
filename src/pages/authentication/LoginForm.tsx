@@ -18,12 +18,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/loginSchema";
 import useUser from "../../hooks/useUser";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
+import { useErrorBoundary } from "react-error-boundary";
+import type { User } from "../../types/userTypes";
 
 interface LoginFormProps {
   show: boolean;
   onClose: () => void;
   onSignupClick?: () => void;
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: User) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({
@@ -40,40 +42,42 @@ const LoginForm: React.FC<LoginFormProps> = ({
     resolver: yupResolver(loginSchema),
   });
 
+  const { showBoundary } = useErrorBoundary();
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const { fetchUsers } = useUser();
-const { showSnackbar } = useDialogSnackbar();
+  const { showSnackbar } = useDialogSnackbar();
 
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down("sm")); // Mobile
   const isSm = useMediaQuery(theme.breakpoints.between("sm", "md")); // Tablet
 
-  const onSubmit = async (data: { emailOrUsername: string; password: string }) => {
+  const onSubmit = async (data: {
+    emailOrUsername: string;
+    password: string;
+  }) => {
     setError("");
-    try {
-      const users = await fetchUsers();
-      const foundUser = users.find(
-        (u) =>
-          (u.emailOrUsername === data.emailOrUsername ||
-            u.fullName === data.emailOrUsername) &&
-          u.password === data.password
-      );
 
-      if (foundUser) {
-        localStorage.setItem("user", JSON.stringify(foundUser));
-        onLoginSuccess(foundUser);
-        showSnackbar("Login successful!", "success");
-        onClose();
-        methods.reset();
-      } else {
-        setError("Invalid username/email or password");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Try again!");
-      showSnackbar("Something went wrong. Try again!", "error");
+    const users = await fetchUsers(); // no try/catch
+
+    const foundUser = users.find(
+      (u) =>
+        (u.emailOrUsername === data.emailOrUsername ||
+          u.fullName === data.emailOrUsername) &&
+        u.password === data.password,
+    );
+
+    if (foundUser) {
+      localStorage.setItem("user", JSON.stringify(foundUser));
+      onLoginSuccess(foundUser);
+      showSnackbar("Login successful!", "success");
+      onClose();
+      methods.reset();
+    } else {
+      //  business logic error
+      setError("Invalid username/email or password");
     }
   };
 
@@ -96,7 +100,6 @@ const { showSnackbar } = useDialogSnackbar();
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-      
           }}
         >
           {/* Close Icon */}
@@ -144,7 +147,12 @@ const { showSnackbar } = useDialogSnackbar();
           )}
 
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+            <form
+              onSubmit={methods.handleSubmit((data) =>
+                onSubmit(data).catch(showBoundary),
+              )}
+              noValidate
+            >
               <MyInput
                 name="emailOrUsername"
                 label="Email or Username"
@@ -165,7 +173,10 @@ const { showSnackbar } = useDialogSnackbar();
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -199,7 +210,6 @@ const { showSnackbar } = useDialogSnackbar();
           </Typography>
         </Box>
       </Modal>
-
     </>
   );
 };

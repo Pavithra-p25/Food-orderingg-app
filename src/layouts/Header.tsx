@@ -13,6 +13,7 @@ import {
   Switch,
   Menu,
   MenuItem,
+  Tooltip,
 } from "@mui/material";
 import { ButtonGroup } from "@mui/material";
 import MyButton from "../components/newcomponents/button/MyButton";
@@ -219,16 +220,48 @@ const Header: React.FC = () => {
     if (state.user) {
       return (
         <>
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={1}
-            sx={{ cursor: "pointer" }}
-            onClick={(e) => setAnchorEl(e.currentTarget)}
+          <Tooltip
+            title={toTitleCase(state.user.fullName)}
+            arrow
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: "black",
+                  color: "white",
+                  fontWeight: "bold",
+                  fontSize: "0.8rem",
+                  padding: "6px 12px",
+                  borderRadius: 1,
+                },
+              },
+              arrow: {
+                sx: {
+                  color: "black",
+                },
+              },
+            }}
           >
-            <PersonIcon />
-            <Typography >{toTitleCase(state.user.fullName)}</Typography>
-          </Box>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                border: "2px solid",
+                borderColor: "error.main",
+                color: "error.main",
+                fontWeight: "bold",
+                fontSize: 16,
+                cursor: "pointer",
+                userSelect: "none",
+              }}
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+            >
+              {state.user.fullName?.charAt(0).toUpperCase()}
+            </Box>
+          </Tooltip>
 
           <Menu
             anchorEl={anchorEl}

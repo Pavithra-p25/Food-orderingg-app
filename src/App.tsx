@@ -2,7 +2,8 @@ import React, { useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorFallback } from "./utils/ErrorFallback";
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
 import { FavProvider } from "./context/FavContext";
 import { getTheme } from "./config/theme/Theme";
@@ -43,6 +44,7 @@ const AppContent = () => {
 
   return (
     <MuiThemeProvider theme={getTheme(darkMode ? "dark" : "light")}>
+       <ErrorBoundary FallbackComponent={ErrorFallback}>
       <CssBaseline />
       <DialogSnackbarProvider>
         <FavProvider>
@@ -55,6 +57,7 @@ const AppContent = () => {
           </div>
         </FavProvider>
       </DialogSnackbarProvider>
+      </ErrorBoundary>
     </MuiThemeProvider>
   );
 };
