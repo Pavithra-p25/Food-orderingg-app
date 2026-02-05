@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import {
   createRestaurantInfo,
@@ -8,6 +9,7 @@ import {
 } from "../services/restaurantInfoService";
 
 export const useRestaurantInfo = () => {
+  const { showBoundary } = useErrorBoundary();
   const [restaurantInfoList, setRestaurantInfoList] = useState<
     RestaurantInfoValues[]
   >([]);
@@ -21,11 +23,10 @@ export const useRestaurantInfo = () => {
       const data = await getRestaurantInfoList();
       setRestaurantInfoList(data);
     } catch (err: any) {
-      setError(
-        err instanceof Error
-          ? err
-          : new Error("Failed to fetch restaurant info"),
-      );
+      const errorObj = new Error("Failed to fetch restaurant info");
+
+      setError(errorObj);
+      showBoundary(errorObj);
     } finally {
       setLoading(false);
     }
@@ -76,7 +77,7 @@ export const useRestaurantInfo = () => {
         prev.filter((r) => String(r.id) !== String(id)),
       );
 
-      // optional but safe
+     
       await fetchRestaurantInfo();
     } finally {
       setLoading(false);

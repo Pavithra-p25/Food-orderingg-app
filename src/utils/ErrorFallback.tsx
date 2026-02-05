@@ -1,11 +1,26 @@
-import { Snackbar, Alert } from "@mui/material";
+import {  Box, Typography, Button } from "@mui/material";
 
 export function ErrorFallback({ error, resetErrorBoundary }: any) {
   return (
-    <Snackbar open autoHideDuration={4000} onClose={resetErrorBoundary}>
-      <Alert severity="error" onClose={resetErrorBoundary}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      height="100vh"
+      textAlign="center"
+      p={3}
+    >
+      <Typography variant="h4" color="error" gutterBottom>
+        Something went wrong
+      </Typography>
+      <Typography variant="body1" color="textSecondary" sx={{ mb: 3 }}>
         {error.message}
-      </Alert>
-    </Snackbar>
+      </Typography>
+      <Button variant="contained" color="primary" onClick={resetErrorBoundary}>
+        Try Again
+      </Button>
+    
+    </Box>
   );
 }

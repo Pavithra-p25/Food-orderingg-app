@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useErrorBoundary } from "react-error-boundary";
 import * as restaurantService from "../../services/restaurantService";
 import type { Restaurant } from "../../types/RestaurantTypes";
 
@@ -13,6 +14,7 @@ export type CreateRestaurantDTO = Omit<
 //user may update only some fields , so fields are optional (partial)
 type UpdateRestaurantDTO = Partial<CreateRestaurantDTO>;
 export const useRestaurants = () => {
+  const { showBoundary } = useErrorBoundary();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,22 +25,28 @@ export const useRestaurants = () => {
       const data = await restaurantService.getRestaurants();
       return data ?? [];
     } catch (err: any) {
-      // throw error for ErrorBoundary
-      throw new Error(err.message || "Failed to fetch restaurants");
+      const errorObj = new Error("Failed to get restaurants");
+      // Trigger global ErrorBoundary for  fetch errors
+      showBoundary(errorObj);
+      throw errorObj;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showBoundary]);
 
-  const getRestaurantDetails = useCallback(async (id: string) => {
-    try {
-      const data = await restaurantService.getRestaurantById(id);
-      return data ?? null;
-    } catch (error) {
-      console.error("Failed to fetch restaurant details:", error);
-      return null;
-    }
-  }, []);
+  const getRestaurantDetails = useCallback(
+    async (id: string) => {
+      try {
+        const data = await restaurantService.getRestaurantById(id);
+        return data ?? null;
+      } catch (error) {
+        console.error("Failed to fetch restaurant details:", error);
+        showBoundary(error);
+        return null;
+      }
+    },
+    [showBoundary],
+  );
 
   const addRestaurant = useCallback(async (formData: CreateRestaurantDTO) => {
     try {
