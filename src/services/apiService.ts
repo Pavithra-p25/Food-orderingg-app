@@ -12,24 +12,36 @@ const api = axios.create({
 });
 
 /* GLOBAL ERROR INTERCEPTOR */
-
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<{ message?: string }>) => {
-    let message = "Unexpected error occurred";
-
-    if (error.response) {
-      message =
-        error.response.data?.message ||
-        `Server error (${error.response.status})`;
-    } else if (error.request) {
-      message = "Network error. Please check your connection.";
+    //  SERVER DOWN / NO RESPONSE
+    if (!error.response) {
+      (error as any).isServerDown = true;
+      (error as any).customMessage =
+        "Unable to connect to server. Please check your internet or try again later.";
+      return Promise.reject(error);
     }
 
-    // throw normal Error for ErrorBoundary
-    return Promise.reject(new Error(message));
+    const status = error.response.status;
+
+    //  WRONG API / RESOURCE NOT FOUND
+    if (status === 404) {
+      (error as any).isNotFound = true;
+      (error as any).customMessage =
+        "Requested data not found. Please try again.";
+      return Promise.reject(error);
+    }
+
+    // OTHER SERVER ERRORS (500, 400, etc.)
+    (error as any).customMessage =
+      error.response.data?.message ||
+      "Something went wrong. Please try again.";
+
+    return Promise.reject(error);
   }
 );
+
 
 // Reusable API service
 export const apiService = { // reusable api wrapper 

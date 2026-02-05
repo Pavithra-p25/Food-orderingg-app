@@ -59,14 +59,7 @@
       "emailOrUsername": "admin",
       "password": "Adm123",
       "role": "admin",
-      "favorites": [
-        {
-          "id": "df0b-0",
-          "name": "Salad",
-          "price": 140,
-          "image": "https://images.immediate.co.uk/production/volatile/sites/30/2014/05/Epic-summer-salad-hub-2646e6e.jpg?resize=1200%2C630"
-        }
-      ]
+      "favorites": []
     }
   ],
   "restaurants": [

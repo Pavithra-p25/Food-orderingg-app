@@ -12,16 +12,24 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
-
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 const RestaurantInfoList = () => {
-  const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo , error} =
-    useRestaurantInfo();
+  const {
+    restaurantInfoList,
+    fetchRestaurantInfo,
+    removeRestaurantInfo,
+    error,
+  } = useRestaurantInfo();
+  const { showSnackbar } = useDialogSnackbar();
 
-   if (error) {
-    throw error;
-  }
+  useEffect(() => {
+    if (error) {
+      showSnackbar(error.message, "error");
+    }
+  }, [error, showSnackbar]);
 
+  
   const navigate = useNavigate();
 
   const [previewRestaurant, setPreviewRestaurant] =

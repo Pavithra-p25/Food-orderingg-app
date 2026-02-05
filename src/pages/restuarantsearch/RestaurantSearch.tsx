@@ -12,6 +12,8 @@ import RestaurantSearchForm from "./RestaurantSearchForm";
 import RestaurantTable from "./RestaurantTable";
 // HOOK
 import { useRestaurantTableActions } from "../../hooks/restaurant/useRestaurantTableActions";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
+
 
 const RestaurantSearch: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const RestaurantSearch: React.FC = () => {
   });
 
   const { handleSubmit, reset } = methods;
+  const { showSnackbar } = useDialogSnackbar();
 
   const [results, setResults] = useState<Restaurant[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
@@ -47,18 +50,24 @@ const RestaurantSearch: React.FC = () => {
     activateRestaurant,
     deleteRestaurant,
   );
-
-  
- useEffect(() => {
+useEffect(() => {
   const fetchRestaurants = async () => {
-    const data = await getAllRestaurants(); // throws if API fails
-    setAllRestaurants(data);
-    setResults(data);
+    try {
+      const data = await getAllRestaurants();
+      setAllRestaurants(data);
+      setResults(data);
+    } catch (err: any) {
+      showSnackbar(
+        err?.message || "Failed to fetch restaurants",
+        "error"
+      );
+      setAllRestaurants([]);
+      setResults([]);
+    }
   };
+
   fetchRestaurants();
-}, [getAllRestaurants]);
-
-
+}, [getAllRestaurants, showSnackbar]);
 
   const handleReset = () => {
     reset(restaurantDefaultValues); //reset search form

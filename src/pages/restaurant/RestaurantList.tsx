@@ -15,6 +15,7 @@ import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import CommonInput from "../../components/newcomponents/textfields/CommonInput";
 import CommonSelect from "../../components/newcomponents/textfields/CommonSelect";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 const CATEGORY_OPTIONS = ["", ...RESTAURANT_CATEGORIES];
 
@@ -24,8 +25,7 @@ const RestaurantList: React.FC = () => {
   //  LOCAL STATE
   const [search, setSearch] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { showSnackbar } = useDialogSnackbar();
 
   const [visibleCount, setVisibleCount] = useState<number>(9);
 
@@ -33,26 +33,22 @@ const RestaurantList: React.FC = () => {
     category: "",
   });
 
-  const { getAllRestaurants } = useRestaurants();
+  const { getAllRestaurants, loading } = useRestaurants();
 
   //  FETCH RESTAURANTS
   useEffect(() => {
     const fetchRestaurants = async () => {
-      setLoading(true);
-      setError(null);
-
       try {
         const data = await getAllRestaurants();
         setRestaurants(data);
-      } catch (err) {
-        setError("Failed to load restaurants");
-      } finally {
-        setLoading(false);
+      } catch (err: any) {
+        // ONLY snackbar here
+        showSnackbar(err?.message || "Failed to load restaurants", "error");
       }
     };
 
     fetchRestaurants();
-  }, [getAllRestaurants]);
+  }, [getAllRestaurants, showSnackbar]);
 
   // FILTER LOGIC
   const filteredRestaurants = restaurants.filter((r) => {
@@ -82,6 +78,9 @@ const RestaurantList: React.FC = () => {
     setVisibleCount(9);
   }, [search, filters.category]);
 
+ 
+
+
   return (
     <Box
       sx={{
@@ -90,8 +89,8 @@ const RestaurantList: React.FC = () => {
         ml: { lg: "72px" }, // offset for collapsed sidebar
       }}
     >
+
       {loading && <Typography>Loading restaurants...</Typography>}
-      {error && <Typography color="error">{error}</Typography>}
 
       <Grid container spacing={3}>
         {/* FILTERS */}
@@ -166,7 +165,7 @@ const RestaurantList: React.FC = () => {
           </Grid>
 
           {/* NOT FOUND MESSAGE */}
-          {!loading && !error && filteredRestaurants.length === 0 && (
+          {!loading && filteredRestaurants.length === 0 && (
             <Typography
               align="center"
               color="text.secondary"

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ErrorBoundary } from "react-error-boundary";
-import { ErrorFallback } from "./utils/ErrorFallback";
+import { ErrorFallback } from "./components/error/ErrorFallback";
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
 import { FavProvider } from "./context/FavContext";
 import { getTheme } from "./config/theme/Theme";

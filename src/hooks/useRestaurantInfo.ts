@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
+import { useCallback } from "react";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import {
   createRestaurantInfo,
@@ -9,38 +10,48 @@ import {
 } from "../services/restaurantInfoService";
 
 export const useRestaurantInfo = () => {
-  const { showBoundary } = useErrorBoundary();
   const [restaurantInfoList, setRestaurantInfoList] = useState<
     RestaurantInfoValues[]
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { showBoundary } = useErrorBoundary();
 
   /* GET ALL */
-  const fetchRestaurantInfo = async () => {
-    try {
-      setLoading(true);
-      const data = await getRestaurantInfoList();
-      setRestaurantInfoList(data);
-    } catch (err: any) {
-      const errorObj = new Error("Failed to fetch restaurant info");
+  const fetchRestaurantInfo = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      setError(errorObj);
-      showBoundary(errorObj);
+    try {
+      const data = await getRestaurantInfoList();
+      setRestaurantInfoList(data ?? []);
+    } catch (err: any) {
+      //  SERVER DOWN -FULL PAGE
+      if (err?.isServerDown) {
+        showBoundary(err);
+        return;
+      }
+
+      //  API / DOMAIN ERROR- SNACKBAR
+      setError(
+        new Error(
+          err?.customMessage || "Failed to fetch restaurant information",
+        ),
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, [showBoundary]);
 
   /* CREATE */
   const addRestaurantInfo = async (data: RestaurantInfoValues) => {
     try {
       setLoading(true);
       await createRestaurantInfo(data);
-      await fetchRestaurantInfo(); // refresh list
-    } catch (err) {
-      if (err instanceof Error) throw err;
-      throw new Error("Failed to save restaurant info");
+      await fetchRestaurantInfo();
+    } catch (err: any) {
+      setError(err.message || "Failed to save restaurant info");
+      throw err; // form pages may still want to handle this
     } finally {
       setLoading(false);
     }
@@ -56,11 +67,11 @@ export const useRestaurantInfo = () => {
       const updated = await updateRestaurantInfo(id, data);
 
       setRestaurantInfoList((prev) =>
-        prev.map((r) => (r.id === id ? updated : r)),
+        prev.map((r) => (String(r.id) === String(id) ? updated : r)),
       );
-    } catch (err) {
-      if (err instanceof Error) throw err;
-      throw new Error("Failed to update restaurant info");
+    } catch (err: any) {
+      setError(err.message || "Failed to update restaurant info");
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -72,18 +83,16 @@ export const useRestaurantInfo = () => {
       setLoading(true);
       await deleteRestaurantInfo(id);
 
-      // update UI
       setRestaurantInfoList((prev) =>
         prev.filter((r) => String(r.id) !== String(id)),
       );
-
-     
-      await fetchRestaurantInfo();
+    } catch (err: any) {
+      setError(err.message || "Failed to delete restaurant info");
+      throw err;
     } finally {
       setLoading(false);
     }
   };
-
   return {
     restaurantInfoList,
     loading,
