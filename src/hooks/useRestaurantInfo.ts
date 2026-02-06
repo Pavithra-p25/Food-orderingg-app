@@ -51,7 +51,7 @@ export const useRestaurantInfo = () => {
       await fetchRestaurantInfo();
     } catch (err: any) {
       setError(err.message || "Failed to save restaurant info");
-      throw err; // form pages may still want to handle this
+      throw err; 
     } finally {
       setLoading(false);
     }

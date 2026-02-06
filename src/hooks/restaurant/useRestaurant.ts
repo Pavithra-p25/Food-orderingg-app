@@ -4,7 +4,6 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 import { useErrorBoundary } from "react-error-boundary";
 import { handleError } from "../../utils/HandleError";
 
-
 const nowISO = () => new Date().toISOString(); //return current date and time in iso format
 
 //data transfer object , user does not send id , dates , status (system controlled), so removed using omit
@@ -19,137 +18,135 @@ export const useRestaurants = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-   const { showBoundary } = useErrorBoundary();
-const getAllRestaurants = useCallback(async () => {
-  setLoading(true);
-  setError(null);
+  const { showBoundary } = useErrorBoundary();
+  const getAllRestaurants = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-  try {
-    const data = await restaurantService.getRestaurants();
-    return data ?? [];
-  } catch (err: any) {
-    handleError({
-      error: err,
-      showBoundary,
-      fallbackMessage: "Failed to fetch restaurant list",
-    });
-
-    return [];
-  } finally {
-    setLoading(false);
-  }
-}, [showBoundary]);
-
-
- const getRestaurantDetails = useCallback(
-  async (id: string) => {
     try {
-      const data = await restaurantService.getRestaurantById(id);
-      return data ?? null;
+      const data = await restaurantService.getRestaurants();
+      return data ?? [];
     } catch (err: any) {
       handleError({
         error: err,
         showBoundary,
-        fallbackMessage: "Failed to fetch restaurant details",
+        fallbackMessage: "Failed to fetch restaurant list",
       });
-
-      return null;
+    } finally {
+      setLoading(false);
     }
-  },
-  [showBoundary],
-);
+  }, [showBoundary]);
 
-const addRestaurant = useCallback(async (formData: CreateRestaurantDTO) => {
-  try {
-    const now = nowISO();
+  const getRestaurantDetails = useCallback(
+    async (id: string) => {
+      try {
+        const data = await restaurantService.getRestaurantById(id);
+        return data ?? null;
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to fetch restaurant details",
+        });
 
-    const payload = {
-      ...formData,
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    };
+        return null;
+      }
+    },
+    [showBoundary],
+  );
 
-    return await restaurantService.createRestaurant(payload);
-  } catch (err: any) {
-    handleError({
-      error: err,
-      showBoundary,
-      fallbackMessage: "Failed to create restaurant",
-    });
-  }
-}, [showBoundary]);
+  const addRestaurant = useCallback(
+    async (formData: CreateRestaurantDTO) => {
+      try {
+        const now = nowISO();
 
-const updateRestaurant = useCallback(
-  async (id: string, formData: UpdateRestaurantDTO) => {
-    try {
-      return await restaurantService.updateRestaurant(id, {
-        ...formData,
-        updatedAt: nowISO(),
-      });
-    } catch (err: any) {
-      handleError({
-        error: err,
-        showBoundary,
-        fallbackMessage: "Failed to update restaurant",
-      });
-    }
-  },
-  [showBoundary],
-);
+        const payload = {
+          ...formData,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        return await restaurantService.createRestaurant(payload);
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to create restaurant",
+        });
+      }
+    },
+    [showBoundary],
+  );
+
+  const updateRestaurant = useCallback(
+    async (id: string, formData: UpdateRestaurantDTO) => {
+      try {
+        return await restaurantService.updateRestaurant(id, {
+          ...formData,
+          updatedAt: nowISO(),
+        });
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to update restaurant",
+        });
+      }
+    },
+    [showBoundary],
+  );
 
   const softDeleteRestaurant = useCallback(
-  async (id: string) => {
-    try {
-      return await restaurantService.softDeleteRestaurant(id, {
-        isActive: false,
-        updatedAt: nowISO(),
-      });
-    } catch (err: any) {
-      handleError({
-        error: err,
-        showBoundary,
-        fallbackMessage: "Failed to deactivate restaurant",
-      });
-    }
-  },
-  [showBoundary],
-);
-
+    async (id: string) => {
+      try {
+        return await restaurantService.softDeleteRestaurant(id, {
+          isActive: false,
+          updatedAt: nowISO(),
+        });
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to deactivate restaurant",
+        });
+      }
+    },
+    [showBoundary],
+  );
 
   const activateRestaurant = useCallback(
-  async (id: string) => {
-    try {
-      return await restaurantService.activateRestaurant(id, {
-        isActive: true,
-        updatedAt: nowISO(),
-      });
-    } catch (err: any) {
-      handleError({
-        error: err,
-        showBoundary,
-        fallbackMessage: "Failed to activate restaurant",
-      });
-    }
-  },
-  [showBoundary],
-);
+    async (id: string) => {
+      try {
+        return await restaurantService.activateRestaurant(id, {
+          isActive: true,
+          updatedAt: nowISO(),
+        });
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to activate restaurant",
+        });
+      }
+    },
+    [showBoundary],
+  );
 
-const deleteRestaurant = useCallback(
-  async (id: string) => {
-    try {
-      return await restaurantService.deleteRestaurant(id);
-    } catch (err: any) {
-      handleError({
-        error: err,
-        showBoundary,
-        fallbackMessage: "Failed to delete restaurant",
-      });
-    }
-  },
-  [showBoundary],
-);
-
+  const deleteRestaurant = useCallback(
+    async (id: string) => {
+      try {
+        return await restaurantService.deleteRestaurant(id);
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to delete restaurant",
+        });
+      }
+    },
+    [showBoundary],
+  );
 
   return {
     getAllRestaurants,

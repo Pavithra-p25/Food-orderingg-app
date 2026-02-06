@@ -14,7 +14,6 @@ import RestaurantTable from "./RestaurantTable";
 import { useRestaurantTableActions } from "../../hooks/restaurant/useRestaurantTableActions";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
-
 const RestaurantSearch: React.FC = () => {
   const navigate = useNavigate();
 
@@ -35,7 +34,6 @@ const RestaurantSearch: React.FC = () => {
     deleteRestaurant,
   } = useRestaurants();
 
-
   // ACTIONS HOOK
   const {
     showConfirm,
@@ -50,24 +48,24 @@ const RestaurantSearch: React.FC = () => {
     activateRestaurant,
     deleteRestaurant,
   );
-useEffect(() => {
-  const fetchRestaurants = async () => {
-    try {
-      const data = await getAllRestaurants();
-      setAllRestaurants(data);
-      setResults(data);
-    } catch (err: any) {
-      showSnackbar(
-        err?.message || "Failed to fetch restaurants",
-        "error"
-      );
-      setAllRestaurants([]);
-      setResults([]);
-    }
-  };
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const data = await getAllRestaurants();
 
-  fetchRestaurants();
-}, [getAllRestaurants, showSnackbar]);
+        const safeData: Restaurant[] = data ?? [];
+
+        setAllRestaurants(safeData);
+        setResults(safeData);
+      } catch (err: any) {
+        showSnackbar(err?.message || "Failed to fetch restaurants", "error");
+        setAllRestaurants([]);
+        setResults([]);
+      }
+    };
+
+    fetchRestaurants();
+  }, [getAllRestaurants, showSnackbar]);
 
   const handleReset = () => {
     reset(restaurantDefaultValues); //reset search form
@@ -78,11 +76,11 @@ useEffect(() => {
   const allCount = results.length;
 
   const activeCount = results.filter(
-    (r) => r.isActive && r.status !== "draft"
+    (r) => r.isActive && r.status !== "draft",
   ).length;
 
   const inactiveCount = results.filter(
-    (r) => !r.isActive && r.status !== "draft"
+    (r) => !r.isActive && r.status !== "draft",
   ).length;
 
   //search logic
@@ -111,7 +109,7 @@ useEffect(() => {
   };
 
   const activeRestaurants = results.filter(
-    (r) => r.isActive && r.status !== "draft"
+    (r) => r.isActive && r.status !== "draft",
   );
 
   const tabs = [
@@ -121,7 +119,11 @@ useEffect(() => {
       tabContent: (
         <RestaurantTable
           results={results}
-          onEdit={(r) => navigate(`/restaurant/edit/${r.id}`)}
+          onEdit={(r) =>
+            navigate(`/restaurant/register`, {
+              state: { mode: "edit", data: r },
+            })
+          }
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="all"
@@ -228,7 +230,6 @@ useEffect(() => {
           </Stack>
         </DialogContent>
       </MyDialog>
-
     </Container>
   );
 };
