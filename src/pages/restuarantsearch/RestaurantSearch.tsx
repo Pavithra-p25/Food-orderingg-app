@@ -119,11 +119,7 @@ const RestaurantSearch: React.FC = () => {
       tabContent: (
         <RestaurantTable
           results={results}
-          onEdit={(r) =>
-            navigate(`/restaurant/register`, {
-              state: { mode: "edit", data: r },
-            })
-          }
+          onEdit={(r) => navigate(`/restaurant/edit/${r.id}`)}
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="all"
