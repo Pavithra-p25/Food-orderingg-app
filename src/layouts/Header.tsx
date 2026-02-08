@@ -126,7 +126,7 @@ const Header: React.FC = () => {
     {
       text: "Home",
       icon: <HomeIcon />,
-      to: "/HomePage",
+      to: "/",
       roles: ["guest", "user", "admin"],
     },
     {
@@ -279,7 +279,7 @@ const Header: React.FC = () => {
                 setState((prev) => ({ ...prev, user: null }));
                 showSnackbar("Logged out successfully", "success"); //  global snackbar
                 setAnchorEl(null);
-                navigate("/HomePage");
+                navigate("/");
               }}
             >
               <LogoutIcon fontSize="small" />
@@ -332,7 +332,7 @@ const Header: React.FC = () => {
                   opacity: 0.85,
                 },
               }}
-              onClick={() => navigate("/HomePage")}
+              onClick={() => navigate("/")}
             >
               FoodExpress
             </Typography>
