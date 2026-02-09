@@ -18,7 +18,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from "../../schemas/loginSchema";
 import useUser from "../../hooks/useUser";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
-import { useErrorBoundary } from "react-error-boundary";
 import type { User } from "../../types/userTypes";
 
 interface LoginFormProps {
@@ -42,8 +41,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
     resolver: yupResolver(loginSchema),
   });
 
-  const { showBoundary } = useErrorBoundary();
-
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
@@ -60,7 +57,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   }) => {
     setError("");
 
-    const users = await fetchUsers(); // no try/catch
+    const users = await fetchUsers(); 
 
     const foundUser = users.find(
       (u) =>
@@ -147,12 +144,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           )}
 
           <FormProvider {...methods}>
-            <form
-              onSubmit={methods.handleSubmit((data) =>
-                onSubmit(data).catch(showBoundary),
-              )}
-              noValidate
-            >
+            <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
               <MyInput
                 name="emailOrUsername"
                 label="Email or Username"

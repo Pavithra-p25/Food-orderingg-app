@@ -41,37 +41,32 @@ const SignupForm: React.FC<SignupFormProps> = ({ onClose, onLoginClick }) => {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
-    setError("");
-    try {
-      const users = await fetchUsers();
-      const existingUser = users.find(
-        (u) =>
-          u.emailOrUsername.trim().toLowerCase() ===
-          data.emailOrUsername.trim().toLowerCase(),
-      );
+  setError("");
 
-      if (existingUser) {
-        setError("User already exists");
-        return;
-      }
+  const users = await fetchUsers(); //no try/catch
 
-      await addUser({
-        fullName: data.fullName.trim(),
-        emailOrUsername: data.emailOrUsername.trim(),
-        password: data.password.trim(),
-      });
+  const existingUser = users.find(
+    (u) =>
+      u.emailOrUsername.trim().toLowerCase() ===
+      data.emailOrUsername.trim().toLowerCase(),
+  );
 
-      showSnackbar("Signup successful!", "success");
-      methods.reset();
-      onClose();
-    } catch (err) {
-      if (err instanceof Error) {
-        showSnackbar(err.message, "error");
-      } else {
-        showSnackbar("Something went wrong. Try again!", "error");
-      }
-    }
-  };
+  if (existingUser) {
+    setError("User already exists");
+    return;
+  }
+
+  await addUser({
+    fullName: data.fullName.trim(),
+    emailOrUsername: data.emailOrUsername.trim(),
+    password: data.password.trim(),
+  });
+
+  showSnackbar("Signup successful!", "success");
+  methods.reset();
+  onClose();
+};
+
 
   return (
     <>

@@ -8,40 +8,37 @@ import {
   getRestaurantInfoList,
   updateRestaurantInfo,
 } from "../services/restaurantInfoService";
+import { handleError } from "../utils/HandleError";
+import { useDialogSnackbar } from "../context/DialogSnackbarContext";
+
 
 export const useRestaurantInfo = () => {
   const [restaurantInfoList, setRestaurantInfoList] = useState<
     RestaurantInfoValues[]
   >([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+ 
   const { showBoundary } = useErrorBoundary();
+  const {showSnackbar} = useDialogSnackbar();
 
   /* GET ALL */
-  const fetchRestaurantInfo = useCallback(async () => {
+    const fetchRestaurantInfo = useCallback(async () => {
     setLoading(true);
-    setError(null);
 
     try {
       const data = await getRestaurantInfoList();
       setRestaurantInfoList(data ?? []);
     } catch (err: any) {
-      //  SERVER DOWN -FULL PAGE
-      if (err?.isServerDown) {
-        showBoundary(err);
-        return;
-      }
-
-      //  API / DOMAIN ERROR- SNACKBAR
-      setError(
-        new Error(
-          err?.customMessage || "Failed to fetch restaurant information",
-        ),
-      );
+      handleError({
+        error: err,
+        showBoundary,
+        fallbackMessage: "Failed to fetch restaurant information",
+        showSnackbar,
+      });
     } finally {
       setLoading(false);
     }
-  }, [showBoundary]);
+  }, [showBoundary, showSnackbar]);
 
   /* CREATE */
   const addRestaurantInfo = async (data: RestaurantInfoValues) => {
@@ -50,8 +47,13 @@ export const useRestaurantInfo = () => {
       await createRestaurantInfo(data);
       await fetchRestaurantInfo();
     } catch (err: any) {
-      setError(err.message || "Failed to save restaurant info");
-      throw err; 
+      handleError({
+        error: err,
+        showBoundary,
+        fallbackMessage: "Failed to save restaurant info",
+        showSnackbar,
+      });
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,12 @@ export const useRestaurantInfo = () => {
         prev.map((r) => (String(r.id) === String(id) ? updated : r)),
       );
     } catch (err: any) {
-      setError(err.message || "Failed to update restaurant info");
+      handleError({
+        error: err,
+        showBoundary,
+        fallbackMessage: "Failed to update restaurant info",
+        showSnackbar,
+      });
       throw err;
     } finally {
       setLoading(false);
@@ -87,16 +94,21 @@ export const useRestaurantInfo = () => {
         prev.filter((r) => String(r.id) !== String(id)),
       );
     } catch (err: any) {
-      setError(err.message || "Failed to delete restaurant info");
+      handleError({
+        error: err,
+        showBoundary,
+        fallbackMessage: "Failed to delete restaurant info",
+        showSnackbar,
+      });
       throw err;
     } finally {
       setLoading(false);
     }
   };
+
   return {
     restaurantInfoList,
     loading,
-    error,
     addRestaurantInfo,
     fetchRestaurantInfo,
     editRestaurantInfo,
