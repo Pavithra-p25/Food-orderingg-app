@@ -78,9 +78,6 @@ const RestaurantList: React.FC = () => {
     setVisibleCount(9);
   }, [search, filters.category]);
 
- 
-
-
   return (
     <Box
       sx={{
@@ -89,7 +86,6 @@ const RestaurantList: React.FC = () => {
         ml: { lg: "72px" }, // offset for collapsed sidebar
       }}
     >
-
       {loading && <Typography>Loading restaurants...</Typography>}
 
       <Grid container spacing={3}>

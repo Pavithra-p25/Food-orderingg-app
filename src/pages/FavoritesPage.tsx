@@ -10,13 +10,16 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useNavigate } from "react-router-dom";
-import { useFav } from "../context/FavContext";
-import MyCard from "../components/newcomponents/card/MyCard"; 
+import MyCard from "../components/newcomponents/card/MyCard";
 import MyButton from "../components/newcomponents/button/MyButton";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../store/Store";
+import { removeFavorite } from "../store/slices/FavoritesSlice";
 
 const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
-  const { favorites, removeFromFavorites } = useFav();
+  const dispatch = useDispatch<AppDispatch>();
+  const favorites = useSelector((state: RootState) => state.favorites.items);
 
   // EMPTY STATE
   if (favorites.length === 0) {
@@ -81,7 +84,7 @@ const FavoritesPage: React.FC = () => {
                 <Tooltip title="Remove from favorites">
                   <IconButton
                     color="error"
-                    onClick={() => removeFromFavorites(item.id)}
+                  onClick={() => dispatch(removeFavorite(item.id))}
                   >
                     <FavoriteIcon />
                   </IconButton>

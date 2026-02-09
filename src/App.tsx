@@ -11,7 +11,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/error/ErrorFallback";
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
-import { FavProvider } from "./context/FavContext";
 import { getTheme } from "./config/theme/Theme";
 import { DialogSnackbarProvider } from "./context/DialogSnackbarContext";
 import Header from "./layouts/Header";
@@ -27,6 +26,10 @@ import RestaurantInfoList from "./pages/restaurantinfo/RestaurantInfoList";
 import RestaurantForm from "./pages/registerrestaurant/RestaurantForm";
 import BackToTop from "./components/newcomponents/BackToTop";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "./store/Store";
+import { fetchFavorites } from "./store/slices/FavoritesThunks";
 
 /* Routes */
 const AppRoutes = () => (
@@ -60,36 +63,40 @@ const AppContent = () => {
   const isSpecialPage =
     location.pathname === "/404" || location.pathname === "/error";
 
+ const dispatch = useDispatch<AppDispatch>();
+
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (user?.id) {
+      dispatch(fetchFavorites(user.id));
+    }
+  }, [dispatch]);
+
   return (
     <MuiThemeProvider theme={getTheme(darkMode ? "dark" : "light")}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <CssBaseline />
         <DialogSnackbarProvider>
-          <FavProvider>
-            <div className="d-flex flex-column min-vh-100">
+          <div className="d-flex flex-column min-vh-100">
+            {/* Header only for normal pages */}
+            {!isSpecialPage && <Header />}
 
-              {/* Header only for normal pages */}
-              {!isSpecialPage && <Header />}
+            <main className={!isSpecialPage ? "flex-grow-1 pt-5" : ""}>
+              <AppRoutes />
+            </main>
 
-              <main className={!isSpecialPage ? "flex-grow-1 pt-5" : ""}>
-                <AppRoutes />
-              </main>
+            {/* Footer only for normal pages */}
+            {!isSpecialPage && <Footer />}
+          </div>
 
-              {/* Footer only for normal pages */}
-              {!isSpecialPage && <Footer />}
-
-            </div>
-
-            {/* BackToTop only for normal pages */}
-            {!isSpecialPage && <BackToTop />}
-
-          </FavProvider>
+          {/* BackToTop only for normal pages */}
+          {!isSpecialPage && <BackToTop />}
         </DialogSnackbarProvider>
       </ErrorBoundary>
     </MuiThemeProvider>
   );
 };
-
 
 /* Root */
 const App: React.FC = () => {

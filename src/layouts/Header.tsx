@@ -36,7 +36,9 @@ import { useLocation } from "react-router-dom";
 import { useDialogSnackbar } from "../context/DialogSnackbarContext";
 import { useNavigate } from "react-router-dom";
 import Badge from "@mui/material/Badge";
-import { useFav } from "../context/FavContext";
+import { useSelector } from "react-redux";
+import type { RootState } from "../store/Store";
+
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -61,7 +63,6 @@ const Header: React.FC = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { showSnackbar, showDialog, hideDialog } = useDialogSnackbar();
-  const { favorites } = useFav();
   const toTitleCase = (name: string) =>
     name
       ?.toLowerCase()
@@ -120,6 +121,10 @@ const Header: React.FC = () => {
       <Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
     </Box>
   );
+
+  const favorites = useSelector(
+  (state: RootState) => state.favorites.items
+);
 
   const isMobile = window.innerWidth < 1200;
   const menuItems = [

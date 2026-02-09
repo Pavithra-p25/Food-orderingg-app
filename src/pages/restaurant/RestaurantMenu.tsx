@@ -15,9 +15,12 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import MyCard from "../../components/newcomponents/card/MyCard";
 import db from "../../../server/db.json";
-import { useFav } from "../../context/FavContext";
 import type { FavoriteItem } from "../../types/userTypes";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../../store/Store";
+import { addFavorite, removeFavorite } from "../../store/slices/FavoritesSlice";
+import { saveFavorites } from "../../store/slices/FavoritesThunks";
 
 // Types
 type MenuItem = {
@@ -37,7 +40,9 @@ type Restaurant = {
 const RestaurantMenu: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const { favorites, addToFavorites, removeFromFavorites } = useFav();
+  const dispatch = useDispatch<AppDispatch>();
+  const favorites = useSelector((state: RootState) => state.favorites.items);
+
   const [error, setError] = useState<string | null>(null);
 
   // Merge restaurant + menuItems
@@ -69,7 +74,7 @@ const RestaurantMenu: React.FC = () => {
   }, [id]);
 
   // Handlers
-const handleFavorite = (
+  const handleFavorite = (
   item: MenuItem,
   itemId: string,
   isFavorite: boolean
@@ -87,9 +92,23 @@ const handleFavorite = (
     image: item.file || "/placeholder.jpg",
   };
 
-  isFavorite
-    ? removeFromFavorites(itemId)
-    : addToFavorites(favItem);
+  let updatedFavorites: FavoriteItem[];
+
+  if (isFavorite) {
+    dispatch(removeFavorite(itemId));
+    updatedFavorites = favorites.filter((f) => f.id !== itemId);
+  } else {
+    dispatch(addFavorite(favItem));
+    updatedFavorites = [...favorites, favItem];
+  }
+
+  // to DB
+  dispatch(
+    saveFavorites({
+      userId: user.id,
+      favorites: updatedFavorites,
+    })
+  );
 };
 
 
@@ -162,8 +181,7 @@ const handleFavorite = (
       <Grid container spacing={3}>
         {restaurant.menuItems && restaurant.menuItems.length > 0
           ? restaurant.menuItems.map((item, index) => {
-             const itemId = `${restaurant.id}-${index}`;
-
+              const itemId = `${restaurant.id}-${index}`;
 
               const isFavorite = favorites.some((fav) => fav.id === itemId);
 

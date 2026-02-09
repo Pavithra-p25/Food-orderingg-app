@@ -32,6 +32,7 @@ export const useRestaurants = () => {
         showBoundary,
         fallbackMessage: "Failed to fetch restaurant list",
       });
+      return[];
     } finally {
       setLoading(false);
     }
@@ -55,29 +56,28 @@ export const useRestaurants = () => {
     [showBoundary],
   );
 
-  const addRestaurant = useCallback(
-    async (formData: CreateRestaurantDTO) => {
-      try {
-        const now = nowISO();
+ const addRestaurant = useCallback(
+  async (formData: CreateRestaurantDTO): Promise<Restaurant | null> => {
+    try {
+      const now = nowISO();
+      return await restaurantService.createRestaurant({
+        ...formData,
+        isActive: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+    } catch (err: any) {
+      handleError({
+        error: err,
+        showBoundary,
+        fallbackMessage: "Failed to create restaurant",
+      });
+      return null;
+    }
+  },
+  [showBoundary],
+);
 
-        const payload = {
-          ...formData,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-        };
-
-        return await restaurantService.createRestaurant(payload);
-      } catch (err: any) {
-        handleError({
-          error: err,
-          showBoundary,
-          fallbackMessage: "Failed to create restaurant",
-        });
-      }
-    },
-    [showBoundary],
-  );
 
   const updateRestaurant = useCallback(
     async (id: string, formData: UpdateRestaurantDTO) => {
