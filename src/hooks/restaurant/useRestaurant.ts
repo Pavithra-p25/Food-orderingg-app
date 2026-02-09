@@ -3,6 +3,7 @@ import * as restaurantService from "../../services/restaurantService";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import { useErrorBoundary } from "react-error-boundary";
 import { handleError } from "../../utils/HandleError";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 const nowISO = () => new Date().toISOString(); //return current date and time in iso format
 
@@ -16,27 +17,32 @@ export type CreateRestaurantDTO = Omit<
 type UpdateRestaurantDTO = Partial<CreateRestaurantDTO>;
 export const useRestaurants = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error] = useState<Error | null>(null);
+  const { showSnackbar } = useDialogSnackbar();
 
   const { showBoundary } = useErrorBoundary();
   const getAllRestaurants = useCallback(async () => {
     setLoading(true);
-    setError(null);
 
     try {
       const data = await restaurantService.getRestaurants();
       return data ?? [];
     } catch (err: any) {
       handleError({
-        error: err,
+        error: {
+          ...err,
+          customMessage: "Restaurant list not found",
+        },
         showBoundary,
         fallbackMessage: "Failed to fetch restaurant list",
+        showSnackbar,
       });
-      return[];
+
+      return [];
     } finally {
       setLoading(false);
     }
-  }, [showBoundary]);
+  }, [showBoundary, showSnackbar]);
 
   const getRestaurantDetails = useCallback(
     async (id: string) => {
@@ -45,9 +51,10 @@ export const useRestaurants = () => {
         return data ?? null;
       } catch (err: any) {
         handleError({
-          error: err,
+          error: { ...err, customMessage: "Restaurant menu not found " },
           showBoundary,
           fallbackMessage: "Failed to fetch restaurant details",
+          showSnackbar,
         });
 
         return null;
@@ -56,28 +63,28 @@ export const useRestaurants = () => {
     [showBoundary],
   );
 
- const addRestaurant = useCallback(
-  async (formData: CreateRestaurantDTO): Promise<Restaurant | null> => {
-    try {
-      const now = nowISO();
-      return await restaurantService.createRestaurant({
-        ...formData,
-        isActive: true,
-        createdAt: now,
-        updatedAt: now,
-      });
-    } catch (err: any) {
-      handleError({
-        error: err,
-        showBoundary,
-        fallbackMessage: "Failed to create restaurant",
-      });
-      return null;
-    }
-  },
-  [showBoundary],
-);
-
+  const addRestaurant = useCallback(
+    async (formData: CreateRestaurantDTO): Promise<Restaurant | null> => {
+      try {
+        const now = nowISO();
+        return await restaurantService.createRestaurant({
+          ...formData,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        });
+      } catch (err: any) {
+        handleError({
+          error: err,
+          showBoundary,
+          fallbackMessage: "Failed to create restaurant",
+          showSnackbar,
+        });
+        return null;
+      }
+    },
+    [showBoundary],
+  );
 
   const updateRestaurant = useCallback(
     async (id: string, formData: UpdateRestaurantDTO) => {
@@ -91,6 +98,7 @@ export const useRestaurants = () => {
           error: err,
           showBoundary,
           fallbackMessage: "Failed to update restaurant",
+          showSnackbar,
         });
       }
     },
@@ -109,6 +117,7 @@ export const useRestaurants = () => {
           error: err,
           showBoundary,
           fallbackMessage: "Failed to deactivate restaurant",
+          showSnackbar,
         });
       }
     },
@@ -127,6 +136,7 @@ export const useRestaurants = () => {
           error: err,
           showBoundary,
           fallbackMessage: "Failed to activate restaurant",
+          showSnackbar,
         });
       }
     },
@@ -142,6 +152,7 @@ export const useRestaurants = () => {
           error: err,
           showBoundary,
           fallbackMessage: "Failed to delete restaurant",
+          showSnackbar,
         });
       }
     },

@@ -12,10 +12,10 @@ export const fetchFavorites = createAsyncThunk(
 );
 
 export const saveFavorites = createAsyncThunk(
-  "favorites/save",
+  "favorites/save", 
   async ({
-    userId,
-    favorites,
+    userId, //which user to save for
+    favorites,//array of favorite items
   }: {
     userId: string;
     favorites: FavoriteItem[];

@@ -15,7 +15,6 @@ import useRestaurants from "../../hooks/restaurant/useRestaurant";
 import CommonInput from "../../components/newcomponents/textfields/CommonInput";
 import CommonSelect from "../../components/newcomponents/textfields/CommonSelect";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
-import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 const CATEGORY_OPTIONS = ["", ...RESTAURANT_CATEGORIES];
 
@@ -25,8 +24,7 @@ const RestaurantList: React.FC = () => {
   //  LOCAL STATE
   const [search, setSearch] = useState<string>("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const { showSnackbar } = useDialogSnackbar();
-
+ 
   const [visibleCount, setVisibleCount] = useState<number>(9);
 
   const [filters, setFilters] = useState({
@@ -37,18 +35,14 @@ const RestaurantList: React.FC = () => {
 
   //  FETCH RESTAURANTS
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        const data = await getAllRestaurants();
-        setRestaurants(data);
-      } catch (err: any) {
-        // ONLY snackbar here
-        showSnackbar(err?.message || "Failed to load restaurants", "error");
-      }
-    };
+  const fetchRestaurants = async () => {
+    const data = await getAllRestaurants();
+    setRestaurants(data);
+  };
 
-    fetchRestaurants();
-  }, [getAllRestaurants, showSnackbar]);
+  fetchRestaurants();
+}, [getAllRestaurants]);
+
 
   // FILTER LOGIC
   const filteredRestaurants = restaurants.filter((r) => {

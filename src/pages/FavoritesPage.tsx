@@ -12,14 +12,14 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useNavigate } from "react-router-dom";
 import MyCard from "../components/newcomponents/card/MyCard";
 import MyButton from "../components/newcomponents/button/MyButton";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../store/Store";
+import { useDispatch, useSelector } from "react-redux"; 
+import type { RootState, AppDispatch } from "../store/Store"; //redux store
 import { removeFavorite } from "../store/slices/FavoritesSlice";
 
 const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const favorites = useSelector((state: RootState) => state.favorites.items);
+  const favorites = useSelector((state: RootState) => state.favorites.items); // read favorites
 
   // EMPTY STATE
   if (favorites.length === 0) {
