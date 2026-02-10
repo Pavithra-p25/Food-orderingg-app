@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit"; // to create slice - state +action +reducers
+import type { PayloadAction } from "@reduxjs/toolkit"; // for action.payload
 import type { FavoriteItem } from "../../types/userTypes";
 import { fetchFavorites } from "./FavoritesThunks";
 
@@ -27,6 +27,7 @@ const favoritesSlice = createSlice({
       state.items = state.items.filter((item) => item.id !== action.payload);
     },
   },
+  //for thunks
   extraReducers: (builder) => {
     builder
       //api call started

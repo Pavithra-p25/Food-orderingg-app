@@ -41,6 +41,8 @@ const RestaurantMenu: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const dispatch = useDispatch<AppDispatch>();
+
+  //favorites from redux store, 
   const favorites = useSelector((state: RootState) => state.favorites.items);
 
   const [error, setError] = useState<string | null>(null);
@@ -95,10 +97,10 @@ const RestaurantMenu: React.FC = () => {
   let updatedFavorites: FavoriteItem[];
 
   if (isFavorite) {
-    dispatch(removeFavorite(itemId));
+    dispatch(removeFavorite(itemId)); //already in - remoe
     updatedFavorites = favorites.filter((f) => f.id !== itemId);
   } else {
-    dispatch(addFavorite(favItem));
+    dispatch(addFavorite(favItem)); // not yet - add
     updatedFavorites = [...favorites, favItem];
   }
 
