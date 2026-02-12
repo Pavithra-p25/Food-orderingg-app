@@ -13,8 +13,8 @@ import { useNavigate } from "react-router-dom";
 import MyCard from "../components/newcomponents/card/MyCard";
 import MyButton from "../components/newcomponents/button/MyButton";
 import { useDispatch, useSelector } from "react-redux"; 
-import type { RootState, AppDispatch } from "../store/Store"; //redux store
-import { removeFavorite } from "../store/slices/FavoritesSlice";
+import type { RootState, AppDispatch } from "../redux/Store"; //redux store
+import { removeFavorite } from "../redux/slices/FavoritesSlice";
 
 const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();

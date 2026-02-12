@@ -18,9 +18,9 @@ import db from "../../../server/db.json";
 import type { FavoriteItem } from "../../types/userTypes";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../../store/Store";
-import { addFavorite, removeFavorite } from "../../store/slices/FavoritesSlice";
-import { saveFavorites } from "../../store/slices/FavoritesThunks";
+import type { RootState, AppDispatch } from "../../redux/Store";
+import { addFavorite, removeFavorite } from "../../redux/slices/FavoritesSlice";
+import { saveFavorites } from "../../redux/slices/FavoritesThunks";
 
 // Types
 type MenuItem = {

@@ -37,7 +37,7 @@ import { useDialogSnackbar } from "../context/DialogSnackbarContext";
 import { useNavigate } from "react-router-dom";
 import Badge from "@mui/material/Badge";
 import { useSelector } from "react-redux";
-import type { RootState } from "../store/Store";
+import type { RootState } from "../redux/Store";
 
 
 type FoodMode = "veg" | "nonveg" | null;

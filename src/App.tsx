@@ -28,8 +28,8 @@ import BackToTop from "./components/newcomponents/BackToTop";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import type { AppDispatch } from "./store/Store";
-import { fetchFavorites } from "./store/slices/FavoritesThunks";
+import type { AppDispatch } from "./redux/Store";
+import { fetchFavorites } from "./redux/slices/FavoritesThunks";
 
 /* Routes */
 const AppRoutes = () => (
