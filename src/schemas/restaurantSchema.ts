@@ -43,27 +43,62 @@ export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
   averageDeliveryTime: yup.string().optional(),
 
   // Contact tab
-  ownerName: yup.string().required(ERROR_MESSAGES.contact.ownerNameRequired),
+  ownerName: yup
+    .string()
+    .required(ERROR_MESSAGES.contact.ownerNameRequired)
+    .trim()
+    .min(3, "Owner name must be at least 3 characters")
+    .max(30, "Owner name must not exceed 30 characters")
+    .matches(/^[A-Za-z ]+$/, "Owner name should contain only letters"),
 
   supportEmail: yup
     .string()
     .email(ERROR_MESSAGES.email.invalid)
     .required(ERROR_MESSAGES.contact.supportEmailRequired),
 
-  phone: yup.string().required(ERROR_MESSAGES.contact.phoneRequired),
+  phone: yup
+    .string()
+    .required(ERROR_MESSAGES.contact.phoneRequired)
+    .matches(/^[0-9]+$/, "Phone number should contain only numbers")
+    .min(10, "Phone number must be 10 digits")
+    .max(10, "Phone number must be 10 digits"),
 
-  alternatePhone: yup.string().optional(),
+  alternatePhone: yup
+    .string()
+    .optional()
+    .matches(/^[0-9]+$/, "Phone number should contain only numbers")
+    .min(10, "Phone number must be 10 digits")
+    .max(10, "Phone number must be 10 digits"),
 
   // Location tab
   address: yup.string().required(ERROR_MESSAGES.location.addressRequired),
 
-  city: yup.string().required(ERROR_MESSAGES.location.cityRequired),
+  city: yup
+    .string()
+    .required(ERROR_MESSAGES.location.cityRequired)
+    .trim()
+    .min(3, "City name must be at least 3 characters")
+    .max(30, "City name must not exceed 30 characters")
+    .matches(/^[A-Za-z ]+$/, "City name should contain only letters"),
 
-  state: yup.string().required(ERROR_MESSAGES.location.stateRequired),
+  state: yup
+    .string()
+    .required(ERROR_MESSAGES.location.stateRequired)
+    .trim()
+    .min(3, "City name must be at least 3 characters")
+    .max(30, "City name must not exceed 30 characters")
+    .matches(/^[A-Za-z ]+$/, "City name should contain only letters"),
 
   pincode: yup.string().required(ERROR_MESSAGES.location.pincodeRequired),
 
-  country: yup.string().required(ERROR_MESSAGES.location.countryRequired),
+  country: yup
+  .string()
+  .required(ERROR_MESSAGES.location.countryRequired)
+  .trim()
+  .min(3, "Country name must be at least 3 characters")
+  .max(50, "Country name must not exceed 50 characters")
+  .matches(/^[A-Za-z ]+$/, "Country name should contain only letters"),
+
 
   acceptTerms: yup
     .boolean()

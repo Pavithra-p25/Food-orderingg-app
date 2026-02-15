@@ -17,7 +17,7 @@ const RestaurantTab: React.FC = () => {
   const {
     control,
     watch,
-   
+
     formState: { errors },
   } = useFormContext<Restaurant>();
 
@@ -148,34 +148,41 @@ const RestaurantTab: React.FC = () => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-      <MyCheckbox
-  name="restaurantType"
-  label="Restaurant Type"
-  options={RESTAURANT_TYPES.map((type) => ({
-    label: type,
-    value: type,
-  }))}
-  onChangeOverride={(value: string[]) => {
+        <MyCheckbox
+          name="restaurantType"
+          label="Restaurant Type"
+          options={RESTAURANT_TYPES.map((type) => ({
+            label: type,
+            value: type,
+          }))}
+          onChangeOverride={(newValue: string[]) => {
+            const currentType = watch("restaurantType") || [];
+            const wasBothSelected = currentType.includes("Both");
+            const isBothSelected = newValue.includes("Both");
 
-    const hasVeg = value.includes("Veg");
-    const hasNonVeg = value.includes("Non-Veg");
-    const hasBoth = value.includes("Both");
+            // User unchecked Both explicitly - Clear all
+            if (wasBothSelected && !isBothSelected) {
+              return [];
+            }
 
-    // If Both selected → select all
-    if (hasBoth) {
-      return ["Veg", "Non-Veg", "Both"];
-    }
+            //  User checked Both explicitly - Select all
+            if (!wasBothSelected && isBothSelected) {
+              return ["Veg", "Non-Veg", "Both"];
+            }
 
-    // If Veg + Non-Veg selected → auto add Both
-    if (hasVeg && hasNonVeg) {
-      return ["Veg", "Non-Veg", "Both"];
-    }
+            //  Logic for Veg/Non-Veg interactions
+            const hasVeg = newValue.includes("Veg");
+            const hasNonVeg = newValue.includes("Non-Veg");
 
-    // Otherwise remove Both
-   return value.filter((v: string) => v !== "Both");
-
-  }}
-/>
+            if (hasVeg && hasNonVeg) {
+              // If both individual options are present, ensure Both is checked
+              return ["Veg", "Non-Veg", "Both"];
+            } else {
+              // If one is missing, ensure Both is NOT checked
+              return newValue.filter((v) => v !== "Both");
+            }
+          }}
+        />
 
       </Grid>
     </Grid>

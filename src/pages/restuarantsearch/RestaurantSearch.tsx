@@ -84,29 +84,46 @@ const RestaurantSearch: React.FC = () => {
   ).length;
 
   //search logic
-  const onSubmit = async (data: Restaurant) => {
-    try {
-      const filtered = allRestaurants.filter((res: Restaurant) => {
-        const match = (field?: string, value?: string) =>
-          value && field?.toLowerCase().includes(value.toLowerCase().trim());
+ const onSubmit = async (data: Restaurant) => {
+  try {
+    const filtered = allRestaurants.filter((res: Restaurant) => {
+      // Helper for string fields
+      const match = (fieldValue?: string, inputValue?: string) =>
+        inputValue
+          ? fieldValue?.toLowerCase().includes(inputValue.toLowerCase().trim())
+          : false;
 
-        return (
-          match(res.restaurantName, data.restaurantName) ||
-          match(res.category, data.category) ||
-          match(res.restaurantType, data.restaurantType) ||
-          match(res.city, data.city) ||
-          match(res.state, data.state) ||
-          match(res.phone, data.phone) ||
-          match(res.email, data.email)
-        );
-      });
+      // Check string fields
+      const stringFields: (keyof Restaurant)[] = [
+        "restaurantName",
+        "category",
+        "city",
+        "state",
+        "phone",
+        "email",
+      ];
 
-      setResults(filtered);
-    } catch (error) {
-      console.error("Failed to filter restaurants:", error);
-      setResults([]);
-    }
-  };
+      const stringMatch = stringFields.some((field) =>
+        match(res[field] as string, data[field] as string)
+      );
+
+      // Check restaurantType array
+      const typeMatch =
+        data.restaurantType && data.restaurantType.length > 0
+          ? res.restaurantType?.some((t) => data.restaurantType!.includes(t))
+          : false;
+
+      // Include restaurant if any string field matches OR type matches
+      return stringMatch || typeMatch;
+    });
+
+    setResults(filtered);
+  } catch (error) {
+    console.error("Failed to filter restaurants:", error);
+    setResults([]);
+  }
+};
+
 
   const activeRestaurants = results.filter(
     (r) => r.isActive && r.status !== "draft",

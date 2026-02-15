@@ -40,7 +40,7 @@ const AppRoutes = () => (
     <Route path="/restaurants/:id" element={<RestaurantMenu />} />
     <Route path="/favorites" element={<FavoritesPage />} />
     <Route path="/cart" element={<CartPage />} />
-    <Route path="/RestaurantSearch" element={<RestaurantSearch />} />
+    <Route path="/restaurantsearch" element={<RestaurantSearch />} />
     <Route path="/RestaurantForm" element={<RestaurantForm />} />
     <Route path="/restaurant/register" element={<RestaurantForm />} />
     <Route path="/restaurant/edit/:id" element={<RestaurantForm />} />
@@ -56,6 +56,7 @@ const AppRoutes = () => (
 
 /* This component CAN read darkMode */
 const AppContent = () => {
+  
   const { darkMode } = useContext(ThemeContext);
   const location = useLocation();
 
@@ -72,6 +73,8 @@ const AppContent = () => {
       dispatch(fetchFavorites(user.id));
     }
   }, [dispatch]);
+
+  
 
   return (
     <MuiThemeProvider theme={getTheme(darkMode ? "dark" : "light")}>
