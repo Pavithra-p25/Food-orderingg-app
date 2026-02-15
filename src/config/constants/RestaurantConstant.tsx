@@ -1,5 +1,10 @@
+import type { RestaurantType } from "../../types/RestaurantTypes";
 // Allowed restaurant types
-export const RESTAURANT_TYPES = ["Veg", "Non-Veg", "Both"];
+export const RESTAURANT_TYPES: RestaurantType[] = [
+  "Veg",
+  "Non-Veg",
+  "Both",
+];
 
 // Delivery time options
 export const DELIVERY_TIME_OPTIONS = [

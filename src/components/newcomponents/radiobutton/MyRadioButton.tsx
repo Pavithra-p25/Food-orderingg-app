@@ -14,6 +14,7 @@ interface MyRadioButtonProps {
   label: string; // Group label
   options: { label: string; value: string | number }[]; //array of options
   disabled?: boolean;
+   required?: boolean; 
 }
 
 const MyRadioButton: React.FC<MyRadioButtonProps> = ({

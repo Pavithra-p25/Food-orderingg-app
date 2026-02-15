@@ -55,7 +55,8 @@ export function useFormHandlers({
     setActiveTab: (tab: RestaurantTabKey) => void,
     isDirty: boolean,
     hasErrors: boolean,
-    onConfirm: () => void
+    onConfirm: () => void,
+    onAfterReset?: () => void 
   ) => {
     if (isDirty || hasErrors) {
       onConfirm();
@@ -63,6 +64,9 @@ export function useFormHandlers({
     }
     reset();
     setActiveTab("login");
+      if (onAfterReset) {
+    onAfterReset(); //  clear extra states like file preview
+  }
   };
 
   // handler for center button (Save / Register)

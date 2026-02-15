@@ -13,7 +13,7 @@ export type RestaurantStatus = "draft" | "active" | "inactive";
 
 /* Restaurant Types */
 
-export type RestaurantType = "Veg" | "Non-Veg" | "Both" | "";
+export type RestaurantType = "Veg" | "Non-Veg"|"Both"  ;
 
 export type Timestamps = {
   createdAt: string; // ISO date
@@ -28,13 +28,13 @@ export type Login = {
 
 export type RestaurantData = {
   restaurantName: string;
-  restaurantType?: RestaurantType;
+  restaurantType?: RestaurantType[];
   category: string;
   openingTime?: string;
   closingTime?: string;
   averageDeliveryTime: string;
   website?: string;
-  logo?: string ;
+  logo?: FileList;
 };
 
 export type Contact = {

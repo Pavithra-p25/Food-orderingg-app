@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import type { Restaurant, RestaurantType} from "../types/RestaurantTypes";
+import type { Restaurant, RestaurantType } from "../types/RestaurantTypes";
 import { ERROR_MESSAGES } from "../config/constants/ErrorMessages";
 
 export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
@@ -12,73 +12,65 @@ export const restaurantSchema: yup.ObjectSchema<Restaurant> = yup.object({
   password: yup
     .string()
     .min(6, ERROR_MESSAGES.password.min)
+    .matches(/^\S*$/, "Password should not contain spaces")
     .required(ERROR_MESSAGES.password.required),
 
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], ERROR_MESSAGES.password.match)
+    .matches(/^\S*$/, "Confirm Password should not contain spaces")
     .required(ERROR_MESSAGES.password.confirmPasswordRequired),
 
   // Restaurant tab
   restaurantName: yup
     .string()
-    .required(ERROR_MESSAGES.restaurant.nameRequired),
-
+    .required(ERROR_MESSAGES.restaurant.nameRequired)
+    .trim()
+    .min(3, "Restaurant name must be at least 3 characters")
+    .max(30, "Restaurant name must not exceed 30 characters")
+    .matches(
+      /^[A-Za-z0-9 &-]+$/,
+      "Restaurant name contains invalid characters",
+    ),
   restaurantType: yup
-    .mixed<RestaurantType>() //mixed can be any type (string number object etc)
-    .oneOf(["Veg", "Non-Veg", "Both"], ERROR_MESSAGES.restaurant.typeInvalid)
+    .array()
+    .of(yup.mixed<RestaurantType>().oneOf(["Veg", "Non-Veg"]))
+    .min(1, ERROR_MESSAGES.restaurant.typeRequired)
     .required(ERROR_MESSAGES.restaurant.typeRequired),
 
-  category: yup
-    .string()
-    .required(ERROR_MESSAGES.restaurant.categoryRequired),
+  category: yup.string().required(ERROR_MESSAGES.restaurant.categoryRequired),
 
   averageDeliveryTime: yup.string().optional(),
 
   // Contact tab
-  ownerName: yup
-    .string()
-    .required(ERROR_MESSAGES.contact.ownerNameRequired),
+  ownerName: yup.string().required(ERROR_MESSAGES.contact.ownerNameRequired),
 
   supportEmail: yup
     .string()
     .email(ERROR_MESSAGES.email.invalid)
     .required(ERROR_MESSAGES.contact.supportEmailRequired),
 
-  phone: yup
-    .string()
-    .required(ERROR_MESSAGES.contact.phoneRequired),
+  phone: yup.string().required(ERROR_MESSAGES.contact.phoneRequired),
 
   alternatePhone: yup.string().optional(),
 
   // Location tab
-  address: yup
-    .string()
-    .required(ERROR_MESSAGES.location.addressRequired),
+  address: yup.string().required(ERROR_MESSAGES.location.addressRequired),
 
-  city: yup
-    .string()
-    .required(ERROR_MESSAGES.location.cityRequired),
+  city: yup.string().required(ERROR_MESSAGES.location.cityRequired),
 
-  state: yup
-    .string()
-    .required(ERROR_MESSAGES.location.stateRequired),
+  state: yup.string().required(ERROR_MESSAGES.location.stateRequired),
 
   pincode: yup.string().required(ERROR_MESSAGES.location.pincodeRequired),
 
-  country: yup
-    .string()
-    .required(ERROR_MESSAGES.location.countryRequired),
+  country: yup.string().required(ERROR_MESSAGES.location.countryRequired),
 
-   acceptTerms: yup
-  .boolean()
-  .oneOf([true], ERROR_MESSAGES.checkbox.acceptTermsRequired),
+  acceptTerms: yup
+    .boolean()
+    .oneOf([true], ERROR_MESSAGES.checkbox.acceptTermsRequired),
 
   // Optional fields
   openingTime: yup.string().optional(),
   closingTime: yup.string().optional(),
-  website: yup
-    .string()
-    .url(ERROR_MESSAGES.url.invalid)
-    .optional(),
+  website: yup.string().url(ERROR_MESSAGES.url.invalid).optional(),
 }) as yup.ObjectSchema<Restaurant>;

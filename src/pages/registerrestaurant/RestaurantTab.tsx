@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import MyTimePicker from "../../components/newcomponents/timepicker/MyTimePicker";
 import { Controller, useFormContext } from "react-hook-form";
@@ -10,16 +10,32 @@ import {
   RESTAURANT_TYPES,
   DELIVERY_TIME_OPTIONS,
 } from "../../config/constants/RestaurantConstant";
-import MyRadioButton from "../../components/newcomponents/radiobutton/MyRadioButton";
+import MyCheckbox from "../../components/newcomponents/checkbox/MyCheckbox";
 import MyDatePicker from "../../components/newcomponents/datepicker/MyDatePicker";
 
 const RestaurantTab: React.FC = () => {
   const {
     control,
+    watch,
+   
     formState: { errors },
   } = useFormContext<Restaurant>();
-  const [fileName, setFileName] = useState<string>("");
+
+  const logo = watch("logo");
+
+
   const [fileUrl, setFileUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (logo && logo[0]) {
+      const url = URL.createObjectURL(logo[0]);
+      setFileUrl(url);
+
+      return () => URL.revokeObjectURL(url); // prevent memory leak
+    } else {
+      setFileUrl("");
+    }
+  }, [logo]);
 
   return (
     <Grid container spacing={2}>
@@ -40,7 +56,6 @@ const RestaurantTab: React.FC = () => {
           name="category"
           label="Category"
           options={["Indian", "Chinese", "Fast Food", "Italian", "Mexican"]}
-
           required
         />
       </Grid>
@@ -96,7 +111,7 @@ const RestaurantTab: React.FC = () => {
                 onClick={() => document.getElementById("logo-upload")?.click()}
                 style={{ height: 56 }}
               >
-                {fileName ? fileName : "Upload Logo"}
+                {logo && logo[0] ? logo[0].name : "Upload Logo"}
               </MyButton>
               <input
                 type="file"
@@ -106,18 +121,16 @@ const RestaurantTab: React.FC = () => {
                   const files = e.target.files;
                   if (files && files[0]) {
                     field.onChange(files);
-                    setFileName(files[0].name);
-                    setFileUrl(URL.createObjectURL(files[0]));
                   }
                 }}
               />
               {fileUrl && (
                 <a
                   href={fileUrl}
-                  download={fileName}
+                  download={logo?.[0]?.name}
                   style={{ display: "block", marginTop: 8 }}
                 >
-                  Download {fileName}
+                  Download {logo?.[0]?.name}
                 </a>
               )}
             </>
@@ -135,14 +148,35 @@ const RestaurantTab: React.FC = () => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <MyRadioButton
-          name="restaurantType"
-          label="Restaurant Type"
-          options={RESTAURANT_TYPES.map((type) => ({
-            label: type,
-            value: type,
-          }))}
-        />
+      <MyCheckbox
+  name="restaurantType"
+  label="Restaurant Type"
+  options={RESTAURANT_TYPES.map((type) => ({
+    label: type,
+    value: type,
+  }))}
+  onChangeOverride={(value: string[]) => {
+
+    const hasVeg = value.includes("Veg");
+    const hasNonVeg = value.includes("Non-Veg");
+    const hasBoth = value.includes("Both");
+
+    // If Both selected → select all
+    if (hasBoth) {
+      return ["Veg", "Non-Veg", "Both"];
+    }
+
+    // If Veg + Non-Veg selected → auto add Both
+    if (hasVeg && hasNonVeg) {
+      return ["Veg", "Non-Veg", "Both"];
+    }
+
+    // Otherwise remove Both
+   return value.filter((v: string) => v !== "Both");
+
+  }}
+/>
+
       </Grid>
     </Grid>
   );

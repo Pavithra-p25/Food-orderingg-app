@@ -5,6 +5,8 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
+  FormLabel,
+  Box,
 } from "@mui/material";
 
 interface MyCheckboxProps {
@@ -12,6 +14,8 @@ interface MyCheckboxProps {
   label: string;
   disabled?: boolean;
   required?: boolean;
+  options: { label: string; value: string }[];
+  onChangeOverride?: (value: string[]) => string[];
 }
 
 const MyCheckbox: React.FC<MyCheckboxProps> = ({
@@ -19,6 +23,8 @@ const MyCheckbox: React.FC<MyCheckboxProps> = ({
   label,
   disabled = false,
   required = false,
+  options,
+  onChangeOverride,
 }) => {
   const {
     control,
@@ -29,29 +35,52 @@ const MyCheckbox: React.FC<MyCheckboxProps> = ({
   const hasError = !!errorMessage;
 
   return (
-    <FormControl error={hasError}>
+    <FormControl error={hasError} component="fieldset">
+      <FormLabel>{label}</FormLabel>
+
       <Controller
         name={name}
         control={control}
-        defaultValue={false}
-        render={({ field }) => (
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={!!field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-                disabled={disabled}
-                required={required}
-              />
-            }
-            label={label}
-          />
-        )}
+        defaultValue={[]}
+        render={({ field }) => {
+          const value: string[] = field.value || [];
+
+          return (
+            <Box display="flex" gap={3}>
+              {options.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  control={
+                    <Checkbox
+                      checked={value.includes(option.value)}
+                      onChange={(e) => {
+                        const currentValue: string[] = field.value || [];
+
+                        const newValue = e.target.checked
+                          ? [...currentValue, option.value]
+                          : currentValue.filter(
+                              (val: string) => val !== option.value,
+                            );
+
+                        const finalValue = onChangeOverride
+                          ? onChangeOverride(newValue)
+                          : newValue;
+
+                        field.onChange(finalValue);
+                      }}
+                      disabled={disabled}
+                      required={required}
+                    />
+                  }
+                  label={option.label}
+                />
+              ))}
+            </Box>
+          );
+        }}
       />
 
-      {hasError && (
-        <FormHelperText>{errorMessage}</FormHelperText>
-      )}
+      {hasError && <FormHelperText>{errorMessage}</FormHelperText>}
     </FormControl>
   );
 };
