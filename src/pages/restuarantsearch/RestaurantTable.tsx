@@ -7,6 +7,8 @@ import { Chip } from "@mui/material";
 import type { Restaurant } from "../../types/RestaurantTypes";
 import { Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
+import type { Column } from "../../components/newcomponents/table/MyTable";
+
 
 type Props = {
   results: Restaurant[];
@@ -86,9 +88,168 @@ const RestaurantTable: React.FC<Props> = ({
     
   ];
 
+ const baseColumns: Column<TableRow>[] = [
+
+  {
+    id: "restaurantName",
+    label: "Restaurant Name",
+    align: "left",
+    render: (row: TableRow) => {
+      if (!isRestaurant(row)) {
+        return (
+          <strong>
+            {row.label} ({row.count})
+          </strong>
+        );
+      }
+      return row.restaurantName;
+    },
+  },
+  {
+    id: "category",
+    label: "Category",
+    align: "left",
+  },
+  {
+    id: "restaurantType",
+    label: "Type",
+    align: "left",
+  },
+  {
+    id: "city",
+    label: "City",
+    align: "left",
+  },
+  {
+    id: "state",
+    label: "State",
+  },
+  {
+    id: "phone",
+    label: "Phone",
+    align: "center",
+  },
+  {
+    id: "email",
+    label: "Email",
+    align: "left",
+  },
+  {
+    id: "status",
+    label: "Status",
+    align: "center",
+    sortable: false,
+    render: (row: TableRow) => {
+      if (!isRestaurant(row)) return null;
+
+      let label = "Active";
+      let color: "success" | "error" = "success";
+
+      if (row.status === "draft") {
+        return (
+          <Chip
+            label="Draft"
+            size="small"
+            variant="outlined"
+            sx={{
+              color: "white",
+              backgroundColor: "grey",
+              borderColor: "darkgrey",
+            }}
+          />
+        );
+      } else if (row.isActive === false) {
+        label = "Inactive";
+        color = "error";
+      }
+
+      return (
+        <Chip
+          label={label}
+          color={color}
+          size="small"
+          variant="outlined"
+        />
+      );
+    },
+  },
+  {
+    id: "actions",
+    label: "Actions",
+    sortable: false,
+    render: (row: TableRow) => {
+      if (!isRestaurant(row)) return null;
+
+      const isDraft = row.status === "draft";
+      const isInactive = !row.isActive && !isDraft;
+
+      if (activeTab === "active") {
+        return row.isActive || isDraft ? (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <EditNoteIcon
+              color="primary"
+              sx={{ cursor: "pointer" }}
+              onClick={() => onEdit(row)}
+            />
+            <IconButton
+              size="small"
+              onClick={() => onDelete([row.id.toString()])}
+            >
+              <DeleteIcon color="error" />
+            </IconButton>
+          </Box>
+        ) : null;
+      }
+
+      if (activeTab === "inactive") {
+        return isInactive ? (
+          <RestoreIcon
+            color="success"
+            sx={{ cursor: "pointer" }}
+            onClick={() => onRestore([row.id.toString()])}
+          />
+        ) : null;
+      }
+
+      if (isInactive) {
+        return (
+          <RestoreIcon
+            color="success"
+            sx={{ cursor: "pointer" }}
+            onClick={() => onRestore([row.id.toString()])}
+          />
+        );
+      }
+
+      return (
+        <Box sx={{ display: "flex" }}>
+          <IconButton size="small" onClick={() => onEdit(row)}>
+            <EditNoteIcon color="primary" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => onDelete([row.id.toString()])}
+          >
+            <DeleteIcon color="error" />
+          </IconButton>
+        </Box>
+      );
+    },
+  },
+];
+
+const columns =
+  activeTab === "Groupby"
+    ? baseColumns.map((col) => ({
+        ...col,
+        sortable: false,
+      }))
+    : baseColumns;
+
   return (
     <MyTable
       rows={tableRows}
+      columns={columns}
       selectable={isActiveTab || isInactiveTab}
       rowId={(r: any) => r.id.toString()}
       activeTab={activeTab}
@@ -158,158 +319,7 @@ const RestaurantTable: React.FC<Props> = ({
           ? (rows) => handleBulkRestore(rows.filter(isRestaurant))
           : undefined
       }
-      columns={[
-        {
-          id: "restaurantName",
-          label: "Restaurant Name",
-          align: "left",
-          render: (row: TableRow) => {
-            if (!isRestaurant(row)) {
-              return (
-                <strong>
-                  {row.label} ({row.count})
-                </strong>
-              );
-            }
-            return row.restaurantName;
-          },
-        },
-        {
-          id: "category",
-          label: "Category",
-          align: "left",
-        },
-        {
-          id: "restaurantType",
-          label: "Type",
-          align: "left",
-        },
-        {
-          id: "city",
-          label: "City",
-          align: "left",
-        },
-        {
-          id: "state",
-          label: "State",
-        },
-        {
-          id: "phone",
-          label: "Phone",
-          align: "center",
-        },
-        {
-          id: "email",
-          label: "Email",
-          align: "left",
-        },
-        {
-          id: "status",
-          label: "Status",
-          align: "center",
-          sortable: false,
-          render: (row: TableRow) => {
-            if (!isRestaurant(row)) return null;
-
-            let label = "Active";
-            let color: "success" | "error" = "success";
-
-            if (row.status === "draft") {
-              label = "Draft";
-              return (
-                <Chip
-                  label={label}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    color: "white",
-                    backgroundColor: "grey",
-                    borderColor: "darkgrey",
-                  }}
-                />
-              );
-            } else if (row.isActive === false) {
-              label = "Inactive";
-              color = "error";
-            }
-
-            return (
-              <Chip
-                label={label}
-                color={color}
-                size="small"
-                variant="outlined"
-              />
-            );
-          },
-        },
-        {
-          id: "actions",
-          label: "Actions",
-          sortable: false,
-          render: (row: TableRow) => {
-            if (!isRestaurant(row)) return null;
-
-            const isDraft = row.status === "draft";
-            const isInactive = !row.isActive && !isDraft;
-
-            if (activeTab === "active") {
-              return row.isActive || isDraft ? (
-                <Box sx={{ display: "flex", flexWrap: "nowrap", gap: 1 }}>
-                  <EditNoteIcon
-                    color="primary"
-                    sx={{ cursor: "pointer", mr: 1 }}
-                    onClick={() => onEdit(row)}
-                  />
-                  <IconButton
-                  size="small"
-                  onClick={() => onDelete([row.id.toString()])}
-                >
-                  <DeleteIcon color="error" />
-                </IconButton>
-                </Box>
-              ) : null;
-            }
-
-            if (activeTab === "inactive") {
-              return isInactive ? (
-                <RestoreIcon
-                  color="success"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => onRestore([row.id.toString()])}
-                />
-              ) : null;
-            }
-
-            // All tab
-            if (isInactive) {
-              return (
-                <RestoreIcon
-                  color="success"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => onRestore([row.id.toString()])}
-                />
-              );
-            }
-
-            // Draft or active
-            return (
-              <Box sx={{ display: "flex" }}>
-                <IconButton size="small" onClick={() => onEdit(row)}>
-                  <EditNoteIcon color="primary" />
-                </IconButton>
-
-                <IconButton
-                  size="small"
-                  onClick={() => onDelete([row.id.toString()])}
-                >
-                  <DeleteIcon color="error" />
-                </IconButton>
-              </Box>
-            );
-          },
-        },
-      ]}
+    
     />
   );
 };

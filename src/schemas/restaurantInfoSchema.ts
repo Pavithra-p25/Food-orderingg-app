@@ -25,7 +25,12 @@ export const restaurantInfoSchema = yup.object({
           .string()
           .required(`Item name ${REQUIRED_ERROR}`)
           .min(3, "Item name must be at least 3 characters")
-          .max(30, "Item name cannot exceed 30 characters"),
+          .max(30, "Item name cannot exceed 30 characters")
+          .matches(
+            NAME_REGEX,
+            "Item name cannot contain numbers or special characters",
+          ),
+
         category: yup
           .string()
           .required("Category is required")
@@ -33,9 +38,13 @@ export const restaurantInfoSchema = yup.object({
         price: yup
           .number()
           .nullable()
+          .transform((value, originalValue) =>
+            originalValue === "" ? null : value,
+          )
           .typeError("Price must be a number")
           .required("Price is required")
           .moreThan(0, "Price must be greater than 0"),
+
         file: yup
           .mixed<File>()
           .nullable()

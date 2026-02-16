@@ -44,7 +44,7 @@ const AppRoutes = () => (
     <Route path="/RestaurantForm" element={<RestaurantForm />} />
     <Route path="/restaurant/register" element={<RestaurantForm />} />
     <Route path="/restaurant/edit/:id" element={<RestaurantForm />} />
-    <Route path="/RestaurantInfo" element={<RestaurantInfo />} />
+    <Route path="/restaurantinfo" element={<RestaurantInfo />} />
     <Route path="/restaurant-info/edit/:id" element={<RestaurantInfo />} />
     <Route path="/RestaurantInfoList" element={<RestaurantInfoList />} />
     <Route path="/error" element={null} />

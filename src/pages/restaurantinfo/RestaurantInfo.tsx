@@ -79,16 +79,18 @@ const RestaurantInfo: React.FC = () => {
 
   /*  Accordion handlers  */
   const {
-    expandedRestaurant,
-    setExpandedRestaurant,
-    expandedBranches,
-    setExpandedBranches,
-    expandAll,
-    setExpandAll,
-    handleBranchAdded,
-    handleReset,
-    handleSubmitForm,
-  } = useRestaurantInfoHandlers(reset);
+  expandedRestaurant,
+  setExpandedRestaurant,
+  expandedBranches,
+  setExpandedBranches,
+  expandAll,
+  setExpandAll,
+  handleBranchAdded,
+  handleReset,
+  handleSubmitForm,
+  handleToggleExpandAll,
+} = useRestaurantInfoHandlers(reset, branchArray.fields.length);
+
 
   useEffect(() => {
     if (restaurantData && branchArray.fields.length > 0) {
@@ -132,7 +134,8 @@ const RestaurantInfo: React.FC = () => {
               <Tooltip
                 title={expandAll ? "Collapse All Forms" : "Expand All Forms"}
               >
-                <IconButton onClick={() => setExpandAll((p) => !p)}>
+              <IconButton onClick={handleToggleExpandAll}>
+
                   <UnfoldMoreIcon
                     sx={{
                       transform: expandAll ? "rotate(180deg)" : "rotate(0deg)",

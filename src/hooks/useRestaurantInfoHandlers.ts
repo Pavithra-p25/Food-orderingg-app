@@ -6,35 +6,36 @@ import { useRestaurantInfo } from "./useRestaurantInfo";
 import { useDialogSnackbar } from "../context/DialogSnackbarContext";
 
 export const useRestaurantInfoHandlers = (
-  reset: UseFormReset<RestaurantInfoValues>
-  
+  reset: UseFormReset<RestaurantInfoValues>,
+   branchCount: number
 ) => {
   const { addRestaurantInfo, fetchRestaurantInfo } = useRestaurantInfo();
 
   // Accordion state
-  const [expandedRestaurant, setExpandedRestaurant] = React.useState(false);
+  const [expandedRestaurant, setExpandedRestaurant] = React.useState(true);
   const [expandedBranches, setExpandedBranches] = React.useState<number[]>([]);
   const [expandAll, setExpandAll] = React.useState(false);
   const { showSnackbar } = useDialogSnackbar(); 
+ 
 
   const handleBranchAdded = (newIndex: number) => {
     setExpandedBranches((prev) => [...prev, newIndex]);
   };
 
-  // Expand/collapse all accordions
-  const handleExpandAll = (branchCount: number) => {
-    if (expandAll) {
-      setExpandedRestaurant(true);
-      setExpandedBranches(Array.from({ length: branchCount }, (_, i) => i));
-    } else {
-      setExpandedRestaurant(false);
-      setExpandedBranches([]);
-    }
-  };
+  const handleToggleExpandAll = () => {
+  const newValue = !expandAll;
+  setExpandAll(newValue);
 
-  React.useEffect(() => {
-    handleExpandAll(0);
-  }, [expandAll]);
+  if (newValue) {
+    setExpandedRestaurant(true);
+    setExpandedBranches(
+      Array.from({ length: branchCount }, (_, i) => i)
+    );
+  } else {
+    setExpandedRestaurant(false);
+    setExpandedBranches([]);
+  }
+};
 
   // Reset form
   const handleReset = () => {
@@ -64,5 +65,6 @@ export const useRestaurantInfoHandlers = (
     handleBranchAdded,
     handleReset,
     handleSubmitForm,
+    handleToggleExpandAll,
   };
 };

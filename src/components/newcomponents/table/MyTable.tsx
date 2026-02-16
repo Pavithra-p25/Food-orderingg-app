@@ -25,7 +25,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import Collapse from "@mui/material/Collapse";
 
-interface Column<T> {
+export interface Column<T> {
   id: keyof T | string;
   label: string | React.ReactNode;
   render?: (row: T) => React.ReactNode;
@@ -150,9 +150,23 @@ function MyTable<T>({
   const dense = typeof denseProp === "boolean" ? denseProp : internalDense;
 
   const handleSelectAll = (checked: boolean) => {
-    const newSelected = checked
-      ? rows.filter((r: any) => !r.isGroup).map(rowId)
-      : [];
+    const start = page * rowsPerPage;
+    const currentPageRows = sortedRows
+      .slice(start, start + rowsPerPage)
+      .filter((r: any) => !r.isGroup);
+
+    const currentPageIds = currentPageRows.map(rowId);
+
+    let newSelected: string[];
+
+    if (checked) {
+      newSelected = [
+        ...selected,
+        ...currentPageIds.filter((id) => !selected.includes(id)),
+      ];
+    } else {
+      newSelected = selected.filter((id) => !currentPageIds.includes(id));
+    }
 
     setSelected(newSelected);
     onSelectionChange?.(rows.filter((r) => newSelected.includes(rowId(r))));
@@ -295,17 +309,25 @@ function MyTable<T>({
     },
   };
 
-  const selectableRows = rows.filter((r: any) => !r.isGroup);
+  const currentPageIds = useMemo(() => {
+    const start = page * rowsPerPage;
+    return sortedRows
+      .slice(start, start + rowsPerPage)
+      .filter((r: any) => !r.isGroup)
+      .map(rowId);
+  }, [sortedRows, page, rowsPerPage]);
 
   const selectionColumn: Column<T> = {
     id: "__select__",
     label: (
       <Checkbox
         indeterminate={
-          selected.length > 0 && selected.length < selectableRows.length
+          currentPageIds.some((id) => selected.includes(id)) &&
+          !currentPageIds.every((id) => selected.includes(id))
         }
         checked={
-          selectableRows.length > 0 && selected.length === selectableRows.length
+          currentPageIds.length > 0 &&
+          currentPageIds.every((id) => selected.includes(id))
         }
         onClick={(e) => e.stopPropagation()}
         onChange={(_, checked) => handleSelectAll(checked)}
@@ -332,7 +354,17 @@ function MyTable<T>({
     if (selectable) cols = [selectionColumn, ...cols];
     if (enableExpand) cols = [expandColumn, ...cols];
     return cols;
-  }, [columns, selectable, enableExpand, selected, openRows]);
+  }, [
+    columns,
+    selectable,
+    enableExpand,
+    selected,
+    openRows,
+    page,
+    rowsPerPage,
+    sortedRows,
+    currentPageIds,
+  ]);
 
   const selectedRows = useMemo(
     () => rows.filter((r: any) => !r.isGroup && selected.includes(rowId(r))),

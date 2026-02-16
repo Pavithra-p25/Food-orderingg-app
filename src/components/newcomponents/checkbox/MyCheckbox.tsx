@@ -23,7 +23,7 @@ const MyCheckbox: React.FC<MyCheckboxProps> = ({
   label,
   disabled = false,
   required = false,
-  options,
+   options = [],
   onChangeOverride,
 }) => {
   const {
@@ -47,7 +47,8 @@ const MyCheckbox: React.FC<MyCheckboxProps> = ({
 
           return (
             <Box display="flex" gap={3}>
-              {options.map((option) => (
+            {(options ?? []).map((option) => (
+
                 <FormControlLabel
                   key={option.value}
                   control={

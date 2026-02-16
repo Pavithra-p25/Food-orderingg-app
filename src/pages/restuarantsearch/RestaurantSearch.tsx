@@ -84,46 +84,49 @@ const RestaurantSearch: React.FC = () => {
   ).length;
 
   //search logic
- const onSubmit = async (data: Restaurant) => {
-  try {
-    const filtered = allRestaurants.filter((res: Restaurant) => {
-      // Helper for string fields
-      const match = (fieldValue?: string, inputValue?: string) =>
-        inputValue
-          ? fieldValue?.toLowerCase().includes(inputValue.toLowerCase().trim())
-          : false;
+  const onSubmit = async (data: Restaurant) => {
+    try {
+      const filtered = allRestaurants.filter((res: Restaurant) => {
+        const match = (fieldValue?: string, inputValue?: string) =>
+          inputValue
+            ? fieldValue
+                ?.toLowerCase()
+                .includes(inputValue.toLowerCase().trim())
+            : true; // important change
+        console.log("Submitted Type:", data.restaurantType);
+        console.log("Type of Submitted:", typeof data.restaurantType);
 
-      // Check string fields
-      const stringFields: (keyof Restaurant)[] = [
-        "restaurantName",
-        "category",
-        "city",
-        "state",
-        "phone",
-        "email",
-      ];
+        // String fields
+        const stringFields: (keyof Restaurant)[] = [
+          "restaurantName",
+          "category",
+          "city",
+          "state",
+          "phone",
+          "email",
+        ];
 
-      const stringMatch = stringFields.some((field) =>
-        match(res[field] as string, data[field] as string)
-      );
+        const stringMatch = stringFields.every((field) =>
+          match(res[field] as string, data[field] as string),
+        );
+     const selectedType = data.restaurantType as any;
 
-      // Check restaurantType array
-      const typeMatch =
-        data.restaurantType && data.restaurantType.length > 0
-          ? res.restaurantType?.some((t) => data.restaurantType!.includes(t))
-          : false;
+const typeMatch =
+  selectedType && selectedType.length > 0
+    ? res.restaurantType?.includes(selectedType)
+    : true;
 
-      // Include restaurant if any string field matches OR type matches
-      return stringMatch || typeMatch;
-    });
 
-    setResults(filtered);
-  } catch (error) {
-    console.error("Failed to filter restaurants:", error);
-    setResults([]);
-  }
-};
+        // Now BOTH must match
+        return stringMatch && typeMatch;
+      });
 
+      setResults(filtered);
+    } catch (error) {
+      console.error("Failed to filter restaurants:", error);
+      setResults([]);
+    }
+  };
 
   const activeRestaurants = results.filter(
     (r) => r.isActive && r.status !== "draft",

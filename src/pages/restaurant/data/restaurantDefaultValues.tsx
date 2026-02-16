@@ -15,7 +15,7 @@ export const restaurantDefaultValues: Restaurant = {
 
   //  Restaurant Tab 
   restaurantName: "",
-  restaurantType: "",          
+  restaurantType: [],          
   category: "",            
   averageDeliveryTime: "", 
   openingTime: "",
