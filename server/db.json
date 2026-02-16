@@ -1248,63 +1248,6 @@
       ],
       "ownerName": "Divya",
       "restaurantName": "Green Bowl"
-    },
-    {
-      "id": "60d2",
-      "branches": [
-        {
-          "branchName": "main outlet",
-          "branchCode": "BBQ101",
-          "complianceDetails": [
-            {
-              "licenseType": "FSSAI",
-              "licenseNumber": "FSSBBQ101",
-              "validFrom": "2026-04-01T18:30:00.000Z",
-              "validTill": "2027-04-01T18:30:00.000Z"
-            }
-          ]
-        }
-      ],
-      "menuItems": [
-        {
-          "file": null,
-          "price": 220,
-          "category": "BBQ Starters",
-          "itemName": "Chicken Tikka"
-        },
-        {
-          "file": null,
-          "price": 260,
-          "category": "BBQ Starters",
-          "itemName": "Chicken Malai Kebab"
-        },
-        {
-          "file": null,
-          "price": 200,
-          "category": "Veg BBQ",
-          "itemName": "Paneer Tikka"
-        },
-        {
-          "file": null,
-          "price": 280,
-          "category": "BBQ Starters",
-          "itemName": "Mutton Seekh Kebab"
-        },
-        {
-          "file": null,
-          "price": 35,
-          "category": "Breads",
-          "itemName": "Butter Naan"
-        },
-        {
-          "file": null,
-          "price": 80,
-          "category": "Beverages",
-          "itemName": "Mint Mojito"
-        }
-      ],
-      "ownerName": "Arun",
-      "restaurantName": "BBQ Flame"
     }
   ]
 }

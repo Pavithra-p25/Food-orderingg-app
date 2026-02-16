@@ -89,7 +89,13 @@ const RestaurantInfo: React.FC = () => {
   handleReset,
   handleSubmitForm,
   handleToggleExpandAll,
-} = useRestaurantInfoHandlers(reset, branchArray.fields.length);
+} = useRestaurantInfoHandlers({
+  reset,
+  formState: methods.formState, // pass formState for dirtyFields and errors
+  branchCount: branchArray.fields.length,
+  initialData: restaurantData, // optional, only for edit mode
+});
+
 
 
   useEffect(() => {

@@ -1,9 +1,9 @@
-import * as React from "react";
 import { useFieldArray } from "react-hook-form";
 import type {
   Control,
   UseFormTrigger,
 } from "react-hook-form";
+import { useEffect } from "react";
 import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
 import { MAX_MENU_ITEMS } from "../config/constants/RestaurantConstant";
 import { canAddItem } from "../utils/canAddItem";
@@ -21,33 +21,39 @@ export const useRestaurantAccordionHandlers = (
     control,
     name: "menuItems",
   });
-
 const [menuEditable, setMenuEditable] = useState<boolean[]>(
-  menuItemsArray.fields.map(() => !isEditMode),
+  menuItemsArray.fields.map(() => isEditMode ? false : true)
 );
 
-React.useEffect(() => {
-  setMenuEditable(
-    menuItemsArray.fields.map(() => !isEditMode),
-  );
+ // Sync editable state whenever fields change
+  useEffect(() => {
+  setMenuEditable((prev) => {
+    return menuItemsArray.fields.map((_, index) =>
+      // keep previous editable state if exists
+      prev[index] ?? (isEditMode ? false : true)
+    );
+  });
 }, [menuItemsArray.fields.length, isEditMode]);
 
 
+const addMenuItem = async () => {
+  if (!canAddItem(menuItemsArray.fields.length, MAX_MENU_ITEMS)) return;
 
-  const addMenuItem = async () => {
-    if (!canAddItem(menuItemsArray.fields.length, MAX_MENU_ITEMS)) return;
+  const valid = await trigger("menuItems");
+  if (valid) {
+    menuItemsArray.append({
+      itemName: "",
+      category: "",
+      price: 0,
+      file: null,
+    });
 
-    const valid = await trigger("menuItems");
-    if (valid) {
-      menuItemsArray.append({
-        itemName: "",
-        category: "",
-        price: 0,
-        file: null,
-      });
-      setMenuEditable((prev) => [...prev, true]);
-    }
-  };
+    // Immediately mark the new item as editable
+    setMenuEditable((prev) => [...prev, true]);
+  }
+};
+
+
 
  const saveMenuItem = async (index: number) => {
   const valid = await trigger([

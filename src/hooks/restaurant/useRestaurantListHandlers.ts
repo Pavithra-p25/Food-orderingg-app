@@ -1,5 +1,6 @@
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import type { Dispatch, SetStateAction } from "react";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 import { useRestaurantInfo } from "../useRestaurantInfo";
 
 interface HandlersProps {
@@ -17,6 +18,8 @@ export const useRestaurantListHandlers = ({
 }: HandlersProps) => {
   const { fetchRestaurantInfo, removeRestaurantInfo } = useRestaurantInfo();
 
+const { showDialog, showSnackbar } = useDialogSnackbar();
+
   const handleEdit = (restaurant: RestaurantInfoValues) => {
     setEditingRestaurant(restaurant);
   };
@@ -33,11 +36,26 @@ export const useRestaurantListHandlers = ({
   const handlePreviewClose = () => {
     setPreviewRestaurant(null);
   };
-
-  const handleDeleteClick = (restaurant: RestaurantInfoValues) => {
-    setDeleteRestaurant(restaurant);
+// Delete with confirmation dialog
+  const handleDelete = (restaurant: RestaurantInfoValues) => {
+    showDialog({
+      title: "Confirm Deletion",
+      content: `Are you sure you want to delete "${restaurant.restaurantName}"?`,
+      confirmText: "Yes",
+      cancelText: "No",
+      maxWidth: "xs",
+      onConfirm: async () => {
+        try {
+          if (!restaurant.id) throw new Error("Missing ID");
+          await removeRestaurantInfo(restaurant.id);
+          await fetchRestaurantInfo();
+          showSnackbar("Restaurant deleted successfully", "success");
+        } catch (err) {
+          showSnackbar("Failed to delete restaurant", "error");
+        }
+      },
+    });
   };
-
   const handleDeleteCancel = () => {
     setDeleteRestaurant(null);
   };
@@ -53,7 +71,7 @@ export const useRestaurantListHandlers = ({
     handleEditSuccess,
     handlePreview,
     handlePreviewClose,
-    handleDeleteClick,
+    handleDelete,
     handleDeleteCancel,
     handleDeleteConfirm,
   };

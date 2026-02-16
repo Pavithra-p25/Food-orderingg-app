@@ -12,20 +12,26 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
+import { useRestaurantListHandlers } from "../../hooks/restaurant/useRestaurantListHandlers";
 
 const RestaurantInfoList = () => {
-  const {
-    restaurantInfoList,
-    fetchRestaurantInfo,
-    removeRestaurantInfo,
-  } = useRestaurantInfo();
- 
+  const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo } =
+    useRestaurantInfo();
+
   const navigate = useNavigate();
+  const [, setEditingRestaurant] = useState<RestaurantInfoValues | null>(null);
 
   const [previewRestaurant, setPreviewRestaurant] =
     React.useState<RestaurantInfoValues | null>(null);
   const [deleteRestaurant, setDeleteRestaurant] =
     useState<RestaurantInfoValues | null>(null);
+
+  const { handleDelete } = useRestaurantListHandlers({
+    setEditingRestaurant,
+    setPreviewRestaurant,
+    setDeleteRestaurant,
+    deleteRestaurant,
+  });
 
   useEffect(() => {
     fetchRestaurantInfo();
@@ -79,7 +85,7 @@ const RestaurantInfoList = () => {
           </Tooltip>
           {/* Delete Button */}
           <Tooltip title="Delete">
-            <IconButton color="error" onClick={() => setDeleteRestaurant(row)}>
+            <IconButton color="error" onClick={() => handleDelete(row)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>

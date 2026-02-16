@@ -2,6 +2,7 @@ import * as yup from "yup";
 import { REQUIRED_ERROR } from "../config/constants/ErrorMessages";
 import { NAME_REGEX } from "../config/constants/ValidationRegex";
 
+
 export const restaurantInfoSchema = yup.object({
   restaurantName: yup
     .string()
@@ -84,7 +85,12 @@ export const restaurantInfoSchema = yup.object({
           .string()
           .required(`Branch name ${REQUIRED_ERROR}`)
           .min(3, "Branch name must be at least 3 characters")
-          .max(20, "Branch name cannot exceed 20 characters"),
+          .max(20, "Branch name cannot exceed 20 characters")
+          .matches(
+            /^[A-Za-z\s]+$/,
+            "Branch name cannot contain numbers or special characters",
+          ),
+
         branchCode: yup
           .string()
           .required(`Branch code ${REQUIRED_ERROR}`)
@@ -98,10 +104,19 @@ export const restaurantInfoSchema = yup.object({
             yup.object({
               licenseType: yup
                 .string()
-                .required(`License type ${REQUIRED_ERROR}`),
+                .required(`License type ${REQUIRED_ERROR}`)
+                .min(3, "License type must be at least 3 characters")
+                .max(30, "License type cannot exceed 30 characters")
+                .matches(
+                  /^[A-Za-z\s]+$/,
+                  "License type cannot contain numbers or special characters",
+                ),
               licenseNumber: yup
                 .string()
-                .required(`License number ${REQUIRED_ERROR}`),
+                .required(`License number ${REQUIRED_ERROR}`)
+                .matches(/^\d+$/, "License number must contain only numbers")
+                .min(1, "License number cannot be empty")
+                .max(20, "License number cannot exceed 20 digits"),
               validFrom: yup
                 .string()
                 .required(`Valid from date ${REQUIRED_ERROR}`),

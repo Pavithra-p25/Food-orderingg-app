@@ -22,6 +22,7 @@ import MyButton from "../../components/newcomponents/button/MyButton";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
 import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantHandlers";
+import { useTheme } from "@mui/material/styles";
 
 type RestaurantDetailsAccordionProps = {
   expanded: boolean;
@@ -64,6 +65,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
       <Typography fontWeight={200}>{value || "-"}</Typography>
     </Box>
   );
+  const theme = useTheme();
 
   return (
     <MyAccordion
@@ -136,7 +138,7 @@ const RestaurantDetailsAccordion: React.FC<RestaurantDetailsAccordionProps> = ({
                 p: 3,
                 mb: 3,
                 borderRadius: 3,
-                backgroundColor: "grey.50",
+                backgroundColor: theme.palette.background.paper, 
               }}
             >
               {/* Header */}
