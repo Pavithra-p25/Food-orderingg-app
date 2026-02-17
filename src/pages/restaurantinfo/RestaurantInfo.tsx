@@ -20,8 +20,8 @@ import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
 import { useNavigate, useParams } from "react-router-dom";
 import RestaurantDetailsAccordion from "./RestaurantDetailsAccordion";
 import BranchAccordion from "./BranchAccordion";
-import { useRestaurantInfoHandlers } from "../../hooks/useRestaurantInfoHandlers";
-import { useRestaurantInfo } from "../../hooks/useRestaurantInfo";
+import { useRestaurantInfoHandlers } from "../../hooks/restaurantinfo/useRestaurantInfoHandlers";
+import { useRestaurantInfo } from "../../hooks/restaurantinfo/useRestaurantInfo";
 
 const RestaurantInfo: React.FC = () => {
   const navigate = useNavigate();

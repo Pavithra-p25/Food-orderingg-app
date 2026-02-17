@@ -21,7 +21,7 @@ import MyDropdown from "../../components/newcomponents/textfields/MyDropdown";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { RESTAURANT_CATEGORIES } from "../../config/constants/RestaurantConstant";
-import { useRestaurantAccordionHandlers } from "../../hooks/useRestaurantHandlers";
+import { useRestaurantAccordionHandlers } from "../../hooks/restaurantinfo/useRestaurantHandlers";
 import { useTheme } from "@mui/material/styles";
 
 type RestaurantDetailsAccordionProps = {

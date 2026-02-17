@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { useErrorBoundary } from "react-error-boundary";
 import { useCallback } from "react";
-import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
-import {
-  createRestaurantInfo,
-  deleteRestaurantInfo,
-  getRestaurantInfoList,
-  updateRestaurantInfo,
-} from "../services/restaurantInfoService";
-import { handleError } from "../utils/HandleError";
-import { useDialogSnackbar } from "../context/DialogSnackbarContext";
-
+import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
+import { createRestaurantInfo,deleteRestaurantInfo,getRestaurantInfoList,updateRestaurantInfo } from "../../services/restaurantInfoService";
+import { handleError } from "../../utils/HandleError";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 export const useRestaurantInfo = () => {
   const [restaurantInfoList, setRestaurantInfoList] = useState<

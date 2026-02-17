@@ -5,7 +5,11 @@ export const signupSchema = yup.object({
   fullName: yup
     .string()
     .required("Full name is required")
-    .min(3, "Full name must be at least 3 characters"),
+    .min(3, "Full name must be at least 3 characters")
+    .matches(
+      /^[A-Za-z ]+$/,
+      "Full name should contain only letters and spaces"
+    ),
 
   emailOrUsername: yup
     .string()

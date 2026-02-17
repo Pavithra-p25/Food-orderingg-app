@@ -1,9 +1,9 @@
 import React from "react";
 import type { UseFormReset, FormState } from "react-hook-form";
-import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
-import { defaultRestaurantValues } from "../pages/restaurantinfo/data/RestaurantInfoDefault";
+import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
+import { defaultRestaurantValues } from "../../pages/restaurantinfo/data/RestaurantInfoDefault";
 import { useRestaurantInfo } from "./useRestaurantInfo";
-import { useDialogSnackbar } from "../context/DialogSnackbarContext";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 
 interface UseRestaurantInfoHandlersProps {
   reset: UseFormReset<RestaurantInfoValues>;

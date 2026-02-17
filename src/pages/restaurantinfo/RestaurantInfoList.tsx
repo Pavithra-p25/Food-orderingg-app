@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Paper, Box, Typography } from "@mui/material";
 import MyTable from "../../components/newcomponents/table/MyTable";
-import { useRestaurantInfo } from "../../hooks/useRestaurantInfo";
+import { useRestaurantInfo } from "../../hooks/restaurantinfo/useRestaurantInfo";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import EditNoteIcon from "@mui/icons-material/EditNote";
@@ -12,7 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import { useRestaurantListHandlers } from "../../hooks/restaurant/useRestaurantListHandlers";
+import { useRestaurantListHandlers } from "../../hooks/restaurantinfo/useRestaurantListHandlers";
 import { ExportRestaurantInfo } from "./ExportRestaurantInfo";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";

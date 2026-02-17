@@ -1,7 +1,7 @@
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import type { Dispatch, SetStateAction } from "react";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
-import { useRestaurantInfo } from "../useRestaurantInfo";
+import { useRestaurantInfo } from "./useRestaurantInfo";
 
 interface HandlersProps {
   setEditingRestaurant: Dispatch<SetStateAction<RestaurantInfoValues | null>>;

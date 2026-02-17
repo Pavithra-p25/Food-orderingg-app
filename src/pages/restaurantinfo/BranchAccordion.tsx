@@ -21,10 +21,7 @@ import type {
   UseFormTrigger,
 } from "react-hook-form";
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
-import {
-  useBranchAccordionHandlers,
-  useComplianceAccordionHandlers,
-} from "../../hooks/useBranchHandlers";
+import { useBranchAccordionHandlers,useComplianceAccordionHandlers } from "../../hooks/restaurantinfo/useBranchHandlers";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 type BranchAccordionProps = {

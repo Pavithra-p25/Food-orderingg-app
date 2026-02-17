@@ -5,9 +5,9 @@ import type {
   UseFieldArrayReturn,
   UseFormTrigger,
 } from "react-hook-form";
-import type { RestaurantInfoValues } from "../types/RestaurantInfoTypes";
-import { MAX_BRANCHES, MAX_COMPLIANCE } from "../config/constants/RestaurantConstant";
-import { canAddItem } from "../utils/canAddItem";
+import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
+import { MAX_BRANCHES, MAX_COMPLIANCE } from "../../config/constants/RestaurantConstant";
+import { canAddItem } from "../../utils/canAddItem";
 
 /*   BRANCH HANDLERS */
 export const useBranchAccordionHandlers = (

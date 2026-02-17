@@ -252,6 +252,7 @@ function MyTable<T>({
 
   const expandColumn: Column<T> = {
     id: "__expand__",
+    width: 50, // Fixed width for alignment
     label: (
       <IconButton
         size="small"
@@ -267,8 +268,9 @@ function MyTable<T>({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 30,
-          height: 30,
+          width: 32, // Standardized width
+          height: 32, // Standardized height
+          padding: 0, // Standardized padding
         }}
       >
         {isGroupByTab ? (
