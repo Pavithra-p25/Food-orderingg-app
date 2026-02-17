@@ -36,6 +36,8 @@ const { showDialog, showSnackbar } = useDialogSnackbar();
   const handlePreviewClose = () => {
     setPreviewRestaurant(null);
   };
+
+  
 // Delete with confirmation dialog
   const handleDelete = (restaurant: RestaurantInfoValues) => {
     showDialog({

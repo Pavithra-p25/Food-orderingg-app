@@ -96,8 +96,6 @@ const RestaurantInfo: React.FC = () => {
   initialData: restaurantData, // optional, only for edit mode
 });
 
-
-
   useEffect(() => {
     if (restaurantData && branchArray.fields.length > 0) {
       setExpandedRestaurant(true);

@@ -13,6 +13,12 @@ import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useRestaurantListHandlers } from "../../hooks/restaurant/useRestaurantListHandlers";
+import { ExportRestaurantInfo } from "./ExportRestaurantInfo";
+import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import DescriptionIcon from "@mui/icons-material/Description";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 const RestaurantInfoList = () => {
   const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo } =
@@ -26,6 +32,8 @@ const RestaurantInfoList = () => {
   const [deleteRestaurant, setDeleteRestaurant] =
     useState<RestaurantInfoValues | null>(null);
 
+  const { showDialog, showSnackbar } = useDialogSnackbar();
+
   const { handleDelete } = useRestaurantListHandlers({
     setEditingRestaurant,
     setPreviewRestaurant,
@@ -36,6 +44,53 @@ const RestaurantInfoList = () => {
   useEffect(() => {
     fetchRestaurantInfo();
   }, []);
+
+  const openExportDialog = (data: RestaurantInfoValues[], title: string) => {
+    showDialog({
+      title,
+      maxWidth: "xs",
+      content: (
+        <Stack spacing={2} mt={1}>
+          <MyButton
+            variant="primary"
+            startIcon={<DescriptionIcon />}
+            onClick={() => {
+              ExportRestaurantInfo(data, "csv");
+              showSnackbar("CSV downloaded successfully", "success");
+            }}
+          >
+            Export as CSV
+          </MyButton>
+
+          <MyButton
+            variant="success"
+            startIcon={<TableChartIcon />}
+            onClick={() => {
+              ExportRestaurantInfo(data, "excel");
+              showSnackbar("Excel downloaded successfully", "success");
+            }}
+          >
+            Export as Excel
+          </MyButton>
+
+          <MyButton
+            variant="cancel"
+            startIcon={<PictureAsPdfIcon />}
+            onClick={() => {
+              ExportRestaurantInfo(data, "pdf");
+              showSnackbar("PDF downloaded successfully", "success");
+            }}
+          >
+            Export as PDF
+          </MyButton>
+        </Stack>
+      ),
+    });
+  };
+
+  const handleRowExport = (row: RestaurantInfoValues) => {
+    openExportDialog([row], row.restaurantName);
+  };
 
   const restaurantColumns = [
     {
@@ -62,9 +117,15 @@ const RestaurantInfoList = () => {
       label: "Actions",
       sortable: false,
       align: "center" as const,
-      render: (row: any) => (
-        <Box display="flex" gap={1} justifyContent="center" width="30px">
-          {/* Edit Button */}
+      width: 180,
+      render: (row: RestaurantInfoValues) => (
+        <Box
+          display="flex"
+          gap={1}
+          justifyContent="center"
+          sx={{ minWidth: 170 }}
+        >
+          {/* Edit */}
           <Tooltip title="Edit">
             <IconButton
               color="primary"
@@ -74,7 +135,7 @@ const RestaurantInfoList = () => {
             </IconButton>
           </Tooltip>
 
-          {/* Preview Button */}
+          {/* Preview */}
           <Tooltip title="Preview">
             <IconButton
               color="success"
@@ -83,7 +144,15 @@ const RestaurantInfoList = () => {
               <VisibilityIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          {/* Delete Button */}
+
+          {/* Download */}
+          <Tooltip title="Download">
+            <IconButton color="info" onClick={() => handleRowExport(row)}>
+              <FileDownloadIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          {/* Delete */}
           <Tooltip title="Delete">
             <IconButton color="error" onClick={() => handleDelete(row)}>
               <DeleteIcon fontSize="small" />
@@ -100,6 +169,64 @@ const RestaurantInfoList = () => {
         <Typography variant="h6" fontWeight="bold" mb={3} textAlign="center">
           Restaurant Information List
         </Typography>
+
+        <Box display="flex" justifyContent="flex-end" mb={2}>
+          <MyButton
+            variant="contained"
+            startIcon={<FileDownloadIcon />}
+            disabled={!restaurantInfoList?.length}
+            onClick={() => {
+              showDialog({
+                title: "Select Export Format",
+                maxWidth: "xs",
+                content: (
+                  <Stack spacing={2} mt={1}>
+                    {/* CSV - Blue */}
+                    <MyButton
+                      variant="primary"
+                      startIcon={<DescriptionIcon />}
+                      onClick={() => {
+                        ExportRestaurantInfo(restaurantInfoList, "csv");
+                        showSnackbar("CSV downloaded successfully", "success");
+                      }}
+                    >
+                      Export as CSV
+                    </MyButton>
+
+                    {/* Excel - Green */}
+                    <MyButton
+                      variant="success"
+                      startIcon={<TableChartIcon />}
+                      onClick={() => {
+                        ExportRestaurantInfo(restaurantInfoList, "excel");
+                        showSnackbar(
+                          "Excel downloaded successfully",
+                          "success",
+                        );
+                      }}
+                    >
+                      Export as Excel
+                    </MyButton>
+
+                    {/* PDF - Red */}
+                    <MyButton
+                      variant="cancel"
+                      startIcon={<PictureAsPdfIcon />}
+                      onClick={() => {
+                        ExportRestaurantInfo(restaurantInfoList, "pdf");
+                        showSnackbar("PDF downloaded successfully", "success");
+                      }}
+                    >
+                      Export as PDF
+                    </MyButton>
+                  </Stack>
+                ),
+              });
+            }}
+          >
+            Export
+          </MyButton>
+        </Box>
 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
           <Box sx={{ minWidth: { xs: 900, md: "100%" } }}>

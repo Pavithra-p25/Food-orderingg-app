@@ -53,7 +53,7 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
   expanded,
   onToggle,
   onBranchAdded,
-   isEditMode,
+  isEditMode,
 }) => {
   const { watch } = useFormContext<RestaurantInfoValues>();
 
@@ -71,7 +71,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
     saveLicense,
     editLicense,
     removeLicense,
-  } = useComplianceAccordionHandlers(control, branchIndex, trigger,isEditMode,);
+    setComplianceEditable,
+  } = useComplianceAccordionHandlers(control, branchIndex, trigger, isEditMode);
 
   /* TABLE DATA */
   const complianceRows: ComplianceRow[] = complianceArray.fields.map(
@@ -372,7 +373,8 @@ const BranchAccordion: React.FC<BranchAccordionProps> = ({
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                if (branchArray.fields.length < 3) addBranch();
+                if (branchArray.fields.length < 3)
+                  addBranch(setComplianceEditable);
               }}
             >
               <AddIcon />

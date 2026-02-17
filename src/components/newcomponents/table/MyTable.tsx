@@ -134,7 +134,6 @@ function MyTable<T>({
   enableGroupScroll = false,
   scrollable = false,
   activeTab,
-  variant = "display",
   minWidth,
 }: MyTableProps<T>) {
   const [orderBy, setOrderBy] = useState<string | null>(null);
@@ -452,8 +451,8 @@ function MyTable<T>({
         <Table
           size={dense ? "small" : "medium"}
           sx={{
-            tableLayout: variant === "editable" ? "fixed" : "auto",
-            minWidth: variant === "editable" ? (minWidth ?? 900) : undefined,
+            tableLayout: "fixed",
+            minWidth: minWidth ?? 900,
           }}
         >
           <TableHead>
@@ -576,9 +575,9 @@ function MyTable<T>({
                     key={index}
                     align="center"
                     sx={{
-                      width: col.id === "actions" ? 90 : undefined,
-                      minWidth: col.id === "actions" ? 90 : undefined,
-                      whiteSpace: col.id === "actions" ? "nowrap" : undefined,
+                      width: col.width,
+                      minWidth: col.minWidth || col.width,
+                      whiteSpace: col.width ? "nowrap" : undefined,
                       borderRight:
                         enableGroupScroll &&
                         typeof col.id === "string" &&
@@ -674,14 +673,12 @@ function MyTable<T>({
                           colSpan={effectiveColSpan}
                           sx={{
                             alignItems: "center",
-                            height: "150%",
                             py: 1.5,
                             //  LOCK ACTIONS COLUMN WIDTH
-                            width: col.id === "actions" ? 90 : undefined,
-                            maxWidth: col.id === "actions" ? 90 : undefined,
-                            padding: col.id === "actions" ? "4px" : undefined,
-                            whiteSpace:
-                              col.id === "actions" ? "nowrap" : undefined,
+                            width: col.width,
+                            minWidth: col.minWidth || col.width,
+                            whiteSpace: col.width ? "nowrap" : undefined,
+
                             borderRight:
                               enableGroupScroll &&
                               typeof col.id === "string" &&
