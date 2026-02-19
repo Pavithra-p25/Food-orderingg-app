@@ -8,6 +8,16 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 import { Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import type { Column } from "../../components/newcomponents/table/MyTable";
+import { useState } from "react";
+import { Button, Grid, Stack } from "@mui/material";
+import MyDialog from "../../components/newcomponents/dialog/MyDialog";
+import { exportData } from "../../utils/ExportData";
+import MyButton from "../../components/newcomponents/button/MyButton";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import GridOnIcon from "@mui/icons-material/GridOn"; // for Excel representation
+import { exportPdfAllTabs } from "./ExportPdfAllTabs";
+import * as XLSX from "xlsx";
 
 type Props = {
   results: Restaurant[];
@@ -86,6 +96,115 @@ const RestaurantTable: React.FC<Props> = ({
     },
   ];
 
+  const [exportOpen, setExportOpen] = useState(false);
+
+  const handleExportOpen = () => setExportOpen(true);
+  const handleExportClose = () => setExportOpen(false);
+
+  // Helper function to convert a Restaurant row into exportable object
+  const formatRowForExport = (row: Restaurant) => {
+    const rowData: Record<string, any> = {};
+
+    baseColumns.forEach((col) => {
+      if (!col.id || col.id === "actions") return;
+
+      if (col.id === "status") {
+        if (row.status === "draft") rowData[col.id] = "Draft";
+        else if (row.isActive === false) rowData[col.id] = "Inactive";
+        else rowData[col.id] = "Active";
+      } else {
+        rowData[col.id] = (row as any)[col.id] ?? "";
+      }
+    });
+
+    return rowData;
+  };
+  const handleExport = (format: "csv" | "excel" | "pdf") => {
+    if (format === "pdf") {
+      const allTabs = [
+        { name: "All", data: results.map(formatRowForExport) },
+        {
+          name: "Active",
+          data: results.filter((r) => r.isActive).map(formatRowForExport),
+        },
+        {
+          name: "Inactive",
+          data: results.filter((r) => !r.isActive).map(formatRowForExport),
+        },
+        {
+          name: "Group By",
+          data: tableRows.filter(isRestaurant).map(formatRowForExport),
+        },
+      ];
+
+      exportPdfAllTabs(allTabs, { orientation: "landscape" });
+      handleExportClose();
+      return;
+    }
+
+    let rowsToExport: TableRow[] = [];
+    switch (activeTab) {
+      case "Groupby":
+        rowsToExport = tableRows;
+        break;
+      case "all":
+      case "active":
+      case "inactive":
+        rowsToExport = tableRows;
+        break;
+    }
+
+    const dataToExport = rowsToExport
+      .filter(isRestaurant)
+      .map(formatRowForExport); // filter here
+    exportData(dataToExport, format, "Restaurants");
+    handleExportClose();
+  };
+
+  const exportExcelAllTabs = () => {
+    const allTabs = [
+      { name: "All", data: results.map(formatRowForExport) },
+      {
+        name: "Active",
+        data: results.filter((r) => r.isActive).map(formatRowForExport),
+      },
+      {
+        name: "Inactive",
+        data: results.filter((r) => !r.isActive).map(formatRowForExport),
+      },
+      {
+        name: "Group By",
+        data: tableRows.filter(isRestaurant).map(formatRowForExport),
+      },
+    ];
+
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+
+    allTabs.forEach((tab) => {
+      const worksheet = XLSX.utils.json_to_sheet(tab.data);
+
+      // Calculate column widths
+      const columns = Object.keys(tab.data[0] || {});
+      const colWidths = columns.map((col) => {
+        const maxLength = Math.max(
+          col.length, // header length
+          ...tab.data.map((row) => ((row[col] || "") + "").length), // cell length
+        );
+        return { wch: maxLength + 2 }; // add 2 for padding
+      });
+
+      worksheet["!cols"] = colWidths;
+
+      // Add sheet to workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, tab.name);
+    });
+
+    // Save the workbook
+    XLSX.writeFile(workbook, "Restaurants.xlsx");
+    handleExportClose();
+  };
+
   const baseColumns: Column<TableRow>[] = [
     {
       id: "restaurantName",
@@ -124,7 +243,6 @@ const RestaurantTable: React.FC<Props> = ({
       id: "restaurantType",
       label: "Type",
       align: "left",
-
     },
     {
       id: "city",
@@ -290,79 +408,142 @@ const RestaurantTable: React.FC<Props> = ({
       : baseColumns;
 
   return (
-    <MyTable
-      rows={tableRows}
-      columns={columns}
-      selectable={isActiveTab || isInactiveTab}
-      rowId={(r: any) => r.id.toString()}
-      activeTab={activeTab}
-      scrollable
-      columnGroups={activeTab === "Groupby" ? columnGroups : undefined}
-      pagination={activeTab !== "Groupby"}
-      enableGroupScroll={activeTab === "Groupby"}
-      onSelectionChange={(selectedRows) => {
-        console.log("Selected rows:", selectedRows);
-      }}
-      enableExpand={activeTab === "all" || activeTab === "Groupby"}
-      expandedContent={
-        activeTab === "all"
-          ? (row) =>
-              isRestaurant(row) && (
-                <Box sx={{ p: 2 }}>
-                  {/* Heading */}
-                  <Box
-                    sx={{
-                      mb: 1,
-                      fontWeight: "bold",
-                      fontSize: 14,
-                      color: "gray",
-                    }}
-                  >
-                    More Restaurant Info
-                  </Box>
+    <>
+      <Grid
+        container
+        size={{ xs: 12 }}
+        sx={{ mb: 2, justifyContent: "flex-end" }}
+      >
+        <Button variant="contained" onClick={handleExportOpen}>
+          Export
+        </Button>
+      </Grid>
 
-                  {/* Row */}
-                  <Box sx={{ display: "flex", gap: 4, mb: 2 }}>
-                    <Box>
-                      <Box sx={{ fontSize: 12, color: "grey" }}>Owner Name</Box>
-                      <Box>{row.ownerName || "N/A"}</Box>
+      <MyTable
+        rows={tableRows}
+        columns={columns}
+        selectable={isActiveTab || isInactiveTab}
+        rowId={(r: any) => r.id.toString()}
+        activeTab={activeTab}
+        scrollable
+        columnGroups={activeTab === "Groupby" ? columnGroups : undefined}
+        pagination={activeTab !== "Groupby"}
+        enableGroupScroll={activeTab === "Groupby"}
+        onSelectionChange={(selectedRows) => {
+          console.log("Selected rows:", selectedRows);
+        }}
+        enableExpand={activeTab === "all" || activeTab === "Groupby"}
+        expandedContent={
+          activeTab === "all"
+            ? (row) =>
+                isRestaurant(row) && (
+                  <Box sx={{ p: 2 }}>
+                    {/* Heading */}
+                    <Box
+                      sx={{
+                        mb: 1,
+                        fontWeight: "bold",
+                        fontSize: 14,
+                        color: "gray",
+                      }}
+                    >
+                      More Restaurant Info
                     </Box>
 
-                    <Box>
-                      <Box sx={{ fontSize: 12, color: "grey" }}>
-                        Alternate Phone
-                      </Box>
-                      <Box>{row.alternatePhone || "N/A"}</Box>
-                    </Box>
-
-                    <Box>
-                      <Box sx={{ fontSize: 12, color: "grey" }}>
-                        Average Delivery Time
-                      </Box>
+                    {/* Row */}
+                    <Box sx={{ display: "flex", gap: 4, mb: 2 }}>
                       <Box>
-                        {row.averageDeliveryTime
-                          ? `${row.averageDeliveryTime}`
-                          : "N/A"}
+                        <Box sx={{ fontSize: 12, color: "grey" }}>
+                          Owner Name
+                        </Box>
+                        <Box>{row.ownerName || "N/A"}</Box>
+                      </Box>
+
+                      <Box>
+                        <Box sx={{ fontSize: 12, color: "grey" }}>
+                          Alternate Phone
+                        </Box>
+                        <Box>{row.alternatePhone || "N/A"}</Box>
+                      </Box>
+
+                      <Box>
+                        <Box sx={{ fontSize: 12, color: "grey" }}>
+                          Average Delivery Time
+                        </Box>
+                        <Box>
+                          {row.averageDeliveryTime
+                            ? `${row.averageDeliveryTime}`
+                            : "N/A"}
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
-                </Box>
-              )
-          : undefined
-      }
-      /* bulk delete only in active tab */
-      onBulkDelete={
-        isActiveTab
-          ? (rows) => handleBulkDelete(rows.filter(isRestaurant))
-          : undefined
-      }
-      /* Bulk restore only in inactive tab */
-      onBulkRestore={
-        isInactiveTab
-          ? (rows) => handleBulkRestore(rows.filter(isRestaurant))
-          : undefined
-      }
-    />
+                )
+            : undefined
+        }
+        /* bulk delete only in active tab */
+        onBulkDelete={
+          isActiveTab
+            ? (rows) => handleBulkDelete(rows.filter(isRestaurant))
+            : undefined
+        }
+        /* Bulk restore only in inactive tab */
+        onBulkRestore={
+          isInactiveTab
+            ? (rows) => handleBulkRestore(rows.filter(isRestaurant))
+            : undefined
+        }
+      />
+      <MyDialog open={exportOpen} onClose={handleExportClose} maxWidth="xs">
+        <Box sx={{ p: 3 }}>
+          {/* Single Heading */}
+          <Box
+            sx={{
+              mb: 3,
+              fontWeight: "bold",
+              fontSize: 16,
+              textAlign: "center",
+              color: "primary.main",
+            }}
+          >
+            Export As
+          </Box>
+
+          {/* Buttons with icons */}
+          <Stack spacing={2}>
+            <MyButton
+              variant="contained"
+              fullWidth
+              startIcon={<InsertDriveFileIcon />}
+              onClick={() => handleExport("csv")}
+              sx={{ textTransform: "none" }}
+            >
+              CSV
+            </MyButton>
+
+            <MyButton
+              variant="success"
+              fullWidth
+              startIcon={<GridOnIcon />} // Excel icon
+              onClick={exportExcelAllTabs}
+              sx={{ textTransform: "none" }}
+            >
+              Excel
+            </MyButton>
+
+            <MyButton
+              variant="cancel"
+              fullWidth
+              startIcon={<PictureAsPdfIcon />} // PDF icon
+              onClick={() => handleExport("pdf")}
+              sx={{ textTransform: "none" }}
+            >
+              PDF
+            </MyButton>
+          </Stack>
+        </Box>
+      </MyDialog>
+    </>
   );
 };
 

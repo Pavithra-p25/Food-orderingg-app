@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container, Paper, Box, Typography } from "@mui/material";
 import MyTable from "../../components/newcomponents/table/MyTable";
 import { useRestaurantInfo } from "../../hooks/restaurantinfo/useRestaurantInfo";
@@ -13,12 +13,16 @@ import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import { useRestaurantListHandlers } from "../../hooks/restaurantinfo/useRestaurantListHandlers";
-import { ExportRestaurantInfo } from "./ExportRestaurantInfo";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { exportData, getToday } from "../../utils/ExportData";
+import * as XLSX from "xlsx";
+
 
 const RestaurantInfoList = () => {
   const { restaurantInfoList, fetchRestaurantInfo, removeRestaurantInfo } =
@@ -33,6 +37,7 @@ const RestaurantInfoList = () => {
     useState<RestaurantInfoValues | null>(null);
 
   const { showDialog, showSnackbar } = useDialogSnackbar();
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const { handleDelete } = useRestaurantListHandlers({
     setEditingRestaurant,
@@ -44,53 +49,6 @@ const RestaurantInfoList = () => {
   useEffect(() => {
     fetchRestaurantInfo();
   }, []);
-
-  const openExportDialog = (data: RestaurantInfoValues[], title: string) => {
-    showDialog({
-      title,
-      maxWidth: "xs",
-      content: (
-        <Stack spacing={2} mt={1}>
-          <MyButton
-            variant="primary"
-            startIcon={<DescriptionIcon />}
-            onClick={() => {
-              ExportRestaurantInfo(data, "csv");
-              showSnackbar("CSV downloaded successfully", "success");
-            }}
-          >
-            Export as CSV
-          </MyButton>
-
-          <MyButton
-            variant="success"
-            startIcon={<TableChartIcon />}
-            onClick={() => {
-              ExportRestaurantInfo(data, "excel");
-              showSnackbar("Excel downloaded successfully", "success");
-            }}
-          >
-            Export as Excel
-          </MyButton>
-
-          <MyButton
-            variant="cancel"
-            startIcon={<PictureAsPdfIcon />}
-            onClick={() => {
-              ExportRestaurantInfo(data, "pdf");
-              showSnackbar("PDF downloaded successfully", "success");
-            }}
-          >
-            Export as PDF
-          </MyButton>
-        </Stack>
-      ),
-    });
-  };
-
-  const handleRowExport = (row: RestaurantInfoValues) => {
-    openExportDialog([row], row.restaurantName);
-  };
 
   const restaurantColumns = [
     {
@@ -145,13 +103,6 @@ const RestaurantInfoList = () => {
             </IconButton>
           </Tooltip>
 
-          {/* Download */}
-          <Tooltip title="Download">
-            <IconButton color="info" onClick={() => handleRowExport(row)}>
-              <FileDownloadIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
           {/* Delete */}
           <Tooltip title="Delete">
             <IconButton color="error" onClick={() => handleDelete(row)}>
@@ -162,6 +113,260 @@ const RestaurantInfoList = () => {
       ),
     },
   ];
+
+  const exportPreviewAsPdf = async (
+    previewRef: React.RefObject<HTMLDivElement | null>,
+    fileName: string,
+  ) => {
+    if (!previewRef.current) return;
+
+    const clonedElement = previewRef.current.cloneNode(true) as HTMLElement;
+
+    clonedElement.style.position = "absolute";
+    clonedElement.style.top = "-9999px";
+    clonedElement.style.left = "-9999px";
+    clonedElement.style.display = "block";
+    clonedElement.style.width = previewRef.current.offsetWidth + "px";
+
+    // Show PDF-only elements
+    clonedElement.querySelectorAll(".pdf-only").forEach((el) => {
+      (el as HTMLElement).style.display = "block";
+    });
+
+    // Hide buttons
+    clonedElement.querySelectorAll(".no-print").forEach((el) => {
+      (el as HTMLElement).style.display = "none";
+    });
+
+    document.body.appendChild(clonedElement);
+
+    const canvas = await html2canvas(clonedElement, {
+      scale: 2,
+      useCORS: true,
+      scrollY: -window.scrollY,
+    });
+
+    document.body.removeChild(clonedElement);
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+    }
+
+    pdf.save(`${fileName}-${getToday()}.pdf`);
+  };
+
+  const exportRestaurantPreviewExcel = (restaurant: RestaurantInfoValues) => {
+    const rows: any[][] = [];
+
+    // RESTAURANT INFORMATION
+    rows.push(["RESTAURANT INFORMATION", "", "", ""]);
+    rows.push([]);
+
+    rows.push(["Restaurant Name", restaurant.restaurantName, "", ""]);
+    rows.push(["Owner Name", restaurant.ownerName, "", ""]);
+    rows.push([]);
+
+    // BRANCHES
+    rows.push(["BRANCHES", "", "", ""]);
+    rows.push([]);
+
+    rows.push([
+      "Branch Name",
+      "Branch Code",
+      "License Type",
+      "License Number",
+      "Valid From",
+      "Valid Till",
+      "Status",
+    ]);
+
+    restaurant.branches?.forEach((branch) => {
+      if (branch.complianceDetails?.length) {
+        branch.complianceDetails.forEach((c) => {
+          const isExpired = new Date(c.validTill) < new Date();
+
+          rows.push([
+            branch.branchName,
+            branch.branchCode,
+            c.licenseType,
+            c.licenseNumber,
+            new Date(c.validFrom).toLocaleDateString(),
+            new Date(c.validTill).toLocaleDateString(),
+            isExpired ? "Expired" : "Active",
+          ]);
+        });
+      } else {
+        rows.push([
+          branch.branchName,
+          branch.branchCode,
+          "No Compliance",
+          "",
+          "",
+          "",
+          "",
+        ]);
+      }
+    });
+
+    rows.push([]);
+    rows.push([]);
+
+    // MENU ITEMS
+    rows.push(["MENU ITEMS", "", "", ""]);
+    rows.push([]);
+
+    rows.push(["Item Name", "Category", "Price"]);
+
+    restaurant.menuItems?.forEach((item) => {
+      rows.push([item.itemName, item.category, `₹ ${item.price}`]);
+    });
+
+    // Create sheet
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+    // Merge heading rows
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Restaurant Info
+      { s: { r: 5, c: 0 }, e: { r: 5, c: 6 } }, // Branches
+      {
+        s: { r: rows.findIndex((r) => r[0] === "MENU ITEMS"), c: 0 },
+        e: { r: rows.findIndex((r) => r[0] === "MENU ITEMS"), c: 6 },
+      },
+    ];
+
+    // Auto column width
+    const colCount = Math.max(...rows.map((r) => r.length));
+
+    worksheet["!cols"] = Array.from({ length: colCount }).map((_, i) => ({
+      wch:
+        Math.max(
+          15,
+          ...rows.map((row) => (row[i] ? String(row[i]).length : 0)),
+        ) + 2,
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      restaurant.restaurantName.substring(0, 31),
+    );
+
+    XLSX.writeFile(workbook, `${restaurant.restaurantName}-${getToday()}.xlsx`);
+  };
+
+  //csv row
+  const formatPreviewCsvData = (restaurant: RestaurantInfoValues) => {
+  const rows: any[] = [];
+
+  // Header row
+  rows.push([
+    "Restaurant Name",
+    "Owner Name",
+    "Branch Name",
+    "Branch Code",
+    "License Type",
+    "License Number",
+    "Valid From",
+    "Valid Till",
+    "Status",
+    "Menu Item",
+    "Category",
+    "Price",
+  ]);
+
+  // Branches with compliance
+  if (restaurant.branches?.length) {
+    restaurant.branches.forEach((branch) => {
+      if (branch.complianceDetails?.length) {
+        branch.complianceDetails.forEach((c) => {
+          const isExpired = new Date(c.validTill) < new Date();
+          rows.push([
+            restaurant.restaurantName,
+            restaurant.ownerName,
+            branch.branchName,
+            branch.branchCode,
+            c.licenseType,
+            c.licenseNumber,
+            new Date(c.validFrom).toLocaleDateString(),
+            new Date(c.validTill).toLocaleDateString(),
+            isExpired ? "Expired" : "Active",
+            "", // Menu item columns left empty for branch rows
+            "",
+            "",
+          ]);
+        });
+      } else {
+        rows.push([
+          restaurant.restaurantName,
+          restaurant.ownerName,
+          branch.branchName,
+          branch.branchCode,
+          "No Compliance",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+        ]);
+      }
+    });
+  }
+
+  // Menu items (once per restaurant)
+  if (restaurant.menuItems?.length) {
+    restaurant.menuItems.forEach((item) => {
+      rows.push([
+        restaurant.restaurantName,
+        restaurant.ownerName,
+        "", // Branch columns empty
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        item.itemName,
+        item.category,
+        item.price,
+      ]);
+    });
+  }
+
+  return rows;
+};
+
+
+  const formatWholeExportData = (restaurants: RestaurantInfoValues[]) => {
+    return restaurants.map((r) => ({
+      "Restaurant Name": r.restaurantName,
+      "Owner Name": r.ownerName,
+      "Total Branches": r.branches?.length ?? 0,
+      "Total Menu Items": r.menuItems?.length ?? 0,
+    }));
+  };
+
 
   return (
     <Container maxWidth="lg" sx={{ mt: { xs: 2, md: 4 } }}>
@@ -186,7 +391,11 @@ const RestaurantInfoList = () => {
                       variant="primary"
                       startIcon={<DescriptionIcon />}
                       onClick={() => {
-                        ExportRestaurantInfo(restaurantInfoList, "csv");
+                        exportData(
+                          formatWholeExportData(restaurantInfoList),
+                          "csv",
+                          "restaurant-info",
+                        );
                         showSnackbar("CSV downloaded successfully", "success");
                       }}
                     >
@@ -198,7 +407,12 @@ const RestaurantInfoList = () => {
                       variant="success"
                       startIcon={<TableChartIcon />}
                       onClick={() => {
-                        ExportRestaurantInfo(restaurantInfoList, "excel");
+                        exportData(
+                          formatWholeExportData(restaurantInfoList),
+                          "excel",
+                          "restaurant-info",
+                          { sheetName: "Restaurants" },
+                        );
                         showSnackbar(
                           "Excel downloaded successfully",
                           "success",
@@ -213,7 +427,12 @@ const RestaurantInfoList = () => {
                       variant="cancel"
                       startIcon={<PictureAsPdfIcon />}
                       onClick={() => {
-                        ExportRestaurantInfo(restaurantInfoList, "pdf");
+                        exportData(
+                          formatWholeExportData(restaurantInfoList),
+                          "pdf",
+                          "restaurant-info",
+                          { title: "Restaurant Information" },
+                        );
                         showSnackbar("PDF downloaded successfully", "success");
                       }}
                     >
@@ -297,19 +516,101 @@ const RestaurantInfoList = () => {
         maxWidth="md"
       >
         {previewRestaurant && (
-          <Box sx={{ p: 3 }}>
+          <Box ref={previewRef} sx={{ p: 3, backgroundColor: "#fff" }}>
+            {/* Restaurant Name - Only for PDF */}
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              textAlign="center"
+              mb={3}
+              sx={{ display: "none" }}
+              className="pdf-only"
+            >
+              {previewRestaurant.restaurantName.toUpperCase()}
+            </Typography>
+
             {/* Restaurant Header */}
             <Box
               sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 mb: 3,
-                textAlign: "center",
                 borderBottom: "2px solid #1976d2",
                 pb: 2,
               }}
             >
-              <Typography variant="subtitle1" color="text.primary" align="left">
+              <Typography variant="subtitle1" fontWeight="bold">
                 Owner: {previewRestaurant.ownerName.toUpperCase()}
               </Typography>
+
+              <Box className="no-print">
+                <MyButton
+                  variant="primary"
+                  startIcon={<FileDownloadIcon />}
+                  onClick={() => {
+                    showDialog({
+                      title: "Select Export Format",
+                      maxWidth: "xs",
+                      content: (
+                        <Stack spacing={2} mt={1}>
+                          <MyButton
+                            variant="primary"
+                            startIcon={<DescriptionIcon />}
+                            onClick={() => {
+                              exportData(
+                                formatPreviewCsvData(previewRestaurant),
+                                "csv",
+                                previewRestaurant.restaurantName,
+                              );
+                              showSnackbar(
+                                "CSV downloaded successfully",
+                                "success",
+                              );
+                            }}
+                          >
+                            Export as CSV
+                          </MyButton>
+
+                          <MyButton
+                            variant="success"
+                            startIcon={<TableChartIcon />}
+                            onClick={() => {
+                              exportRestaurantPreviewExcel(previewRestaurant);
+
+                              showSnackbar(
+                                "Excel downloaded successfully",
+                                "success",
+                              );
+                            }}
+                          >
+                            Export as Excel
+                          </MyButton>
+
+                          <MyButton
+                            variant="cancel"
+                            startIcon={<PictureAsPdfIcon />}
+                            onClick={async () => {
+                              await exportPreviewAsPdf(
+                                previewRef,
+                                previewRestaurant.restaurantName,
+                              );
+                              showSnackbar(
+                                "PDF downloaded successfully",
+                                "success",
+                              );
+                            }}
+                          >
+                            Export as PDF
+                          </MyButton>
+                        </Stack>
+                      ),
+                    });
+                  }}
+                >
+                  Download
+                </MyButton>
+              </Box>
             </Box>
 
             {/* Branches */}

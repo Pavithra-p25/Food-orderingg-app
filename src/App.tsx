@@ -11,7 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "./components/error/ErrorFallback";
 import { ThemeProvider, ThemeContext } from "./context/ThemeContext";
-import { getTheme } from "./config/theme/Theme";
+import { Theme } from "./config/theme/Theme";
 import { DialogSnackbarProvider } from "./context/DialogSnackbarContext";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
@@ -35,7 +35,6 @@ import { fetchFavorites } from "./redux/slices/FavoritesThunks";
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
-    <Route path="/home" element={<HomePage />} />
     <Route path="/restaurants" element={<RestaurantList />} />
     <Route path="/restaurants/:id" element={<RestaurantMenu />} />
     <Route path="/favorites" element={<FavoritesPage />} />
@@ -77,7 +76,7 @@ const AppContent = () => {
   
 
   return (
-    <MuiThemeProvider theme={getTheme(darkMode ? "dark" : "light")}>
+    <MuiThemeProvider theme={Theme(darkMode ? "dark" : "light")}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <CssBaseline />
         <DialogSnackbarProvider>
