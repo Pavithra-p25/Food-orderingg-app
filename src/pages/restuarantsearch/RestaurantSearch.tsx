@@ -10,9 +10,11 @@ import MyDialog from "../../components/newcomponents/dialog/MyDialog";
 import MyTab from "../../components/newcomponents/tabs/MyTab";
 import RestaurantSearchForm from "./RestaurantSearchForm";
 import RestaurantTable from "./RestaurantTable";
+import { Box } from "@mui/material";
 // HOOK
 import { useRestaurantTableActions } from "../../hooks/restaurant/useRestaurantTableActions";
 import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const RestaurantSearch: React.FC = () => {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ const RestaurantSearch: React.FC = () => {
   const { handleSubmit, reset } = methods;
   const { showSnackbar } = useDialogSnackbar();
 
+  const [openExport, setOpenExport] = useState(false);
   const [results, setResults] = useState<Restaurant[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<Restaurant[]>([]);
   //hook for api actions
@@ -109,13 +112,12 @@ const RestaurantSearch: React.FC = () => {
         const stringMatch = stringFields.every((field) =>
           match(res[field] as string, data[field] as string),
         );
-     const selectedType = data.restaurantType as any;
+        const selectedType = data.restaurantType as any;
 
-const typeMatch =
-  selectedType && selectedType.length > 0
-    ? res.restaurantType?.includes(selectedType)
-    : true;
-
+        const typeMatch =
+          selectedType && selectedType.length > 0
+            ? res.restaurantType?.includes(selectedType)
+            : true;
 
         // Now BOTH must match
         return stringMatch && typeMatch;
@@ -143,6 +145,8 @@ const typeMatch =
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="all"
+          exportOpen={openExport}
+          onCloseExport={() => setOpenExport(false)}
         />
       ),
     },
@@ -156,6 +160,8 @@ const typeMatch =
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="active"
+          exportOpen={openExport}
+          onCloseExport={() => setOpenExport(false)}
         />
       ),
     },
@@ -169,6 +175,8 @@ const typeMatch =
           onDelete={handleDeleteClick}
           onRestore={handleRestoreClick}
           activeTab="inactive"
+          exportOpen={openExport}
+          onCloseExport={() => setOpenExport(false)}
         />
       ),
     },
@@ -183,6 +191,8 @@ const typeMatch =
           onRestore={handleRestoreClick}
           activeTab="Groupby"
           enableGrouping
+          exportOpen={openExport}
+          onCloseExport={() => setOpenExport(false)}
         />
       ),
     },
@@ -204,14 +214,37 @@ const typeMatch =
 
         {/* RESULTS TABLE */}
         <Grid size={12}>
-          <MyTab
-            tabs={tabs}
-            tabStatus={{
-              all: "neutral",
-              active: "success",
-              inactive: "error",
+          <Box
+            sx={{
+              backgroundColor: "#fff",
+              borderRadius: 2,
+              boxShadow: 3,
+              p: 3,
             }}
-          />
+          >
+            <Stack spacing={3}>
+              {/* Export Button */}
+              <Stack direction="row" justifyContent="flex-end">
+                <MyButton
+                  variant="contained"
+                  startIcon={<FileDownloadIcon />}
+                  onClick={() => setOpenExport(true)}
+                >
+                  Export
+                </MyButton>
+              </Stack>
+
+              {/* Tabs + Table */}
+              <MyTab
+                tabs={tabs}
+                tabStatus={{
+                  all: "neutral",
+                  active: "success",
+                  inactive: "error",
+                }}
+              />
+            </Stack>
+          </Box>
         </Grid>
       </Grid>
 

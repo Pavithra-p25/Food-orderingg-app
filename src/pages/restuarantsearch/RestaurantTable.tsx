@@ -8,16 +8,15 @@ import type { Restaurant } from "../../types/RestaurantTypes";
 import { Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import type { Column } from "../../components/newcomponents/table/MyTable";
-import { useState } from "react";
-import { Button, Grid, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import MyDialog from "../../components/newcomponents/dialog/MyDialog";
-import { exportData } from "../../utils/ExportData";
+import { exportData } from "../../utils/export/ExportData";
 import MyButton from "../../components/newcomponents/button/MyButton";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import GridOnIcon from "@mui/icons-material/GridOn"; // for Excel representation
 import { exportPdfAllTabs } from "./ExportPdfAllTabs";
-import * as XLSX from "xlsx";
+import { exportExcelAllTabs } from "./ExportExcelAllTabs";
 
 type Props = {
   results: Restaurant[];
@@ -26,6 +25,8 @@ type Props = {
   onRestore: (ids: string[]) => void;
   activeTab: "all" | "active" | "inactive" | "Groupby";
   enableGrouping?: boolean;
+  exportOpen: boolean;
+  onCloseExport: () => void;
 };
 
 type TableRow =
@@ -41,6 +42,8 @@ const RestaurantTable: React.FC<Props> = ({
   onDelete,
   onRestore,
   activeTab,
+  onCloseExport,
+  exportOpen,
 }) => {
   // Group restaurants by category
   const groupByCategory = (rows: Restaurant[]): TableRow[] => {
@@ -96,11 +99,6 @@ const RestaurantTable: React.FC<Props> = ({
     },
   ];
 
-  const [exportOpen, setExportOpen] = useState(false);
-
-  const handleExportOpen = () => setExportOpen(true);
-  const handleExportClose = () => setExportOpen(false);
-
   // Helper function to convert a Restaurant row into exportable object
   const formatRowForExport = (row: Restaurant) => {
     const rowData: Record<string, any> = {};
@@ -131,14 +129,10 @@ const RestaurantTable: React.FC<Props> = ({
           name: "Inactive",
           data: results.filter((r) => !r.isActive).map(formatRowForExport),
         },
-        {
-          name: "Group By",
-          data: tableRows.filter(isRestaurant).map(formatRowForExport),
-        },
       ];
 
       exportPdfAllTabs(allTabs, { orientation: "landscape" });
-      handleExportClose();
+      onCloseExport();
       return;
     }
 
@@ -158,52 +152,12 @@ const RestaurantTable: React.FC<Props> = ({
       .filter(isRestaurant)
       .map(formatRowForExport); // filter here
     exportData(dataToExport, format, "Restaurants");
-    handleExportClose();
+    onCloseExport();
   };
 
-  const exportExcelAllTabs = () => {
-    const allTabs = [
-      { name: "All", data: results.map(formatRowForExport) },
-      {
-        name: "Active",
-        data: results.filter((r) => r.isActive).map(formatRowForExport),
-      },
-      {
-        name: "Inactive",
-        data: results.filter((r) => !r.isActive).map(formatRowForExport),
-      },
-      {
-        name: "Group By",
-        data: tableRows.filter(isRestaurant).map(formatRowForExport),
-      },
-    ];
-
-    // Create a new workbook
-    const workbook = XLSX.utils.book_new();
-
-    allTabs.forEach((tab) => {
-      const worksheet = XLSX.utils.json_to_sheet(tab.data);
-
-      // Calculate column widths
-      const columns = Object.keys(tab.data[0] || {});
-      const colWidths = columns.map((col) => {
-        const maxLength = Math.max(
-          col.length, // header length
-          ...tab.data.map((row) => ((row[col] || "") + "").length), // cell length
-        );
-        return { wch: maxLength + 2 }; // add 2 for padding
-      });
-
-      worksheet["!cols"] = colWidths;
-
-      // Add sheet to workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, tab.name);
-    });
-
-    // Save the workbook
-    XLSX.writeFile(workbook, "Restaurants.xlsx");
-    handleExportClose();
-  };
+ const handleExcelExport = () => {
+  exportExcelAllTabs(results, formatRowForExport, onCloseExport);
+};
 
   const baseColumns: Column<TableRow>[] = [
     {
@@ -409,16 +363,6 @@ const RestaurantTable: React.FC<Props> = ({
 
   return (
     <>
-      <Grid
-        container
-        size={{ xs: 12 }}
-        sx={{ mb: 2, justifyContent: "flex-end" }}
-      >
-        <Button variant="contained" onClick={handleExportOpen}>
-          Export
-        </Button>
-      </Grid>
-
       <MyTable
         rows={tableRows}
         columns={columns}
@@ -494,7 +438,8 @@ const RestaurantTable: React.FC<Props> = ({
             : undefined
         }
       />
-      <MyDialog open={exportOpen} onClose={handleExportClose} maxWidth="xs">
+
+      <MyDialog open={exportOpen} onClose={onCloseExport} maxWidth="xs">
         <Box sx={{ p: 3 }}>
           {/* Single Heading */}
           <Box
@@ -525,7 +470,7 @@ const RestaurantTable: React.FC<Props> = ({
               variant="success"
               fullWidth
               startIcon={<GridOnIcon />} // Excel icon
-              onClick={exportExcelAllTabs}
+              onClick={handleExcelExport}
               sx={{ textTransform: "none" }}
             >
               Excel
