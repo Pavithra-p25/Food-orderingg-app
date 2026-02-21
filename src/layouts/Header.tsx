@@ -38,7 +38,7 @@ import { useNavigate } from "react-router-dom";
 import Badge from "@mui/material/Badge";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/Store";
-
+import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 
 type FoodMode = "veg" | "nonveg" | null;
 
@@ -122,9 +122,7 @@ const Header: React.FC = () => {
     </Box>
   );
 
-  const favorites = useSelector(
-  (state: RootState) => state.favorites.items
-);
+  const favorites = useSelector((state: RootState) => state.favorites.items);
 
   const isMobile = window.innerWidth < 1200;
   const menuItems = [
@@ -173,19 +171,25 @@ const Header: React.FC = () => {
     {
       text: "Search Restaurant",
       icon: <SearchIcon />,
-      to: "/RestaurantSearch",
+      to: "/restaurantsearch",
       roles: ["admin"],
     },
     {
       text: "Restaurant Info",
       icon: <DescriptionIcon />,
-      to: "/RestaurantInfo",
+      to: "/restaurantinfo",
       roles: ["admin"],
     },
     {
       text: "Restaurant Info List",
       icon: <FormatListBulletedIcon />,
-      to: "/RestaurantInfoList",
+      to: "/restaurantinfolist",
+      roles: ["admin"],
+    },
+    {
+      text: "Dashboard",
+      icon: <DashboardCustomizeIcon />,
+      to: "/dashboard",
       roles: ["admin"],
     },
   ];

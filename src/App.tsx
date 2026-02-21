@@ -30,6 +30,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "./redux/Store";
 import { fetchFavorites } from "./redux/slices/FavoritesThunks";
+import Dashboard from "./pages/Dashboard";
 
 /* Routes */
 const AppRoutes = () => (
@@ -47,6 +48,7 @@ const AppRoutes = () => (
     <Route path="/restaurant-info/edit/:id" element={<RestaurantInfo />} />
     <Route path="/RestaurantInfoList" element={<RestaurantInfoList />} />
     <Route path="/error" element={null} />
+    <Route path="/dashboard" element={<Dashboard />} />
     {/* 404 route */}
     <Route path="/404" element={<NotFound />} />
     <Route path="*" element={<Navigate to="/404" replace />} />
