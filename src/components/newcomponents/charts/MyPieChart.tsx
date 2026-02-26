@@ -7,6 +7,7 @@ export interface MyPieChartProps {
   innerRadius?: number;
   outerRadius?: number;
   arcLabel?: "label" | "value" | "formattedValue" | ((item: any) => string);
+  hideLegend?: boolean;
 }
 
 const MyPieChart: React.FC<MyPieChartProps> = ({
@@ -15,6 +16,7 @@ const MyPieChart: React.FC<MyPieChartProps> = ({
   innerRadius = 0,
   outerRadius = 100,
   arcLabel = "label",
+  hideLegend = false,
 }) => {
   return (
     <MuiPieChart
@@ -27,6 +29,11 @@ const MyPieChart: React.FC<MyPieChartProps> = ({
           arcLabel,
         },
       ]}
+      slotProps={{
+        legend: {
+          hidden: hideLegend,
+        } as any,
+      }}
       sx={{
         "& text": {
           fill: "white",

@@ -30,7 +30,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "./redux/Store";
 import { fetchFavorites } from "./redux/slices/FavoritesThunks";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 /* Routes */
 const AppRoutes = () => (
