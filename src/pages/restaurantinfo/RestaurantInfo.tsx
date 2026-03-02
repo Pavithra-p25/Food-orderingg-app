@@ -117,9 +117,7 @@ const RestaurantInfo: React.FC = () => {
 
   showSnackbar("Restaurant updated successfully", "success");
 
-  setTimeout(() => {
-    navigate("/RestaurantInfoList");
-  }, 1500);
+  navigate("/RestaurantInfoList");
 };
 
 

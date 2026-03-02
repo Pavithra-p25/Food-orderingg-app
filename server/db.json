@@ -803,7 +803,7 @@
       "id": "f693",
       "branches": [
         {
-          "branchName": "main branch1",
+          "branchName": "main branch",
           "branchCode": "MB123",
           "complianceDetails": [
             {
@@ -841,7 +841,7 @@
           "itemName": "Pizza"
         }
       ],
-      "ownerName": "second owner",
+      "ownerName": "second ownerr",
       "restaurantName": "second restaurant"
     },
     {
@@ -860,7 +860,7 @@
           ]
         },
         {
-          "branchName": "branch no2",
+          "branchName": "branch no",
           "branchCode": "HVJV89",
           "complianceDetails": [
             {
@@ -886,7 +886,7 @@
           "itemName": "Naan"
         }
       ],
-      "ownerName": "third owner",
+      "ownerName": "third ownerr",
       "restaurantName": "third restaurant"
     },
     {
@@ -1151,6 +1151,33 @@
       ],
       "ownerName": "Divya",
       "restaurantName": "Green Bowl"
+    },
+    {
+      "id": "de76",
+      "branches": [
+        {
+          "branchName": "branch testing",
+          "branchCode": "DHGJ89",
+          "complianceDetails": [
+            {
+              "licenseType": "FSSAI",
+              "licenseNumber": "12345",
+              "validFrom": "2026-03-15T18:30:00.000Z",
+              "validTill": "2026-04-22T18:30:00.000Z"
+            }
+          ]
+        }
+      ],
+      "menuItems": [
+        {
+          "file": null,
+          "price": 300,
+          "category": "Dessert",
+          "itemName": "idly"
+        }
+      ],
+      "ownerName": "hvjv",
+      "restaurantName": "jbjk"
     }
   ]
 }
