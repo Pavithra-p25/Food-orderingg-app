@@ -73,7 +73,7 @@ describe("RestaurantInfo Tests", () => {
     );
   });
 
-test("resets form and shows changes reverted snackbar when form have changes", async () => {
+test("resets form and shows form resetted snackbar when form have changes", async () => {
   const user = userEvent.setup();
 
   render(
