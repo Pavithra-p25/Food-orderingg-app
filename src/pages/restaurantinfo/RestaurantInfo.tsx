@@ -13,20 +13,17 @@ import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import MyButton from "../../components/newcomponents/button/MyButton";
-import { useDialogSnackbar } from "../../context/DialogSnackbarContext";
+
 import type { RestaurantInfoValues } from "../../types/RestaurantInfoTypes";
 import { restaurantInfoSchema } from "../../schemas/restaurantInfoSchema";
 import { defaultRestaurantValues } from "./data/RestaurantInfoDefault";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import RestaurantDetailsAccordion from "./RestaurantDetailsAccordion";
 import BranchAccordion from "./BranchAccordion";
 import { useRestaurantInfoHandlers } from "../../hooks/restaurantinfo/useRestaurantInfoHandlers";
 import { useRestaurantInfo } from "../../hooks/restaurantinfo/useRestaurantInfo";
 
 const RestaurantInfo: React.FC = () => {
-  const navigate = useNavigate();
-  const { showSnackbar } = useDialogSnackbar();
-
   const methods = useForm<RestaurantInfoValues>({
     defaultValues: defaultRestaurantValues,
     resolver: yupResolver(restaurantInfoSchema),
@@ -42,17 +39,15 @@ const RestaurantInfo: React.FC = () => {
   } = methods;
 
   const { id } = useParams();
-  const { restaurantInfoList, editRestaurantInfo, fetchRestaurantInfo } =
-    useRestaurantInfo();
+  const { restaurantInfoList, fetchRestaurantInfo } = useRestaurantInfo();
 
-   
   const restaurantData = restaurantInfoList.find(
     (r) => String(r.id) === String(id),
   );
 
   useEffect(() => {
-  fetchRestaurantInfo();
-}, []);
+    fetchRestaurantInfo();
+  }, []);
 
   const isEditMode = Boolean(restaurantData);
 
@@ -61,40 +56,40 @@ const RestaurantInfo: React.FC = () => {
     name: "branches",
   });
 
-  /* Prefill form in edit mode */
-  useEffect(() => {
-    if (restaurantData) {
-      const sanitizedData = {
-        ...restaurantData,
-        menuItems:
-          restaurantData.menuItems?.map((item: any) => ({
-            ...item,
-            file: item.file instanceof File ? item.file : null,
-          })) || [],
-      };
-
-      reset(sanitizedData);
-    }
-  }, [restaurantData, reset]);
+  // Prefill in edit mode
+useEffect(() => {
+  if (restaurantData) {
+    const sanitizedData = {
+      ...restaurantData,
+      menuItems:
+        restaurantData.menuItems?.map((item: any) => ({
+          ...item,
+          file: item.file instanceof File ? item.file : null,
+        })) || [],
+    };
+    reset(sanitizedData);
+  }
+}, [restaurantData, reset]);
 
   /*  Accordion handlers  */
   const {
-  expandedRestaurant,
-  setExpandedRestaurant,
-  expandedBranches,
-  setExpandedBranches,
-  expandAll,
-  setExpandAll,
-  handleBranchAdded,
-  handleReset,
-  handleSubmitForm,
-  handleToggleExpandAll,
-} = useRestaurantInfoHandlers({
-  reset,
-  formState: methods.formState, // pass formState for dirtyFields and errors
-  branchCount: branchArray.fields.length,
-  initialData: restaurantData, // optional, only for edit mode
-});
+    expandedRestaurant,
+    setExpandedRestaurant,
+    expandedBranches,
+    setExpandedBranches,
+    expandAll,
+    setExpandAll,
+    handleBranchAdded,
+    handleReset,
+    handleSubmitForm,
+    handleToggleExpandAll,
+    handleUpdateForm,
+  } = useRestaurantInfoHandlers({
+    reset,
+    formState: methods.formState, // pass formState for dirtyFields and errors
+    branchCount: branchArray.fields.length,
+    initialData: restaurantData, // optional, only for edit mode
+  });
 
   useEffect(() => {
     if (restaurantData && branchArray.fields.length > 0) {
@@ -103,23 +98,6 @@ const RestaurantInfo: React.FC = () => {
       setExpandAll(true);
     }
   }, [restaurantData, branchArray.fields.length]);
-
-  /*  Update handler  */
- const handleUpdate = async (data: RestaurantInfoValues) => {
-  const id = data.id || restaurantData?.id;
-
-  if (!id) {
-    showSnackbar("Missing restaurant ID", "error");
-    return;
-  }
-
-  await editRestaurantInfo(id, data);
-
-  showSnackbar("Restaurant updated successfully", "success");
-
-  navigate("/RestaurantInfoList");
-};
-
 
   return (
     <FormProvider {...methods}>
@@ -136,8 +114,7 @@ const RestaurantInfo: React.FC = () => {
               <Tooltip
                 title={expandAll ? "Collapse All Forms" : "Expand All Forms"}
               >
-              <IconButton onClick={handleToggleExpandAll}>
-
+                <IconButton onClick={handleToggleExpandAll}>
                   <UnfoldMoreIcon
                     sx={{
                       transform: expandAll ? "rotate(180deg)" : "rotate(0deg)",
@@ -149,7 +126,7 @@ const RestaurantInfo: React.FC = () => {
 
             <form
               onSubmit={handleSubmit(
-                isEditMode ? handleUpdate : handleSubmitForm,
+                isEditMode ? handleUpdateForm : handleSubmitForm,
               )}
               noValidate
             >
